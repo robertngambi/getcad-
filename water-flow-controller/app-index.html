@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#00bcd4" />
+<title>AquaCtrl — Water Level Controller</title>
+<style>
+/* ============================================================
+   ROOT
+   ============================================================ */
+:root{
+  --cyan:        #00bcd4;
+  --cyan-dark:   #0097a7;
+  --cyan-light:  #4dd0e1;
+  --bg:          #ffffff;
+  --bg-soft:     #f5f7fa;
+  --line:        #e2e8f0;
+  --text:        #0f1720;
+  --text-dim:    #64748b;
+  --text-soft:   #94a3b8;
+  --green:       #22c55e;
+  --red:         #ef4444;
+  --orange:      #f59e0b;
+  --yellow:      #eab308;
+
+  --radius-lg:   22px;
+  --radius-md:   16px;
+  --radius-sm:   10px;
+
+  --shadow-sm:   0 2px 8px rgba(15,23,32,.06);
+  --shadow-md:   0 6px 20px rgba(15,23,32,.08);
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; padding:0; }
+html{ background:#e5e7eb; }
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);
+  background:#e5e7eb;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+/* ============================================================
+   PHONE FRAME
+   ============================================================ */
+.phone-frame{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  height:100vh;
+  max-height:900px;
+  background:var(--bg);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 20px 60px rgba(15,23,32,.18);
+}
+@media (min-width:520px) and (min-height:820px){
+  .phone-frame{ border-radius:36px; height:860px; }
+}
+
+/* ============================================================
+   HEADER — FLAT BOTTOM
+   ============================================================ */
+header.app-header{
+  flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan) 0%, var(--cyan-dark) 100%);
+  padding:14px 16px 16px;
+  /* flat bottom edge, no radius */
+  box-shadow:0 4px 14px rgba(0,188,212,.22);
+  display:flex; align-items:center; justify-content:space-between;
+  color:#fff;
+  z-index:20;
+}
+.header-left{ display:flex; align-items:center; gap:10px; }
+.header-logo{
+  width:36px; height:36px; border-radius:12px;
+  background:rgba(255,255,255,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px;
+}
+.header-title{ font-size:16px; font-weight:700; letter-spacing:.3px; }
+.header-sub{ font-size:10.5px; opacity:.9; margin-top:1px; }
+
+.conn-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.22);
+  padding:6px 11px; border-radius:999px;
+  font-size:10.5px; font-weight:600;
+  cursor:pointer; user-select:none;
+  transition:background .2s;
+}
+.conn-pill:active{ background:rgba(255,255,255,.4); }
+.conn-dot{
+  width:8px; height:8px; border-radius:50%;
+  background:#ff6b6b;
+  box-shadow:0 0 8px rgba(255,107,107,.8);
+  transition:all .3s;
+}
+.conn-dot.connected{
+  background:#a7f3d0; box-shadow:0 0 10px #a7f3d0;
+  animation:pulseDot 1.6s infinite;
+}
+@keyframes pulseDot{
+  0%,100%{ transform:scale(1); opacity:1; }
+  50%{ transform:scale(1.3); opacity:.7; }
+}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+main{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 14px 90px;
+  background:var(--bg);
+  position:relative;
+}
+
+.section{ display:none; animation:fadeIn .25s ease; }
+.section.active{ display:block; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+.section-title{
+  font-size:13px; font-weight:700; color:var(--text);
+  margin:6px 4px 10px; display:flex; align-items:center; gap:8px;
+}
+.section-title .accent{
+  display:inline-block; width:4px; height:14px; border-radius:2px;
+  background:linear-gradient(180deg,var(--cyan),var(--cyan-dark));
+}
+
+/* ============================================================
+   SLIDER HEADER
+   ============================================================ */
+.slider-header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin:0 4px 10px;
+}
+.slider-title{
+  font-size:13px; font-weight:700; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.slider-title .accent{
+  display:inline-block; width:4px; height:14px; border-radius:2px;
+  background:linear-gradient(180deg,var(--cyan),var(--cyan-dark));
+}
+.slider-nav{ display:flex; gap:6px; }
+.slider-arrow{
+  width:30px; height:30px; border-radius:50%;
+  border:1px solid var(--line);
+  background:#fff; color:var(--text);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; cursor:pointer;
+  transition:all .15s;
+  box-shadow:var(--shadow-sm);
+}
+.slider-arrow:active{ transform:scale(.92); background:var(--bg-soft); }
+.slider-arrow:disabled{ opacity:.35; cursor:default; }
+
+/* ============================================================
+   TANK SLIDER
+   ============================================================ */
+.tank-viewport{
+  position:relative;
+  overflow:hidden;
+  margin:0 2px;
+  touch-action:pan-y;
+}
+.tank-track{
+  display:flex;
+  transition:transform .35s cubic-bezier(.22,.8,.3,1);
+  will-change:transform;
+}
+.tank-slide{
+  min-width:100%;
+  padding:4px 2px 12px;
+}
+
+/* Card: tank left, narrow status cards right */
+.tank-card{
+  position:relative;
+  background:#fff;
+  border-radius:var(--radius-lg);
+  padding:18px 16px;
+  box-shadow:var(--shadow-md);
+  border:1px solid var(--line);
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  overflow:hidden;
+}
+.tank-card::before{
+  content:""; position:absolute; top:0; left:20px; right:20px; height:3px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:.9;
+  border-radius:0 0 4px 4px;
+}
+
+/* Left column — tank */
+.tank-left{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  flex-shrink:0;
+}
+.tank-name{
+  font-size:11.5px; font-weight:800; color:var(--text);
+  margin-bottom:12px; letter-spacing:.5px; text-transform:uppercase;
+  text-align:center;
+}
+
+.tank-shape{
+  position:relative;
+  width:165px; height:260px;    /* taller tank */
+  border-radius:20px 20px 26px 26px;
+  background:#f8fafc;
+  border:2px solid #e2e8f0;
+  overflow:hidden;
+  box-shadow:inset 0 0 22px rgba(15,23,32,.05);
+}
+.tank-shape::after{
+  content:""; position:absolute; top:-4px; left:10px; right:10px; height:6px;
+  border-radius:6px; background:#e2e8f0;
+}
+
+/* Water fill — color is set dynamically */
+.water-fill{
+  position:absolute; left:0; right:0; bottom:0;
+  height:0%;
+  background:#22c55e;
+  transition:height .9s cubic-bezier(.25,.8,.3,1), background-color .6s;
+  border-radius:14px 14px 22px 22px;
+}
+.water-fill::before{
+  content:""; position:absolute; top:-6px; left:0; right:0; height:12px;
+  background:radial-gradient(circle at 20% 100%, transparent 60%, rgba(255,255,255,.35) 61%) repeat-x;
+  background-size:24px 12px;
+  animation:wave 3s linear infinite;
+}
+@keyframes wave{
+  0%{ background-position:0 0; }
+  100%{ background-position:24px 0; }
+}
+
+/* ============================================================
+   WATER FILL
+   ------------------------------------------------------------
+   Anchored to the BOTTOM of the tank. Height grows from 0 % at
+   the bottom upward. The wave overlay is pinned to the TOP edge
+   of the fill only, so it travels with the water surface.
+   ============================================================ */
+.water-fill{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;                          /* anchored to bottom */
+  top:auto;                          /* never anchored to top */
+  height:0%;                         /* grows upward */
+  background:#22c55e;
+  transition:height .9s cubic-bezier(.25,.8,.3,1);
+  border-radius:0px 0px 22px 22px;
+  z-index:1;
+  overflow:visible;                  /* allow the wave above the top edge */
+}
+
+/* Wave sits at the top edge of the fill — travels with the water line */
+.water-fill::before{
+  content:"";
+  position:absolute;
+  left:-50%;
+  right:-50%;
+  top:-8px;                          /* small lift so peaks extend above */
+  height:16px;
+  transition:top .9s cubic-bezier(.25,.8,.3,1);
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16' preserveAspectRatio='none'>\
+<path d='M0,8 Q15,0 30,8 T60,8 T90,8 T120,8' fill='none' stroke='rgba(255,255,255,.55)' stroke-width='2'/>\
+</svg>");
+  background-repeat:repeat-x;
+  background-size:120px 16px;
+  animation:wave 4s linear infinite;
+  opacity:.85;
+  pointer-events:none;
+}
+
+@keyframes wave{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(120px); }
+}
+
+.tank-percent{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-weight:800; color:#0f1720;
+  text-shadow:0 1px 4px rgba(255,255,255,.9), 0 0 12px rgba(255,255,255,.7);
+  pointer-events:none;
+  transition:color .3s;
+  z-index:2;
+}
+.tank-percent.light{ color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.45); }
+.tank-percent .val{ font-size:34px; line-height:1; }
+.tank-percent .unit{ font-size:11px; opacity:.9; margin-top:2px; letter-spacing:1px; }
+
+/* Right column — narrow, fixed width, right-aligned */
+.tank-right{
+  width:148px;
+  flex-shrink:0;
+  margin-left:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-self:flex-start;
+}
+
+.stat-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:9px 11px;
+  box-shadow:var(--shadow-sm);
+  display:flex;
+  align-items:center;
+  gap:9px;
+  transition:opacity .3s, background .3s, border-color .3s;
+}
+
+/* Dots */
+.stat-dot{
+  width:12px; height:12px; border-radius:50%;
+  background:#cbd5e1;
+  flex-shrink:0;
+  transition:all .3s;
+}
+/* Color classes: only paint the dot — no animation here */
+.stat-dot.green{
+  background:var(--green);
+  box-shadow:0 0 10px var(--green), 0 0 20px rgba(34,197,94,.5);
+}
+.stat-dot.red{
+  background:var(--red);
+  box-shadow:0 0 10px var(--red), 0 0 20px rgba(239,68,68,.5);
+}
+.stat-dot.orange{
+  background:var(--orange);
+  box-shadow:0 0 10px var(--orange), 0 0 20px rgba(245,158,11,.5);
+}
+.stat-dot.yellow{
+  background:var(--yellow);
+  box-shadow:0 0 10px var(--yellow), 0 0 20px rgba(234,179,8,.5);
+}
+
+/* Blink takes priority — overrides the stable glow */
+.stat-dot.blink{
+  animation:blinkDot 1s steps(2,end) infinite !important;
+}
+
+/* Stable glow — used by dots that should softly pulse (pump, etc.) */
+.stat-dot.glow{
+  animation:pulseLed 1.6s infinite;
+}
+
+@keyframes blinkDot{
+  0%,49%{ opacity:1; }
+  50%,100%{ opacity:.15; }
+}
+@keyframes pulseLed{
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:.65; transform:scale(1.15); }
+}
+
+.stat-body{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.stat-label{
+  font-size:8.5px; font-weight:800; color:var(--text-dim);
+  text-transform:uppercase; letter-spacing:.9px;
+}
+.stat-value{
+  font-size:11.5px; font-weight:800; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* Pump card states */
+.pump-card{
+  background:#f8fafc;
+  border-color:#e2e8f0;
+  opacity:.5;
+  transition:opacity .3s, background .3s, border-color .3s, box-shadow .3s;
+}
+.pump-card.active{
+  opacity:1;
+  background:linear-gradient(135deg, rgba(34,197,94,.10), rgba(34,197,94,.04));
+  border-color:rgba(34,197,94,.35);
+  box-shadow:0 4px 14px rgba(34,197,94,.15);
+}
+.pump-card .stat-value{ color:var(--text-soft); }
+.pump-card.active .stat-value{ color:var(--green); }
+
+/* Fault chip */
+.fault-chip{
+  display:none; align-items:center; gap:6px;
+  font-size:10px; font-weight:700;
+  background:rgba(239,68,68,.1); color:#b91c1c;
+  padding:5px 10px; border-radius:8px;
+}
+.fault-chip.show{ display:inline-flex; }
+
+/* ============================================================
+   SLIDE DOTS
+   ============================================================ */
+.slide-dots{
+  display:flex; justify-content:center; gap:7px;
+  margin:6px 0 16px;
+}
+.slide-dot{
+  width:7px; height:7px; border-radius:50%;
+  background:#cbd5e1; transition:all .25s;
+  cursor:pointer;
+}
+.slide-dot.active{
+  background:var(--cyan);
+  width:22px; border-radius:4px;
+  box-shadow:0 0 10px rgba(0,188,212,.5);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:11px 16px; border-radius:12px; border:none;
+  font-size:12.5px; font-weight:700; letter-spacing:.3px;
+  cursor:pointer; transition:transform .12s, filter .2s, background .2s;
+  user-select:none;
+}
+.btn:active{ transform:scale(.96); }
+.btn-primary{ background:linear-gradient(135deg,var(--cyan),var(--cyan-dark)); color:#fff; box-shadow:0 6px 16px rgba(0,188,212,.28); }
+.btn-secondary{ background:var(--bg-soft); color:var(--text); border:1px solid var(--line); }
+.btn-danger{ background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; box-shadow:0 6px 16px rgba(239,68,68,.28); }
+.btn-success{ background:linear-gradient(135deg,#22c55e,#15803d); color:#fff; box-shadow:0 6px 16px rgba(34,197,94,.28); }
+.btn-ghost{ background:transparent; color:var(--text-dim); border:1px solid var(--line); }
+.btn-block{ width:100%; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card{
+  background:#fff;
+  border-radius:var(--radius-md);
+  padding:14px 16px;
+  margin-bottom:10px;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-sm);
+}
+.card-title{
+  font-size:11.5px; font-weight:800; color:var(--text-dim);
+  text-transform:uppercase; letter-spacing:1px;
+  margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.card-title .accent{
+  display:inline-block; width:3px; height:12px; border-radius:2px;
+  background:var(--cyan);
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+.segmented{
+  display:flex; background:var(--bg-soft); border-radius:12px; padding:4px;
+  border:1px solid var(--line);
+}
+.segmented button{
+  flex:1; padding:10px; border:none; background:transparent;
+  color:var(--text-dim); font-weight:700; font-size:12px;
+  border-radius:9px; cursor:pointer; transition:all .2s;
+  letter-spacing:.4px;
+}
+.segmented button.active{
+  background:linear-gradient(135deg,var(--cyan),var(--cyan-dark));
+  color:#fff;
+  box-shadow:0 4px 12px rgba(0,188,212,.3);
+}
+
+/* Force area — hidden in AUTO, shown in MANUAL */
+.force-area{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  overflow:hidden;
+  max-height:200px;
+  opacity:1;
+  transition:max-height .35s ease, opacity .35s ease, margin-top .35s ease;
+}
+.force-area.hidden{
+  max-height:0;
+  opacity:0;
+  margin-top:0;
+  pointer-events:none;
+}
+.force-area .btn{
+  padding:13px 10px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+
+.setting-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  gap:10px;
+}
+.setting-row:last-child{ border-bottom:none; }
+.setting-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.setting-label{ font-size:12.5px; font-weight:600; color:var(--text); }
+.setting-desc{ font-size:10.5px; color:var(--text-dim); }
+
+.select-wrap{
+  position:relative;
+  background:var(--bg-soft); border-radius:10px;
+  border:1px solid var(--line);
+}
+.select-wrap select{
+  appearance:none; -webkit-appearance:none;
+  background:transparent; border:none; color:var(--text);
+  padding:8px 30px 8px 12px; font-size:12px; font-weight:600;
+  cursor:pointer;
+}
+.select-wrap::after{
+  content:"▾"; position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  color:var(--cyan); pointer-events:none; font-size:13px;
+}
+
+.toggle{
+  position:relative; width:44px; height:26px;
+  background:#cbd5e1; border-radius:999px;
+  cursor:pointer; transition:background .25s;
+  flex-shrink:0;
+}
+.toggle::after{
+  content:""; position:absolute; top:2px; left:2px;
+  width:22px; height:22px; border-radius:50%;
+  background:#fff; transition:all .25s;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+}
+.toggle.on{ background:linear-gradient(135deg,var(--cyan),var(--cyan-dark)); }
+.toggle.on::after{ left:20px; }
+
+/* ============================================================
+   ABOUT / HELP
+   ============================================================ */
+.about-hero{ text-align:center; padding:18px 0 12px; }
+.about-logo{
+  width:70px; height:70px; margin:0 auto 12px;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--cyan),var(--cyan-dark));
+  display:flex; align-items:center; justify-content:center;
+  font-size:34px;
+  box-shadow:0 12px 30px rgba(0,188,212,.35);
+}
+.about-title{ font-size:19px; font-weight:800; }
+.about-version{ font-size:11.5px; color:var(--text-dim); margin-top:3px; }
+
+.help-item{
+  background:#fff;
+  border-radius:var(--radius-md);
+  margin-bottom:8px;
+  border:1px solid var(--line);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.help-item summary{
+  list-style:none; cursor:pointer;
+  padding:13px 14px;
+  font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:space-between;
+  color:var(--text);
+}
+.help-item summary::-webkit-details-marker{ display:none; }
+.help-item summary::after{
+  content:"+"; color:var(--cyan); font-size:18px; font-weight:800;
+  transition:transform .25s;
+}
+.help-item[open] summary::after{ transform:rotate(45deg); }
+.help-body{
+  padding:12px 14px 14px;
+  font-size:12px; line-height:1.6; color:var(--text-dim);
+  border-top:1px solid var(--line);
+}
+.help-body code{
+  background:rgba(0,188,212,.12); color:var(--cyan-dark);
+  padding:1px 6px; border-radius:5px; font-size:11px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+.help-body b{ color:var(--text); }
+
+/* ============================================================
+   BOTTOM NAV
+   ============================================================ */
+nav.bottom-nav{
+  flex-shrink:0;
+  background:#fff;
+  border-top:1px solid var(--line);
+  display:grid; grid-template-columns:repeat(4,1fr);
+  padding:8px 6px 10px;
+  z-index:20;
+  box-shadow:0 -4px 20px rgba(15,23,32,.05);
+}
+.nav-btn{
+  position:relative;
+  background:transparent; border:none;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:8px 4px; cursor:pointer;
+  color:var(--text-soft); font-size:10px; font-weight:600;
+  border-radius:12px; transition:all .2s;
+  letter-spacing:.3px;
+}
+.nav-btn .nav-icon{ font-size:20px; line-height:1; transition:transform .2s; }
+.nav-btn.active{ color:var(--cyan); }
+.nav-btn.active .nav-icon{ transform:translateY(-2px) scale(1.08); }
+.nav-btn.active::after{
+  content:""; position:absolute; top:2px; left:50%; transform:translateX(-50%);
+  width:20px; height:2.5px; border-radius:2px;
+  background:var(--cyan);
+  box-shadow:0 0 10px var(--cyan);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast{
+  position:absolute;
+  bottom:80px; left:50%; transform:translateX(-50%) translateY(30px);
+  background:rgba(15,23,32,.95); color:#fff;
+  padding:10px 18px; border-radius:12px;
+  font-size:12px; font-weight:600;
+  border:1px solid rgba(0,188,212,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  opacity:0; pointer-events:none; transition:all .35s;
+  z-index:100; max-width:88%; text-align:center;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ============================================================
+   LOG
+   ============================================================ */
+.log-panel{
+  background:#0f1720; border-radius:12px; padding:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px; color:#7dd3fc;
+  max-height:150px; overflow-y:auto;
+}
+.log-line{ padding:1px 0; word-break:break-all; }
+.log-line.rx{ color:#7dd3fc; }
+.log-line.tx{ color:#fbbf24; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- ============================================================
+       HEADER (flat bottom)
+       ============================================================ -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-logo">💧</div>
+      <div>
+        <div class="header-title">AquaCtrl</div>
+        <div class="header-sub" id="headerSub">Not connected</div>
+      </div>
+    </div>
+    <div class="conn-pill" id="connPill">
+      <span class="conn-dot" id="connDot"></span>
+      <span id="connText">Connect</span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN
+       ============================================================ -->
+  <main>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="section active" id="sec-dashboard">
+      <div class="slider-header">
+        <div class="slider-title"><span class="accent"></span>Live Tanks</div>
+        <div class="slider-nav">
+          <button class="slider-arrow" id="tankPrev">‹</button>
+          <button class="slider-arrow" id="tankNext">›</button>
+        </div>
+      </div>
+
+      <div class="tank-viewport" id="tankViewport">
+        <div class="tank-track" id="tankTrack">
+          <!-- Slides injected by JS -->
+        </div>
+      </div>
+
+      <div class="slide-dots" id="slideDots">
+        <div class="slide-dot active" data-index="0"></div>
+        <div class="slide-dot" data-index="1"></div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="section" id="sec-settings">
+      <div class="section-title"><span class="accent"></span>System Mode</div>
+      <div class="card">
+        <div class="segmented" id="modeSegmented">
+          <button data-mode="AUTO" class="active">AUTO</button>
+          <button data-mode="MANUAL">MANUAL</button>
+        </div>
+
+        <!-- Force ON / OFF — visible only in MANUAL -->
+        <div class="force-area hidden" id="forceArea">
+          <button class="btn btn-success" id="forceOnBtn">⚡ Force ON</button>
+          <button class="btn btn-danger"  id="forceOffBtn">⏹ Force OFF</button>
+        </div>
+
+        <div class="setting-desc" style="margin-top:12px; text-align:center; font-size:10.5px;" id="modeHint">
+          AUTO manages pumps from sensors automatically.
+        </div>
+      </div>
+
+      <div class="section-title"><span class="accent"></span>Tank Selection</div>
+      <div class="card">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Tank Size (Ultrasonic)</div>
+            <div class="setting-desc">Used to compute water level %</div>
+          </div>
+          <div class="select-wrap">
+            <select id="tankSelect">
+              <option value="0">500 L</option>
+              <option value="1">1,000 L</option>
+              <option value="2">2,000 L</option>
+              <option value="3">5,000 L</option>
+              <option value="4">10,000 L</option>
+              <option value="5">20,000 L</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="accent"></span>Cooling Fan (Test)</div>
+      <div class="card">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Fan Override</div>
+            <div class="setting-desc">Force fan ON/OFF for testing</div>
+          </div>
+          <div class="toggle" id="toggleFan"></div>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="accent"></span>Communication Log</div>
+      <div class="card">
+        <div class="log-panel" id="logPanel">
+          <div class="log-line">Waiting for connection…</div>
+        </div>
+        <button class="btn btn-ghost btn-block" style="margin-top:10px;" id="clearLog">Clear Log</button>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="sec-about">
+      <div class="about-hero">
+        <div class="about-logo">💧</div>
+        <div class="about-title">AquaCtrl</div>
+        <div class="about-version">Version 1.2.0 · Bluetooth Water Level Controller</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="accent"></span>About This App</div>
+        <div class="setting-desc" style="line-height:1.6; font-size:12px;">
+          AquaCtrl connects wirelessly to your WLC-16U4-BT water level controller via Bluetooth LE.
+          It shows real-time water levels for two tanks, controls two pumps, and lets you change
+          modes, tank sizes, and force pump states from your phone. When no hardware is connected,
+          the app runs a live simulation so you can explore all features.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="accent"></span>Hardware</div>
+        <div class="setting-row">
+          <div class="setting-label">MCU</div>
+          <div class="setting-desc">ATmega16U4 @ 8 MHz</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Bluetooth Module</div>
+          <div class="setting-desc">KT6368A (BLE 5.0)</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Baud Rate</div>
+          <div class="setting-desc">115200 8N1</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Inputs</div>
+          <div class="setting-desc">Float switch + HC-SR04</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Outputs</div>
+          <div class="setting-desc">2 × relay + fan</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="accent"></span>Legal</div>
+        <div class="setting-desc" style="line-height:1.6; font-size:11.5px;">
+          This software is provided “as is” without warranty. Do not rely on it as the sole
+          safety mechanism for your water system. Always provide physical overflow protection
+          and inspect wiring regularly.
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HELP ============ -->
+    <section class="section" id="sec-help">
+      <div class="section-title"><span class="accent"></span>Getting Started</div>
+      <details class="help-item" open>
+        <summary>Connecting to the controller</summary>
+        <div class="help-body">
+          1. Power on the controller. The <b>MODE LED</b> should be green.<br>
+          2. Make sure your phone’s Bluetooth is ON.<br>
+          3. Tap the <b>Connect</b> pill in the top-right corner.<br>
+          4. Choose the device named <code>KT6368A</code>.<br>
+          5. When connected, the dot turns green.<br><br>
+          <b>No device?</b> The app runs a live simulation automatically.
+        </div>
+      </details>
+
+      <div class="section-title" style="margin-top:16px;"><span class="accent"></span>Operating Modes</div>
+      <details class="help-item">
+        <summary>AUTO mode</summary>
+        <div class="help-body">
+          The controller monitors both tanks and turns pumps ON/OFF automatically.<br><br>
+          • Pump 1 uses the <b>float switch</b>.<br>
+          • Pump 2 uses the <b>ultrasonic sensor</b>.
+        </div>
+      </details>
+      <details class="help-item">
+        <summary>MANUAL mode &amp; Force ON / OFF</summary>
+        <div class="help-body">
+          Switch to MANUAL to reveal the <b>Force ON</b> and <b>Force OFF</b> buttons in Settings.<br><br>
+          • Force ON pumps water regardless of level.<br>
+          • Force OFF stops the pump immediately.<br>
+          • Return to AUTO when done.
+        </div>
+      </details>
+
+      <div class="section-title" style="margin-top:16px;"><span class="accent"></span>Tank Selection</div>
+      <details class="help-item">
+        <summary>Why tank size matters</summary>
+        <div class="help-body">
+          The ultrasonic sensor only measures <i>distance</i>. To convert that to a
+          <b>water percentage</b>, the controller must know the tank’s height.<br><br>
+          Choose the correct tank from Settings → Tank Selection.
+        </div>
+      </details>
+
+      <div class="section-title" style="margin-top:16px;"><span class="accent"></span>Reading the indicators</div>
+      <details class="help-item">
+        <summary>Water color meaning</summary>
+        <div class="help-body">
+          The fill color is computed continuously from the percentage:<br>
+          • <b>Green</b> — near 100 % (full)<br>
+          • <b>Yellow</b> — around 50 %<br>
+          • <b>Orange</b> — around 25 %<br>
+          • <b>Red</b> — near 0 % (empty)
+        </div>
+      </details>
+      <details class="help-item">
+        <summary>Status cards</summary>
+        <div class="help-body">
+          Right side of each tank shows:
+          <br>• <b>Water level</b> — dot color tracks the fill color
+          <br>• <b>Pump</b> — glows green with ON text when running
+          <br>• <b>Tank</b> — currently selected tank size
+          <br>• <b>Input</b> — float switch or ultrasonic sensor
+        </div>
+      </details>
+
+      <div class="section-title" style="margin-top:16px;"><span class="accent"></span>Simulation</div>
+      <details class="help-item">
+        <summary>What is simulation mode?</summary>
+        <div class="help-body">
+          When no Bluetooth device is connected, the app simulates both tanks filling and draining
+          so you can preview all features. The header shows <b>Simulation</b> to remind you.<br><br>
+          Connecting a real controller stops the simulation immediately.
+        </div>
+      </details>
+
+      <div class="section-title" style="margin-top:16px;"><span class="accent"></span>Troubleshooting</div>
+      <details class="help-item">
+        <summary>Cannot connect via Bluetooth</summary>
+        <div class="help-body">
+          • Ensure the module isn’t paired to another phone.<br>
+          • Restart Bluetooth on your phone.<br>
+          • Move closer (within 5–10 m).<br>
+          • Power-cycle the controller.
+        </div>
+      </details>
+      <details class="help-item">
+        <summary>Wrong water percentage</summary>
+        <div class="help-body">
+          • Re-select the correct tank size.<br>
+          • Verify the ultrasonic sensor is 20 cm above the max water line.<br>
+          • Clean the sensor face.
+        </div>
+      </details>
+
+      <div class="section-title" style="margin-top:16px;"><span class="accent"></span>Safety</div>
+      <details class="help-item">
+        <summary>Important warnings</summary>
+        <div class="help-body">
+          • Mains voltage is dangerous — use a qualified electrician.<br>
+          • Always provide physical overflow protection.<br>
+          • Do not rely on Bluetooth alone for safety.<br>
+          • Keep the controller dry.
+        </div>
+      </details>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       BOTTOM NAV
+       ============================================================ -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-target="sec-dashboard">
+      <span class="nav-icon">💧</span><span>Dashboard</span>
+    </button>
+    <button class="nav-btn" data-target="sec-settings">
+      <span class="nav-icon">⚙️</span><span>Settings</span>
+    </button>
+    <button class="nav-btn" data-target="sec-about">
+      <span class="nav-icon">ℹ️</span><span>About</span>
+    </button>
+    <button class="nav-btn" data-target="sec-help">
+      <span class="nav-icon">❓</span><span>Help</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ============================================================
+   APP STATE
+   ============================================================ */
+const state = {
+  connected: false,
+  device: null,
+  rxChar: null,
+  txChar: null,
+
+  mode: 'AUTO',
+  tankIndex: 0,
+  tankNames: ['500 L','1,000 L','2,000 L','5,000 L','10,000 L','20,000 L'],
+
+  tanks: [
+    { id: 1, name: 'Tank 1', sensor: 'FLOAT', level: 0, pumpOn: false, fault: false },
+    { id: 2, name: 'Tank 2', sensor: 'ULTRA', level: 0, pumpOn: false, fault: false }
+  ],
+
+  temperatureC: null,
+  fanOn: false,
+  lastUpdate: null,
+  rxBuffer: '',
+
+  slide: 0,
+  slideCount: 2
+};
+
+/* BLE UUIDs for KT6368A transparent UART (adjust if yours differs) */
+const BLE = {
+  serviceUuid: '0000ffe0-0000-1000-8000-00805f9b34fb',
+  charUuid:    '0000ffe1-0000-1000-8000-00805f9b34fb',
+  nusService:  '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+  nusTxChar:   '6e400002-b5a3-f393-e0a9-e50e24dcca9e',
+  nusRxChar:   '6e400003-b5a3-f393-e0a9-e50e24dcca9e'
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+function toast(msg, ms = 2200){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+function logLine(text, dir){
+  const panel = $('#logPanel');
+  const now = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.className = 'log-line ' + (dir || '');
+  line.textContent = `[${now}] ${dir === 'tx' ? '→ ' : dir === 'rx' ? '← ' : '  '}${text}`;
+  panel.appendChild(line);
+  panel.scrollTop = panel.scrollHeight;
+  while (panel.children.length > 200) panel.removeChild(panel.firstChild);
+}
+
+/* ============================================================
+   DYNAMIC COLOR FROM PERCENTAGE
+   0% -> red, 25% -> orange, 50% -> yellow, 75% -> lime, 100% -> cyan
+   ============================================================ */
+const COLOR_STOPS = [
+  { p:   0, c: [239,  68,  68] },   /* red */
+  { p:  25, c: [245, 158,  11] },
+  { p:  50, c: [234, 179,   8] },
+  { p:  75, c: [132, 204,  22] },
+  { p: 100, c: [  0, 188, 212] },   /* cyan (full)  */
+];
+
+function levelColor(pct){
+  pct = Math.max(0, Math.min(100, pct));
+  for (let i = 0; i < COLOR_STOPS.length - 1; i++){
+    const a = COLOR_STOPS[i];
+    const b = COLOR_STOPS[i+1];
+    if (pct >= a.p && pct <= b.p){
+      const t = (pct - a.p) / (b.p - a.p);
+      return {
+        r: Math.round(a.c[0] + (b.c[0] - a.c[0]) * t),
+        g: Math.round(a.c[1] + (b.c[1] - a.c[1]) * t),
+        b: Math.round(a.c[2] + (b.c[2] - a.c[2]) * t)
+      };
+    }
+  }
+  const last = COLOR_STOPS[COLOR_STOPS.length - 1].c;
+  return { r:last[0], g:last[1], b:last[2] };
+}
+
+function rgbString(c, a){
+  return a == null
+    ? `rgb(${c.r},${c.g},${c.b})`
+    : `rgba(${c.r},${c.g},${c.b},${a})`;
+}
+
+/* ============================================================
+   TANK SLIDES
+   ============================================================ */
+function buildTankSlides(){
+  const track = $('#tankTrack');
+  track.innerHTML = '';
+  state.tanks.forEach(t => {
+    const slide = document.createElement('div');
+    slide.className = 'tank-slide';
+    slide.innerHTML = `
+      <div class="tank-card" data-tank-id="${t.id}">
+        <div class="tank-left">
+          <div class="tank-name">${t.name}</div>
+          <div class="tank-shape">
+            <div class="water-fill" style="height:0%"></div>
+            <div class="tank-percent">
+              <span class="val" data-val>0</span>
+              <span class="unit">%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tank-right">
+          <div class="stat-card" data-stat="level">
+            <span class="stat-dot" data-level-dot></span>
+            <div class="stat-body">
+              <div class="stat-label">Water Level</div>
+              <div class="stat-value" data-level-text>—</div>
+            </div>
+          </div>
+
+          <div class="stat-card pump-card" data-stat="pump">
+            <div class="stat-body">
+              <div class="stat-label">Pump</div>
+              <div class="stat-value" data-pump-text>OFF</div>
+            </div>
+          </div>
+
+          <div class="stat-card" data-stat="tank">
+            <span class="stat-dot" data-tank-dot></span>
+            <div class="stat-body">
+              <div class="stat-label">Tank</div>
+              <div class="stat-value" data-tank-text>—</div>
+            </div>
+          </div>
+
+          <div class="stat-card" data-stat="input">
+            <div class="stat-body">
+              <div class="stat-label">Input</div>
+              <div class="stat-value" data-input-text>—</div>
+            </div>
+          </div>
+
+          <div class="fault-chip" data-fault>Sensor fault</div>
+        </div>
+      </div>
+    `;
+    track.appendChild(slide);
+  });
+}
+
+function updateTankCard(t){
+  const card = document.querySelector(`.tank-card[data-tank-id="${t.id}"]`);
+  if (!card) return;
+
+  const pct = Math.max(0, Math.min(100, t.level));
+  const col = levelColor(pct);
+
+  /* Water fill */
+  const fill = card.querySelector('.water-fill');
+  fill.style.height = pct + '%';
+  const top    = rgbString({ r:col.r, g:col.g, b:col.b }, .95);
+  const mid    = rgbString(col);
+  const bottom = rgbString({
+    r: Math.max(0, col.r - 40),
+    g: Math.max(0, col.g - 50),
+    b: Math.max(0, col.b - 30)
+  });
+  fill.style.background = `linear-gradient(180deg, ${top} 0%, ${mid} 55%, ${bottom} 100%)`;
+
+  /* Percent text */
+  const pctEl = card.querySelector('.tank-percent');
+  card.querySelector('[data-val]').textContent = Math.round(pct);
+  pctEl.classList.toggle('light', pct > 45);
+
+  /* ---- Water-level stat card ----
+     No blink — just a constant glow that changes colour per % */
+  const lvlDot = card.querySelector('[data-level-dot]');
+  lvlDot.className = 'stat-dot';                 /* no blink class */
+  lvlDot.style.background = rgbString(col);
+  lvlDot.style.boxShadow = `0 0 12px ${rgbString(col)}, 0 0 26px ${rgbString(col, .55)}`;
+  card.querySelector('[data-level-text]').textContent = Math.round(pct) + ' %';
+
+  /* ----- Fault detection on tank ------*/
+  if (t.fault) lvlDot.classList.add('blink');
+
+
+  /* Pump card */
+  const pumpCard = card.querySelector('[data-stat="pump"]');
+  pumpCard.classList.toggle('active', t.pumpOn);
+  card.querySelector('[data-pump-text]').textContent = t.pumpOn ? 'ON' : 'OFF';
+
+  /* ---- Tank selected card ----------------------------------------
+     Mirrors the hardware TM LED behaviour (see table):
+       0 (500 L)    -> orange        solid
+       1 (1000 L)   -> orange        blink
+       2 (2000 L)   -> yellow        solid
+       3 (5000 L)   -> yellow        blink
+       4 (10000 L)  -> green         solid
+       5 (20000 L)  -> green         blink
+     ------------------------------------------------------------------ */
+  const TANK_DOT_MAP = [
+    { cls: 'orange', blink: false },  /* 500 L   */
+    { cls: 'orange', blink: true  },  /* 1000 L  */
+    { cls: 'yellow', blink: false },  /* 2000 L  */
+    { cls: 'yellow', blink: true  },  /* 5000 L  */
+    { cls: 'green',  blink: false },  /* 10000 L */
+    { cls: 'green',  blink: true  },  /* 20000 L */
+  ];
+
+  const tankDot = card.querySelector('[data-tank-dot]');
+  const idx = state.tankIndex;
+  const cfg = TANK_DOT_MAP[idx] || TANK_DOT_MAP[0];
+
+  /* Rebuild the class list from scratch every time so stale classes
+     (like a leftover 'blink' or a previous color) can't stick. */
+  tankDot.className = 'stat-dot ' + cfg.cls + (cfg.blink ? ' blink' : '');
+  tankDot.style.background = '';       /* clear any inline override */
+  tankDot.style.boxShadow = '';        /* clear any inline override */
+
+  card.querySelector('[data-tank-text]').textContent = state.tankNames[idx];
+
+
+
+  /* Input type card */
+  card.querySelector('[data-input-text]').textContent =
+    t.sensor === 'FLOAT' ? 'Float Switch' : 'Ultrasonic Sensor';
+
+  /* Fault */
+  card.querySelector('[data-fault]').classList.toggle('show', t.fault);
+}
+
+function renderAllTanks(){ state.tanks.forEach(updateTankCard); }
+
+/* ============================================================
+   SLIDER
+   ============================================================ */
+function updateSlide(animate = true){
+  const track = $('#tankTrack');
+  const vp = $('#tankViewport');
+  const w = vp.clientWidth;
+  if (!animate) track.style.transition = 'none';
+  track.style.transform = `translateX(${-state.slide * w}px)`;
+  if (!animate){ void track.offsetWidth; track.style.transition = ''; }
+
+  $$('#slideDots .slide-dot').forEach((d, i) =>
+    d.classList.toggle('active', i === state.slide));
+  $('#tankPrev').disabled = state.slide <= 0;
+  $('#tankNext').disabled = state.slide >= state.slideCount - 1;
+}
+
+function goSlide(idx){
+  if (idx < 0 || idx >= state.slideCount) return;
+  state.slide = idx;
+  updateSlide(true);
+}
+
+$('#tankPrev').addEventListener('click', () => goSlide(state.slide - 1));
+$('#tankNext').addEventListener('click', () => goSlide(state.slide + 1));
+$$('#slideDots .slide-dot').forEach(d =>
+  d.addEventListener('click', () => goSlide(Number(d.dataset.index))));
+
+/* Swipe */
+(function attachSwipe(){
+  const vp = $('#tankViewport');
+  let startX = 0, startY = 0, tracking = false, locked = false;
+  const THRESH = 40;
+
+  vp.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    startX = t.clientX; startY = t.clientY;
+    tracking = true; locked = false;
+  }, { passive: true });
+
+  vp.addEventListener('touchmove', (e) => {
+    if (!tracking) return;
+    const t = e.touches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if (!locked){
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) locked = true;
+      else if (Math.abs(dy) > 10) { tracking = false; return; }
+    }
+    if (locked){
+      const vpW = vp.clientWidth;
+      const base = -state.slide * vpW;
+      const track = $('#tankTrack');
+      track.style.transition = 'none';
+      track.style.transform = `translateX(${base + dx}px)`;
+    }
+  }, { passive: true });
+
+  vp.addEventListener('touchend', (e) => {
+    if (!tracking) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    tracking = false;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > THRESH){
+      if (dx < 0) goSlide(state.slide + 1);
+      else        goSlide(state.slide - 1);
+    } else {
+      updateSlide(true);
+    }
+    $('#tankTrack').style.transition = '';
+  }, { passive: true });
+})();
+
+window.addEventListener('resize', () => updateSlide(false));
+
+/* ============================================================
+   MODE & FORCE AREA VISIBILITY
+   ============================================================ */
+function applyModeUI(){
+  $$('#modeSegmented button').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === state.mode));
+
+  const area = $('#forceArea');
+  if (state.mode === 'MANUAL'){
+    area.classList.remove('hidden');
+    $('#modeHint').textContent = 'MANUAL mode: use Force ON / Force OFF to control pumps.';
+  } else {
+    area.classList.add('hidden');
+    $('#modeHint').textContent = 'AUTO manages pumps from sensors automatically.';
+  }
+}
+
+/* ============================================================
+   BLUETOOTH
+   ============================================================ */
+async function connectBluetooth(){
+  if (!navigator.bluetooth){
+    toast('Web Bluetooth not supported on this browser');
+    return;
+  }
+  try{
+    toast('Scanning for devices…');
+    state.device = await navigator.bluetooth.requestDevice({
+      filters: [
+        { namePrefix: 'KT6368' },
+        { namePrefix: 'KT' },
+        { namePrefix: 'BT' }
+      ],
+      optionalServices: [BLE.serviceUuid, BLE.nusService]
+    });
+
+    state.device.addEventListener('gattserverdisconnected', onDisconnected);
+
+    const server = await state.device.gatt.connect();
+    toast('Connected, discovering services…');
+
+    let service = null;
+    try{ service = await server.getPrimaryService(BLE.serviceUuid); }
+    catch(e){ service = await server.getPrimaryService(BLE.nusService); }
+
+    let txChar, rxChar;
+    try{
+      txChar = await service.getCharacteristic(BLE.charUuid);
+      rxChar = txChar;
+    }catch(e){
+      txChar = await service.getCharacteristic(BLE.nusTxChar);
+      rxChar = await service.getCharacteristic(BLE.nusRxChar);
+    }
+
+    state.txChar = txChar;
+    state.rxChar = rxChar;
+
+    await rxChar.startNotifications();
+    rxChar.addEventListener('characteristicvaluechanged', onBleData);
+
+    state.connected = true;
+    setConnUI(true);
+    toast('Connected ✔');
+    SIM.stop();
+    bleSend('?');
+  }catch(err){
+    console.error(err);
+    toast('Connection failed: ' + (err.message || err));
+    state.connected = false;
+    setConnUI(false);
+    SIM.start();
+  }
+}
+
+function onDisconnected(){
+  state.connected = false;
+  setConnUI(false);
+  toast('Disconnected — falling back to simulation');
+  SIM.start();
+}
+
+function setConnUI(on){
+  $('#connDot').classList.toggle('connected', on);
+  $('#connText').textContent = on ? 'Connected' : 'Connect';
+  if (on){
+    $('#headerSub').textContent = state.device?.name || 'Device connected';
+  } else if (typeof SIM !== 'undefined' && SIM.active){
+    $('#headerSub').textContent = 'Simulation';
+  } else {
+    $('#headerSub').textContent = 'Not connected';
+  }
+}
+
+async function bleSend(str){
+  if (!state.txChar) return;
+  try{
+    const enc = new TextEncoder().encode(str);
+    await state.txChar.writeValue(enc);
+    logLine(str.replace(/\r?\n/g,''), 'tx');
+  }catch(e){
+    console.error('Send failed', e);
+  }
+}
+
+function onBleData(event){
+  const value = event.target.value;
+  const text = new TextDecoder().decode(value);
+  state.rxBuffer += text;
+  const lines = state.rxBuffer.split(/\r?\n/);
+  state.rxBuffer = lines.pop();
+  lines.forEach(l => {
+    const line = l.trim();
+    if (!line) return;
+    logLine(line, 'rx');
+    parseStatusLine(line);
+  });
+}
+
+/* ============================================================
+   STATUS PARSER
+   ============================================================ */
+function parseStatusLine(line){
+  if (!line.startsWith('STATUS:')) return;
+  const body = line.substring(7);
+  const kv = {};
+  body.split(',').forEach(p => {
+    const [k,v] = p.split('=');
+    if (k) kv[k.trim()] = (v || '').trim();
+  });
+
+  if (kv.Mode){
+    state.mode = kv.Mode === 'MANUAL' ? 'MANUAL' : 'AUTO';
+    applyModeUI();
+  }
+
+  if (kv.Tank){
+    const idx = state.tankNames.findIndex(n =>
+      n.replace(/[ ,]/g,'').toLowerCase() === kv.Tank.replace(/[ ,]/g,'').toLowerCase());
+    if (idx >= 0) state.tankIndex = idx;
+  }
+
+  if (kv.OUT1) state.tanks[0].pumpOn = (kv.OUT1 === 'ON');
+  if (kv.OUT2) state.tanks[1].pumpOn = (kv.OUT2 === 'ON');
+  if (kv.Fan)  state.fanOn = (kv.Fan === 'ON');
+  if (kv.TEMP) state.temperatureC = Number(kv.TEMP);
+
+  if (kv.LEVEL1) state.tanks[0].level = Number(kv.LEVEL1);
+  else           state.tanks[0].level = state.tanks[0].pumpOn ? 25 : 90;
+
+  if (kv.LEVEL2) state.tanks[1].level = Number(kv.LEVEL2);
+  else           state.tanks[1].level = state.tanks[1].pumpOn ? 22 : 88;
+
+  state.lastUpdate = new Date();
+
+  syncSettingsUI();
+  renderAllTanks();
+}
+
+/* ============================================================
+   SETTINGS EVENTS
+   ============================================================ */
+$('#modeSegmented').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-mode]');
+  if (!btn) return;
+  const mode = btn.dataset.mode;
+  if (state.connected){
+    bleSend(mode === 'AUTO' ? 'A' : 'M');
+  } else {
+    toast('Simulation mode: ' + mode);
+  }
+  state.mode = mode;
+  applyModeUI();
+});
+
+/* Force ON / OFF */
+$('#forceOnBtn').addEventListener('click', () => {
+  if (state.mode !== 'MANUAL'){ toast('Switch to MANUAL first'); return; }
+  if (state.connected) bleSend('O');
+  state.tanks.forEach(t => { t.pumpOn = true; });
+  renderAllTanks();
+  toast('Force ON: pumps running');
+});
+$('#forceOffBtn').addEventListener('click', () => {
+  if (state.mode !== 'MANUAL'){ toast('Switch to MANUAL first'); return; }
+  if (state.connected) bleSend('X');
+  state.tanks.forEach(t => { t.pumpOn = false; });
+  renderAllTanks();
+  toast('Force OFF: pumps stopped');
+});
+
+/* Tank select */
+$('#tankSelect').addEventListener('change', (e) => {
+  const idx = Number(e.target.value);
+  if (state.connected){
+    const steps = (idx - state.tankIndex + state.tankNames.length) % state.tankNames.length;
+    for (let i = 0; i < steps; i++) bleSend('T');
+  }
+  state.tankIndex = idx;
+  renderAllTanks();
+  toast('Tank set to ' + state.tankNames[idx]);
+});
+
+/* Fan override */
+$('#toggleFan').addEventListener('click', () => {
+  state.fanOn = !state.fanOn;
+  if (state.connected) bleSend(state.fanOn ? 'F' : 'f');
+  syncSettingsUI();
+});
+
+$('#clearLog').addEventListener('click', () => { $('#logPanel').innerHTML = ''; });
+
+/* Connect pill */
+$('#connPill').addEventListener('click', () => {
+  if (state.connected){
+    if (state.device?.gatt?.connected) state.device.gatt.disconnect();
+  } else {
+    connectBluetooth();
+  }
+});
+
+/* Nav */
+$$('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const target = btn.dataset.target;
+    $$('.section').forEach(s => s.classList.toggle('active', s.id === target));
+    document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (target === 'sec-dashboard') setTimeout(() => updateSlide(false), 50);
+    if (target === 'sec-settings')  setTimeout(() => applyModeUI(), 30);
+  });
+});
+
+/* ============================================================
+   SYNC SETTINGS UI
+   ============================================================ */
+function syncSettingsUI(){
+  applyModeUI();
+  $('#tankSelect').value = state.tankIndex;
+  $('#toggleFan').classList.toggle('on', state.fanOn);
+}
+
+/* ============================================================
+   SIMULATION ENGINE
+   ============================================================ */
+const SIM = {
+  active: false,
+  timer: null,
+  tickMs: 900,
+
+  start(){
+    if (this.active) return;
+    this.active = true;
+    logLine('▶ Simulation mode ON (no hardware connected)', '');
+
+    /* Seed a pleasant starting state if levels are still 0 */
+    if (state.tanks[0].level === 0) state.tanks[0].level = 42;
+    if (state.tanks[1].level === 0) state.tanks[1].level = 68;
+    state.tanks[0].pumpOn = state.tanks[0].level < 30;
+    state.tanks[1].pumpOn = state.tanks[1].level < 30;
+    state.temperatureC = state.temperatureC ?? 31;
+    state.lastUpdate = new Date();
+    renderAllTanks();
+    syncSettingsUI();
+    setConnUI(false);
+
+    this.timer = setInterval(() => this.tick(), this.tickMs);
+  },
+
+  stop(){
+    if (!this.active) return;
+    this.active = false;
+    clearInterval(this.timer);
+    this.timer = null;
+    logLine('⏹ Simulation mode OFF (hardware connected)', '');
+  },
+
+  tick(){
+    state.tanks.forEach(t => {
+      const delta = t.pumpOn ? 1.1 : -0.55;
+      t.level = Math.max(0, Math.min(100, t.level + delta));
+      if (t.level >= 99) t.pumpOn = false;
+      if (t.level <= 22) t.pumpOn = true;
+    });
+
+    const drift = (Math.random() - 0.5) * 0.8;
+    state.temperatureC = Math.max(25, Math.min(48, (state.temperatureC ?? 31) + drift));
+    state.fanOn = state.temperatureC >= 42;
+
+    state.lastUpdate = new Date();
+
+    const lvl1 = Math.round(state.tanks[0].level);
+    const lvl2 = Math.round(state.tanks[1].level);
+    const line = `STATUS:Mode=${state.mode},Tank=${state.tankNames[state.tankIndex].replace(' ','')},`
+               + `OUT1=${state.tanks[0].pumpOn ? 'ON':'OFF'},OUT2=${state.tanks[1].pumpOn ? 'ON':'OFF'},`
+               + `Fan=${state.fanOn ? 'ON':'OFF'},TEMP=${Math.round(state.temperatureC)},`
+               + `LEVEL1=${lvl1},LEVEL2=${lvl2}`;
+    logLine(line, 'rx');
+
+    renderAllTanks();
+    syncSettingsUI();
+  }
+};
+
+/* ============================================================
+   INIT
+   ============================================================ */
+buildTankSlides();
+syncSettingsUI();
+renderAllTanks();
+
+requestAnimationFrame(() => updateSlide(false));
+window.addEventListener('load', () => updateSlide(false));
+setTimeout(() => updateSlide(false), 200);
+
+/* Auto-start simulation when there's no BLE, or when BLE exists
+   but user hasn't connected within 2.5 seconds */
+if (!navigator.bluetooth){
+  logLine('Bluetooth not supported — simulation only', '');
+  setTimeout(() => SIM.start(), 400);
+} else {
+  setTimeout(() => {
+    if (!state.connected) SIM.start();
+  }, 2500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>GetCAD Utility Admin Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ============================================================
+           ROOT VARIABLES
+           ============================================================ */
+        :root {
+            --primary: #0a2463;
+            --primary-light: #1e3a8a;
+            --primary-dark: #061840;
+            --secondary: #0d9488;
+            --secondary-light: #14b8a6;
+            --secondary-dark: #0f766e;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --danger: #dc2626;
+            --danger-light: #f87171;
+            --success: #16a34a;
+            --success-light: #86efac;
+            --warning: #f97316;
+            --warning-light: #fdba74;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 20px;
+        }
+
+        .sidebar .logo .icon {
+            width: 42px;
+            height: 42px;
+            background: var(--secondary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .sidebar .logo h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .sidebar .logo h1 span {
+            color: var(--secondary-light);
+        }
+        .sidebar .logo small {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        .sidebar .nav-section {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.3);
+            padding: 16px 8px 8px;
+        }
+
+        .sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            margin: 1px 0;
+            position: relative;
+        }
+
+        .sidebar .nav-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: white;
+        }
+
+        .sidebar .nav-item.active {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+        }
+
+        .sidebar .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar .nav-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .sidebar .footer {
+            margin-top: auto;
+            padding: 16px 8px 0;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar .footer .user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .sidebar .footer .user:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .sidebar .footer .user .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .sidebar .footer .user .info {
+            flex: 1;
+        }
+        .sidebar .footer .user .info .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .sidebar .footer .user .info .role {
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           TOP BAR
+           ============================================================ */
+        .topbar {
+            background: white;
+            padding: 12px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-200);
+            flex-shrink: 0;
+        }
+
+        .topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar .left .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--gray-600);
+            cursor: pointer;
+        }
+
+        .topbar .left h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        .topbar .left h2 small {
+            font-weight: 400;
+            color: var(--gray-400);
+            font-size: 13px;
+        }
+
+        .topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar .right .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topbar .right .icon-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .topbar .right .icon-btn .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topbar .right .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            padding: 6px 14px;
+            background: var(--gray-100);
+            border-radius: 40px;
+        }
+
+        .topbar .right .connection-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse-dot 2s infinite;
+        }
+
+        .topbar .right .connection-status .dot.offline {
+            background: var(--danger);
+            animation: none;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ============================================================
+           PAGE CONTENT
+           ============================================================ */
+        .page-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px 40px;
+        }
+
+        /* ============================================================
+           PAGE CONTAINERS
+           ============================================================ */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================
+           STATS CARDS
+           ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin: 4px 0 2px;
+        }
+
+        .stat-card .change {
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .stat-card .change.up {
+            color: var(--success);
+            background: #dcfce7;
+        }
+
+        .stat-card .change.down {
+            color: var(--danger);
+            background: #fee2e2;
+        }
+
+        .stat-card .icon-bg {
+            float: right;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-top: -8px;
+        }
+
+        .stat-card .icon-bg.blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .stat-card .icon-bg.green {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .stat-card .icon-bg.yellow {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .stat-card .icon-bg.red {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .stat-card .icon-bg.teal {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+
+        /* ============================================================
+           CHARTS / GRAPHS
+           ============================================================ */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-card .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-card .header h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .chart-card .header .period {
+            font-size: 12px;
+            color: var(--gray-400);
+            background: var(--gray-100);
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chart-card .header .period:hover {
+            background: var(--gray-200);
+        }
+
+        /* ============================================================
+           BAR CHART (Custom)
+           ============================================================ */
+        .bar-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 160px;
+            gap: 8px;
+            padding-top: 8px;
+        }
+
+        .bar-chart .bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bar-chart .bar {
+            width: 100%;
+            max-width: 32px;
+            border-radius: 6px 6px 2px 2px;
+            background: linear-gradient(180deg, var(--secondary), var(--secondary-light));
+            height: 20px;
+            transition: height 0.6s ease;
+            min-height: 4px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bar-chart .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar-chart .bar .tooltip {
+            display: none;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-900);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .bar-chart .bar:hover .tooltip {
+            display: block;
+        }
+
+        .bar-chart .bar-label {
+            font-size: 10px;
+            color: var(--gray-400);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           TABLE
+           ============================================================ */
+        .table-container {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        .table-container .table-header {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .table-container .table-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .table-container .table-header .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-container .table-header .actions input {
+            padding: 6px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xs);
+            font-size: 12px;
+            font-family: var(--font);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .table-container .table-header .actions input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
+        .table-container .table-header .actions button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: var(--radius-xs);
+            background: var(--secondary);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+
+        .table-container .table-header .actions button:hover {
+            background: var(--secondary-dark);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table th {
+            text-align: left;
+            padding: 12px 20px;
+            background: var(--gray-50);
+            color: var(--gray-500);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        table tr:hover td {
+            background: var(--gray-50);
+        }
+
+        table .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        table .status.active {
+            background: #dcfce7;
+            color: var(--success);
+        }
+
+        table .status.inactive {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        table .status.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        table .status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        table .status.active .dot {
+            background: var(--success);
+        }
+        table .status.inactive .dot {
+            background: var(--danger);
+        }
+        table .status.warning .dot {
+            background: #d97706;
+        }
+
+        table .actions-cell {
+            display: flex;
+            gap: 6px;
+        }
+
+        table .actions-cell button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: var(--radius-xs);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+
+        table .actions-cell .edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        table .actions-cell .edit:hover {
+            background: #bfdbfe;
+        }
+
+        table .actions-cell .view {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+
+        table .actions-cell .view:hover {
+            background: #99f6e4;
+        }
+
+        table .actions-cell .delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        table .actions-cell .delete:hover {
+            background: #fca5a5;
+        }
+
+        /* ============================================================
+           MODALS
+           ============================================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 32px 36px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .modal-box .subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 20px;
+        }
+
+        .modal-box .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-box .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+
+        .modal-box .form-group input,
+        .modal-box .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xs);
+            font-size: 14px;
+            font-family: var(--font);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .modal-box .form-group input:focus,
+        .modal-box .form-group select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
+        .modal-box .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-box .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+
+        .modal-box .modal-actions .cancel {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .modal-box .modal-actions .cancel:hover {
+            background: var(--gray-200);
+        }
+
+        .modal-box .modal-actions .confirm {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .modal-box .modal-actions .confirm:hover {
+            background: var(--secondary-dark);
+        }
+
+        .modal-box .modal-actions .confirm.danger {
+            background: var(--danger);
+        }
+
+        .modal-box .modal-actions .confirm.danger:hover {
+            background: #b91c1c;
+        }
+
+        /* ============================================================
+           TOAST NOTIFICATIONS
+           ============================================================ */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--gray-900);
+            color: white;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.4s ease;
+            min-width: 280px;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .toast i {
+            font-size: 18px;
+        }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        .toast.warning i { color: var(--warning); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .topbar .left .menu-toggle {
+                display: block;
+            }
+
+            .topbar {
+                padding: 12px 16px;
+            }
+
+            .page-content {
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .modal-box {
+                padding: 24px 20px;
+            }
+
+            .modal-box .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .table-container .table-header .actions {
+                flex-wrap: wrap;
+            }
+
+            .topbar .right .connection-status span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card .value {
+                font-size: 22px;
+            }
+        }
+
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        .page-content::-webkit-scrollbar,
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .page-content::-webkit-scrollbar-track,
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .page-content::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+
+        /* ============================================================
+           CUSTOM RADIO TOGGLE
+           ============================================================ */
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-group .toggle-btn {
+            padding: 6px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            background: white;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+
+        .toggle-group .toggle-btn.active {
+            border-color: var(--secondary);
+            background: var(--secondary);
+            color: white;
+        }
+
+        .toggle-group .toggle-btn:hover:not(.active) {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        /* ============================================================
+           METER DETAIL CARD
+           ============================================================ */
+        .meter-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .meter-detail-grid .item {
+            padding: 12px 16px;
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+        }
+
+        .meter-detail-grid .item .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .meter-detail-grid .item .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+           EMPTY STATE
+           ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-400);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--gray-300);
+        }
+
+        .empty-state h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    SIDEBAR
+    ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="icon">G</div>
+            <div>
+                <h1>Get<span>CAD</span></h1>
+                <small>Utility Admin</small>
+            </div>
+        </div>
+
+        <div class="nav-section">Main</div>
+        <a class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a class="nav-item" data-page="meters" onclick="navigateTo('meters')">
+            <i class="fas fa-microchip"></i> Meters
+            <span class="badge">247</span>
+        </a>
+        <a class="nav-item" data-page="customers" onclick="navigateTo('customers')">
+            <i class="fas fa-users"></i> Customers
+            <span class="badge">189</span>
+        </a>
+        <a class="nav-item" data-page="billing" onclick="navigateTo('billing')">
+            <i class="fas fa-file-invoice-dollar"></i> Billing
+        </a>
+        <a class="nav-item" data-page="payments" onclick="navigateTo('payments')">
+            <i class="fas fa-credit-card"></i> Payments
+        </a>
+
+        <div class="nav-section">Management</div>
+        <a class="nav-item" data-page="modes" onclick="navigateTo('modes')">
+            <i class="fas fa-sliders-h"></i> Mode Control
+        </a>
+        <a class="nav-item" data-page="alerts" onclick="navigateTo('alerts')">
+            <i class="fas fa-bell"></i> Alerts & Tamper
+            <span class="badge">12</span>
+        </a>
+        <a class="nav-item" data-page="reports" onclick="navigateTo('reports')">
+            <i class="fas fa-chart-bar"></i> Reports
+        </a>
+        <a class="nav-item" data-page="settings" onclick="navigateTo('settings')">
+            <i class="fas fa-cog"></i> Settings
+        </a>
+
+        <div class="footer">
+            <div class="user">
+                <div class="avatar">RN</div>
+                <div class="info">
+                    <div class="name">Robert Ng'ambi</div>
+                    <div class="role">Super Admin</div>
+                </div>
+                <i class="fas fa-ellipsis-v" style="opacity:0.3;"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <div class="main-content">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div class="left">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 id="pageTitle">Dashboard <small>Overview</small></h2>
+            </div>
+            <div class="right">
+                <div class="connection-status">
+                    <span class="dot" id="connectionDot"></span>
+                    <span id="connectionText">Cloud Connected</span>
+                </div>
+                <button class="icon-btn" onclick="showToast('📬 No new notifications','')">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button class="icon-btn" onclick="showToast('🔄 Syncing with cloud...','')">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="icon-btn" onclick="showToast('👋 Logging out...','')">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="page-content">
+
+            <!-- ============================================================
+            PAGE: DASHBOARD
+            ============================================================ -->
+            <div class="page active" id="page-dashboard">
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon-bg blue"><i class="fas fa-microchip"></i></div>
+                        <div class="label">Total Meters</div>
+                        <div class="value">247</div>
+                        <span class="change up"><i class="fas fa-arrow-up"></i> 12% this month</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg green"><i class="fas fa-user-check"></i></div>
+                        <div class="label">Active Customers</div>
+                        <div class="value">189</div>
+                        <span class="change up"><i class="fas fa-arrow-up"></i> 8% this month</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg yellow"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="label">Monthly Revenue</div>
+                        <div class="value">ZMW 47,250</div>
+                        <span class="change up"><i class="fas fa-arrow-up"></i> 15% this month</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg red"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="label">Active Alerts</div>
+                        <div class="value">12</div>
+                        <span class="change down"><i class="fas fa-arrow-down"></i> 3 from last week</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-bg teal"><i class="fas fa-tint"></i></div>
+                        <div class="label">Water Sold (Month)</div>
+                        <div class="value">185,400 L</div>
+                        <span class="change up"><i class="fas fa-arrow-up"></i> 22% this month</span>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-chart-line" style="color:var(--secondary);margin-right:8px;"></i> Weekly Water Consumption</h4>
+                            <span class="period" onclick="showToast('📊 Filter: This Week','')">This Week <i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div class="bar-chart" id="consumptionChart">
+                            <!-- Bars injected by JS -->
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-pie-chart" style="color:var(--secondary);margin-right:8px;"></i> Mode Distribution</h4>
+                        </div>
+                        <div style="padding: 12px 0;">
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span>Prepaid Mode</span>
+                                <span style="font-weight:700;color:var(--gray-800);">142 <span style="font-weight:400;color:var(--gray-400);font-size:12px;">(57%)</span></span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span>Periodic Mode</span>
+                                <span style="font-weight:700;color:var(--gray-800);">68 <span style="font-weight:400;color:var(--gray-400);font-size:12px;">(28%)</span></span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                                <span>Service Mode</span>
+                                <span style="font-weight:700;color:var(--gray-800);">37 <span style="font-weight:400;color:var(--gray-400);font-size:12px;">(15%)</span></span>
+                            </div>
+                            <div style="margin-top:12px;height:8px;border-radius:12px;background:var(--gray-200);display:flex;overflow:hidden;">
+                                <div style="width:57%;background:var(--secondary);"></div>
+                                <div style="width:28%;background:#f59e0b;"></div>
+                                <div style="width:15%;background:#f97316;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-bell" style="color:var(--warning);margin-right:8px;"></i> Recent Alerts</h4>
+                        <div class="actions">
+                            <button onclick="showToast('✅ All alerts cleared','success')"><i class="fas fa-check"></i> Clear All</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Meter</th>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recent Meters -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-microchip" style="color:var(--secondary);margin-right:8px;"></i> Recent Meters</h4>
+                        <div class="actions">
+                            <input type="text" placeholder="Search meters..." id="meterSearch" oninput="filterMeters()" />
+                            <button onclick="openModal('addMeter')"><i class="fas fa-plus"></i> Add Meter</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Meter ID</th>
+                                <th>Customer</th>
+                                <th>Mode</th>
+                                <th>Units (L)</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="meterTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: METERS
+            ============================================================ -->
+            <div class="page" id="page-meters">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-microchip" style="color:var(--secondary);margin-right:8px;"></i> All Meters</h4>
+                        <div class="actions">
+                            <input type="text" placeholder="Search meters..." id="meterSearchAll" oninput="filterMetersAll()" />
+                            <button onclick="openModal('addMeter')"><i class="fas fa-plus"></i> Add Meter</button>
+                            <button onclick="showToast('📤 Exporting meter data...','')"><i class="fas fa-download"></i> Export</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Meter ID</th>
+                                <th>Customer</th>
+                                <th>Phone</th>
+                                <th>Mode</th>
+                                <th>Units (L)</th>
+                                <th>Status</th>
+                                <th>Last Reading</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="meterTableAll">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: CUSTOMERS
+            ============================================================ -->
+            <div class="page" id="page-customers">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-users" style="color:var(--secondary);margin-right:8px;"></i> All Customers</h4>
+                        <div class="actions">
+                            <input type="text" placeholder="Search customers..." id="customerSearch" oninput="filterCustomers()" />
+                            <button onclick="openModal('addCustomer')"><i class="fas fa-plus"></i> Add Customer</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Meter ID</th>
+                                <th>Mode</th>
+                                <th>Balance (L)</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: BILLING
+            ============================================================ -->
+            <div class="page" id="page-billing">
+                <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card">
+                        <div class="label">Total Billed (Month)</div>
+                        <div class="value" style="font-size:22px;">ZMW 47,250</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Collected</div>
+                        <div class="value" style="font-size:22px;color:var(--success);">ZMW 38,900</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Outstanding</div>
+                        <div class="value" style="font-size:22px;color:var(--danger);">ZMW 8,350</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Collection Rate</div>
+                        <div class="value" style="font-size:22px;">82%</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-file-invoice" style="color:var(--secondary);margin-right:8px;"></i> Billing History</h4>
+                        <div class="actions">
+                            <button onclick="showToast('📊 Generating bill report...','')"><i class="fas fa-file-pdf"></i> Generate Report</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Meter</th>
+                                <th>Amount (ZMW)</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billingTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: PAYMENTS
+            ============================================================ -->
+            <div class="page" id="page-payments">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-credit-card" style="color:var(--secondary);margin-right:8px;"></i> Payment History</h4>
+                        <div class="actions">
+                            <button onclick="showToast('📊 Exporting payment data...','')"><i class="fas fa-download"></i> Export</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Customer</th>
+                                <th>Amount (ZMW)</th>
+                                <th>Units (L)</th>
+                                <th>Method</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: MODES
+            ============================================================ -->
+            <div class="page" id="page-modes">
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-card" style="border-left: 4px solid var(--secondary);">
+                        <div class="label">Prepaid Mode</div>
+                        <div class="value" style="font-size:24px;">142 Meters</div>
+                        <span style="font-size:12px;color:var(--gray-400);">Pay-as-you-go</span>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+                        <div class="label">Periodic Mode</div>
+                        <div class="value" style="font-size:24px;">68 Meters</div>
+                        <span style="font-size:12px;color:var(--gray-400);">30-day credit</span>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #f97316;">
+                        <div class="label">Service Mode</div>
+                        <div class="value" style="font-size:24px;">37 Meters</div>
+                        <span style="font-size:12px;color:var(--gray-400);">Fixed period</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-sliders-h" style="color:var(--secondary);margin-right:8px;"></i> Bulk Mode Management</h4>
+                        <div class="actions">
+                            <select id="bulkModeSelect" style="padding:6px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-size:12px;font-family:var(--font);outline:none;">
+                                <option value="prepaid">Prepaid Mode</option>
+                                <option value="periodic">Periodic Mode</option>
+                                <option value="service">Service Mode</option>
+                            </select>
+                            <button onclick="applyBulkMode()"><i class="fas fa-check"></i> Apply to Selected</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:30px;"><input type="checkbox" id="selectAllModes" onchange="toggleAllModes()" /></th>
+                                <th>Meter ID</th>
+                                <th>Customer</th>
+                                <th>Current Mode</th>
+                                <th>Units (L)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modeTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: ALERTS
+            ============================================================ -->
+            <div class="page" id="page-alerts">
+                <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card" style="border-left:4px solid var(--danger);">
+                        <div class="label">Tamper Alerts</div>
+                        <div class="value" style="font-size:24px;color:var(--danger);">4</div>
+                    </div>
+                    <div class="stat-card" style="border-left:4px solid var(--warning);">
+                        <div class="label">Low Units</div>
+                        <div class="value" style="font-size:24px;color:var(--warning);">8</div>
+                    </div>
+                    <div class="stat-card" style="border-left:4px solid #8b5cf6;">
+                        <div class="label">Expiry Alerts</div>
+                        <div class="value" style="font-size:24px;color:#8b5cf6;">3</div>
+                    </div>
+                    <div class="stat-card" style="border-left:4px solid var(--secondary);">
+                        <div class="label">Resolved</div>
+                        <div class="value" style="font-size:24px;color:var(--success);">42</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-bell" style="color:var(--warning);margin-right:8px;"></i> All Alerts</h4>
+                        <div class="actions">
+                            <button onclick="showToast('✅ All alerts resolved','success')"><i class="fas fa-check"></i> Resolve All</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Meter</th>
+                                <th>Customer</th>
+                                <th>Alert Type</th>
+                                <th>Message</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertTableAll">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: REPORTS
+            ============================================================ -->
+            <div class="page" id="page-reports">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-chart-bar" style="color:var(--secondary);margin-right:8px;"></i> Monthly Revenue</h4>
+                        </div>
+                        <div class="bar-chart" id="revenueChart">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-chart-pie" style="color:var(--secondary);margin-right:8px;"></i> Payment Methods</h4>
+                        </div>
+                        <div style="padding: 12px 0;">
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span>Mobile Money</span>
+                                <span style="font-weight:700;color:var(--gray-800);">62%</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span>Bank Card</span>
+                                <span style="font-weight:700;color:var(--gray-800);">28%</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                                <span>Bank Transfer</span>
+                                <span style="font-weight:700;color:var(--gray-800);">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-download" style="color:var(--secondary);margin-right:8px;"></i> Generate Report</h4>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <select style="padding:10px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);">
+                                <option>Monthly Summary</option>
+                                <option>Weekly Summary</option>
+                                <option>Custom Range</option>
+                            </select>
+                            <div style="display:flex;gap:10px;">
+                                <input type="date" style="flex:1;padding:10px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);" />
+                                <input type="date" style="flex:1;padding:10px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);" />
+                            </div>
+                            <button style="padding:12px;background:var(--secondary);color:white;border:none;border-radius:var(--radius-xs);font-weight:700;cursor:pointer;" onclick="showToast('📊 Generating report...','')">
+                                <i class="fas fa-file-pdf"></i> Generate Report
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-print" style="color:var(--secondary);margin-right:8px;"></i> Quick Reports</h4>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <button style="padding:12px 16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-xs);text-align:left;cursor:pointer;transition:var(--transition);font-family:var(--font);" onclick="showToast('📊 Daily sales report generated','success')">
+                                <i class="fas fa-calendar-day" style="color:var(--secondary);margin-right:8px;"></i> Daily Sales Report
+                            </button>
+                            <button style="padding:12px 16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-xs);text-align:left;cursor:pointer;transition:var(--transition);font-family:var(--font);" onclick="showToast('📊 Weekly sales report generated','success')">
+                                <i class="fas fa-calendar-week" style="color:var(--secondary);margin-right:8px;"></i> Weekly Sales Report
+                            </button>
+                            <button style="padding:12px 16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-xs);text-align:left;cursor:pointer;transition:var(--transition);font-family:var(--font);" onclick="showToast('📊 Monthly sales report generated','success')">
+                                <i class="fas fa-calendar-alt" style="color:var(--secondary);margin-right:8px;"></i> Monthly Sales Report
+                            </button>
+                            <button style="padding:12px 16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-xs);text-align:left;cursor:pointer;transition:var(--transition);font-family:var(--font);" onclick="showToast('📊 NRW analysis report generated','success')">
+                                <i class="fas fa-chart-line" style="color:var(--secondary);margin-right:8px;"></i> NRW Analysis Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            PAGE: SETTINGS
+            ============================================================ -->
+            <div class="page" id="page-settings">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-sliders-h" style="color:var(--secondary);margin-right:8px;"></i> General Settings</h4>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span style="font-weight:500;">Utility Name</span>
+                                <input type="text" value="Lusaka Water Supply" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);width:200px;" />
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span style="font-weight:500;">Currency</span>
+                                <select style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);">
+                                    <option>ZMW</option>
+                                    <option>USD</option>
+                                    <option>EUR</option>
+                                </select>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span style="font-weight:500;">Price per Litre (ZMW)</span>
+                                <input type="number" value="0.25" step="0.01" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);width:120px;" />
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+                                <span style="font-weight:500;">SMS Gateway API</span>
+                                <input type="text" value="https://api.smsgateway.com/v1" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);flex:1;margin-left:12px;" />
+                            </div>
+                            <button style="padding:12px;background:var(--secondary);color:white;border:none;border-radius:var(--radius-xs);font-weight:700;cursor:pointer;" onclick="showToast('✅ Settings saved successfully','success')">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="header">
+                            <h4><i class="fas fa-bell" style="color:var(--secondary);margin-right:8px;"></i> Alert Configuration</h4>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span style="font-weight:500;">Low Units Threshold (Prepaid)</span>
+                                <input type="number" value="100" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);width:100px;" />
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span style="font-weight:500;">Low Units Threshold (Periodic)</span>
+                                <input type="number" value="200" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);width:100px;" />
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+                                <span style="font-weight:500;">Low Units Threshold (Service)</span>
+                                <input type="number" value="50" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-family:var(--font);width:100px;" />
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+                                <span style="font-weight:500;">SMS Alerts</span>
+                                <label style="position:relative;display:inline-block;width:48px;height:26px;">
+                                    <input type="checkbox" checked style="opacity:0;width:0;height:0;" />
+                                    <span style="position:absolute;cursor:pointer;inset:0;background:var(--secondary);border-radius:40px;transition:0.4s;"></span>
+                                    <span style="position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.4s;"></span>
+                                </label>
+                            </div>
+                            <button style="padding:12px;background:var(--secondary);color:white;border:none;border-radius:var(--radius-xs);font-weight:700;cursor:pointer;" onclick="showToast('✅ Alert settings saved','success')">
+                                <i class="fas fa-save"></i> Save Alert Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================
+    MODALS
+    ============================================================ -->
+
+    <!-- Add Meter Modal -->
+    <div class="modal-overlay" id="modalAddMeter">
+        <div class="modal-box">
+            <h3><i class="fas fa-microchip" style="color:var(--secondary);margin-right:8px;"></i> Add New Meter</h3>
+            <div class="subtitle">Register a new water meter in the system.</div>
+            <div class="form-group">
+                <label>Meter Serial Number</label>
+                <input type="text" placeholder="e.g. GET-001-2026" id="newMeterSerial" />
+            </div>
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" placeholder="Customer full name" id="newMeterCustomer" />
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" placeholder="+260 97X XXX XXX" id="newMeterPhone" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Operating Mode</label>
+                    <select id="newMeterMode">
+                        <option value="prepaid">Prepaid</option>
+                        <option value="periodic">Periodic</option>
+                        <option value="service">Service</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Initial Units (Litres)</label>
+                    <input type="number" value="2100" id="newMeterUnits" />
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal('addMeter')">Cancel</button>
+                <button class="confirm" onclick="addMeter()">Add Meter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal-overlay" id="modalAddCustomer">
+        <div class="modal-box">
+            <h3><i class="fas fa-user-plus" style="color:var(--secondary);margin-right:8px;"></i> Add New Customer</h3>
+            <div class="subtitle">Register a new customer in the system.</div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" placeholder="Customer full name" id="newCustomerName" />
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" placeholder="+260 97X XXX XXX" id="newCustomerPhone" />
+            </div>
+            <div class="form-group">
+                <label>Meter Serial (if already installed)</label>
+                <input type="text" placeholder="Leave blank if new meter" id="newCustomerMeter" />
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal('addCustomer')">Cancel</button>
+                <button class="confirm" onclick="addCustomer()">Add Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Meter Modal -->
+    <div class="modal-overlay" id="modalViewMeter">
+        <div class="modal-box">
+            <h3><i class="fas fa-microchip" style="color:var(--secondary);margin-right:8px;"></i> Meter Details</h3>
+            <div class="subtitle" id="viewMeterId">Meter: GET-001-2026</div>
+            <div class="meter-detail-grid" id="meterDetailGrid">
+                <div class="item"><div class="label">Customer</div><div class="value" id="viewCustomer">John Doe</div></div>
+                <div class="item"><div class="label">Phone</div><div class="value" id="viewPhone">+260 97X XXX XXX</div></div>
+                <div class="item"><div class="label">Mode</div><div class="value" id="viewMode">Prepaid</div></div>
+                <div class="item"><div class="label">Units Remaining</div><div class="value" id="viewUnits">1,250 L</div></div>
+                <div class="item"><div class="label">Status</div><div class="value" id="viewStatus">🟢 Active</div></div>
+                <div class="item"><div class="label">Last Reading</div><div class="value" id="viewLastReading">Today, 14:30</div></div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal('viewMeter')">Close</button>
+                <button class="confirm" onclick="showToast('📤 Data exported','success')"><i class="fas fa-download"></i> Export Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        // ============================================================
+        // DATA STORE
+        // ============================================================
+        const data = {
+            meters: [
+                { id: 'GET-001-2026', customer: 'John Doe', phone: '+260 97X XXX XXX', mode: 'prepaid', units: 1250,
+                    status: 'active', lastReading: 'Today, 14:30' },
+                { id: 'GET-002-2026', customer: 'Mary Mwape', phone: '+260 96X XXX XXX', mode: 'periodic', units: 380,
+                    status: 'warning', lastReading: 'Today, 12:15' },
+                { id: 'GET-003-2026', customer: 'Peter Banda', phone: '+260 95X XXX XXX', mode: 'service', units: 45,
+                    status: 'warning', lastReading: 'Today, 10:00' },
+                { id: 'GET-004-2026', customer: 'Grace Phiri', phone: '+260 97X XXX XXX', mode: 'prepaid', units: 2100,
+                    status: 'active', lastReading: 'Yesterday, 16:45' },
+                { id: 'GET-005-2026', customer: 'Michael Zulu', phone: '+260 96X XXX XXX', mode: 'prepaid', units: 0,
+                    status: 'inactive', lastReading: 'Yesterday, 09:20' },
+                { id: 'GET-006-2026', customer: 'Sarah Chanda', phone: '+260 95X XXX XXX', mode: 'periodic', units: 150,
+                    status: 'warning', lastReading: 'Today, 08:00' },
+                { id: 'GET-007-2026', customer: 'David Mwansa', phone: '+260 97X XXX XXX', mode: 'prepaid', units: 850,
+                    status: 'active', lastReading: 'Today, 06:30' },
+            ],
+            alerts: [
+                { meter: 'GET-001-2026', customer: 'John Doe', type: 'Low Units',
+                    message: 'Units below 100L. Please recharge.', time: '2 hours ago', status: 'active' },
+                { meter: 'GET-002-2026', customer: 'Mary Mwape', type: 'Expiry Warning',
+                    message: 'Periodic mode: 2 days remaining.', time: '4 hours ago', status: 'active' },
+                { meter: 'GET-003-2026', customer: 'Peter Banda', type: 'Service Expiry',
+                    message: 'Less than 24 hours remaining.', time: '6 hours ago', status: 'active' },
+                { meter: 'GET-005-2026', customer: 'Michael Zulu', type: 'Tamper Alert',
+                    message: 'Unauthorized access detected.', time: '1 day ago', status: 'active' },
+                { meter: 'GET-006-2026', customer: 'Sarah Chanda', type: 'Low Units',
+                    message: 'Units below 200L. Payment due soon.', time: '1 day ago', status: 'active' },
+            ],
+            billing: [
+                { invoice: 'INV-2026-001', customer: 'John Doe', meter: 'GET-001-2026', amount: 312.50,
+                    period: 'July 2026', status: 'paid' },
+                { invoice: 'INV-2026-002', customer: 'Mary Mwape', meter: 'GET-002-2026', amount: 450.00,
+                    period: 'July 2026', status: 'pending' },
+                { invoice: 'INV-2026-003', customer: 'Peter Banda', meter: 'GET-003-2026', amount: 225.00,
+                    period: 'July 2026', status: 'paid' },
+                { invoice: 'INV-2026-004', customer: 'Grace Phiri', meter: 'GET-004-2026', amount: 525.00,
+                    period: 'July 2026', status: 'paid' },
+                { invoice: 'INV-2026-005', customer: 'Michael Zulu', meter: 'GET-005-2026', amount: 0.00,
+                    period: 'July 2026', status: 'pending' },
+            ],
+            payments: [
+                { id: 'PAY-001', customer: 'John Doe', amount: 312.50, units: 1250, method: 'Mobile Money',
+                    date: '2026-07-10', status: 'completed' },
+                { id: 'PAY-002', customer: 'Peter Banda', amount: 225.00, units: 900, method: 'Bank Card',
+                    date: '2026-07-09', status: 'completed' },
+                { id: 'PAY-003', customer: 'Grace Phiri', amount: 525.00, units: 2100, method: 'Mobile Money',
+                    date: '2026-07-08', status: 'completed' },
+                { id: 'PAY-004', customer: 'Mary Mwape', amount: 150.00, units: 600, method: 'Bank Transfer',
+                    date: '2026-07-07', status: 'pending' },
+                { id: 'PAY-005', customer: 'David Mwansa', amount: 100.00, units: 400, method: 'Mobile Money',
+                    date: '2026-07-06', status: 'completed' },
+            ],
+            weeklyConsumption: [55, 70, 45, 90, 120, 80, 45],
+            monthlyRevenue: [3800, 4200, 3900, 5100, 4700, 5250, 4900, 5600, 5800, 6200, 5900, 4725],
+            days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            selectedModes: [],
+            meterIdCounter: 8,
+            invoiceCounter: 6,
+            paymentCounter: 6,
+        };
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function navigateTo(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            // Show target page
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+            if (navItem) navItem.classList.add('active');
+
+            // Update title
+            const titles = {
+                dashboard: 'Dashboard <small>Overview</small>',
+                meters: 'Meters <small>All Devices</small>',
+                customers: 'Customers <small>Manage Users</small>',
+                billing: 'Billing <small>Invoices & Payments</small>',
+                payments: 'Payments <small>Transaction History</small>',
+                modes: 'Mode Control <small>Manage Operating Modes</small>',
+                alerts: 'Alerts & Tamper <small>Security Monitoring</small>',
+                reports: 'Reports <small>Analytics & Insights</small>',
+                settings: 'Settings <small>System Configuration</small>'
+            };
+            document.getElementById('pageTitle').innerHTML = titles[page] || 'Dashboard';
+
+            // Close sidebar on mobile
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        // ============================================================
+        // SIDEBAR TOGGLE (Mobile)
+        // ============================================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ============================================================
+        // TOAST NOTIFICATIONS
+        // ============================================================
+        function showToast(message, type = '') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+            };
+            const icon = icons[type] || 'fa-info-circle';
+
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // ============================================================
+        // MODALS
+        // ============================================================
+        function openModal(type) {
+            document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('open');
+        }
+
+        function closeModal(type) {
+            document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1)).classList.remove('open');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('open');
+            });
+        });
+
+        // ============================================================
+        // RENDER: Consumption Chart (Dashboard)
+        // ============================================================
+        function renderConsumptionChart() {
+            const container = document.getElementById('consumptionChart');
+            const max = Math.max(...data.weeklyConsumption, 1);
+            container.innerHTML = data.weeklyConsumption.map((val, i) => {
+                const pct = (val / max) * 100;
+                const isToday = i === 6;
+                return `
+                    <div class="bar-wrap">
+                        <div class="bar ${isToday ? 'today' : ''}" style="height:${Math.max(pct, 8)}%;background:${isToday ? 'linear-gradient(180deg, #f59e0b, #d97706)' : 'linear-gradient(180deg, var(--secondary), var(--secondary-light))'};">
+                            <div class="tooltip">${val}L</div>
+                        </div>
+                        <span class="bar-label">${data.days[i]}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // RENDER: Revenue Chart (Reports)
+        // ============================================================
+        function renderRevenueChart() {
+            const container = document.getElementById('revenueChart');
+            const max = Math.max(...data.monthlyRevenue, 1);
+            container.innerHTML = data.monthlyRevenue.map((val, i) => {
+                const pct = (val / max) * 100;
+                const isCurrent = i === 11;
+                return `
+                    <div class="bar-wrap">
+                        <div class="bar" style="height:${Math.max(pct, 8)}%;background:${isCurrent ? 'linear-gradient(180deg, #f59e0b, #d97706)' : 'linear-gradient(180deg, var(--secondary), var(--secondary-light))'};">
+                            <div class="tooltip">ZMW ${val}</div>
+                        </div>
+                        <span class="bar-label">${data.months[i]}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // RENDER: Meters Table
+        // ============================================================
+        function renderMeters(filter = '') {
+            const tbody = document.getElementById('meterTableBody');
+            const allBody = document.getElementById('meterTableAll');
+            const filtered = data.meters.filter(m =>
+                m.id.toLowerCase().includes(filter.toLowerCase()) ||
+                m.customer.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            const statusMap = {
+                active: '<span class="status active"><span class="dot"></span> Active</span>',
+                warning: '<span class="status warning"><span class="dot"></span> Warning</span>',
+                inactive: '<span class="status inactive"><span class="dot"></span> Inactive</span>',
+            };
+
+            const modeMap = {
+                prepaid: 'Prepaid',
+                periodic: 'Periodic',
+                service: 'Service'
+            };
+
+            const rows = filtered.slice(0, 5).map(m => `
+                <tr>
+                    <td><strong>${m.id}</strong></td>
+                    <td>${m.customer}</td>
+                    <td><span style="font-weight:600;color:var(--gray-600);">${modeMap[m.mode]}</span></td>
+                    <td>${m.units.toLocaleString()}</td>
+                    <td>${statusMap[m.status] || statusMap.active}</td>
+                    <td class="actions-cell">
+                        <button class="view" onclick="viewMeter('${m.id}')"><i class="fas fa-eye"></i> View</button>
+                        <button class="edit" onclick="showToast('✏️ Editing ${m.id}','')"><i class="fas fa-edit"></i></button>
+                        <button class="delete" onclick="deleteMeter('${m.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // All meters (full list)
+            const allRows = filtered.map(m => `
+                <tr>
+                    <td><strong>${m.id}</strong></td>
+                    <td>${m.customer}</td>
+                    <td>${m.phone}</td>
+                    <td><span style="font-weight:600;color:var(--gray-600);">${modeMap[m.mode]}</span></td>
+                    <td>${m.units.toLocaleString()}</td>
+                    <td>${statusMap[m.status] || statusMap.active}</td>
+                    <td>${m.lastReading}</td>
+                    <td class="actions-cell">
+                        <button class="view" onclick="viewMeter('${m.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="edit" onclick="showToast('✏️ Editing ${m.id}','')"><i class="fas fa-edit"></i></button>
+                        <button class="delete" onclick="deleteMeter('${m.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray-400);">No meters found</td></tr>';
+            allBody.innerHTML = allRows || '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray-400);">No meters found</td></tr>';
+        }
+
+        // ============================================================
+        // RENDER: Customers Table
+        // ============================================================
+        function renderCustomers(filter = '') {
+            const tbody = document.getElementById('customerTableBody');
+            const filtered = data.meters.filter(m =>
+                m.customer.toLowerCase().includes(filter.toLowerCase()) ||
+                m.phone.includes(filter)
+            );
+
+            const modeMap = {
+                prepaid: 'Prepaid',
+                periodic: 'Periodic',
+                service: 'Service'
+            };
+
+            const rows = filtered.map(m => `
+                <tr>
+                    <td><strong>${m.customer}</strong></td>
+                    <td>${m.phone}</td>
+                    <td>${m.id}</td>
+                    <td><span style="font-weight:600;color:var(--gray-600);">${modeMap[m.mode]}</span></td>
+                    <td>${m.units.toLocaleString()}</td>
+                    <td><span class="status ${m.status}"><span class="dot"></span> ${m.status.charAt(0).toUpperCase() + m.status.slice(1)}</span></td>
+                    <td class="actions-cell">
+                        <button class="view" onclick="viewMeter('${m.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="edit" onclick="showToast('✏️ Editing ${m.customer}','')"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No customers found</td></tr>';
+        }
+
+        // ============================================================
+        // RENDER: Alerts
+        // ============================================================
+        function renderAlerts() {
+            const tbody = document.getElementById('alertTableBody');
+            const allBody = document.getElementById('alertTableAll');
+
+            const alertRows = data.alerts.slice(0, 4).map(a => `
+                <tr>
+                    <td><strong>${a.meter}</strong></td>
+                    <td>${a.customer}</td>
+                    <td><span style="font-weight:600;color:var(--warning);">${a.type}</span></td>
+                    <td>${a.time}</td>
+                    <td><span class="status warning"><span class="dot"></span> Active</span></td>
+                </tr>
+            `).join('');
+
+            const allRows = data.alerts.map(a => `
+                <tr>
+                    <td><strong>${a.meter}</strong></td>
+                    <td>${a.customer}</td>
+                    <td><span style="font-weight:600;color:var(--warning);">${a.type}</span></td>
+                    <td>${a.message}</td>
+                    <td>${a.time}</td>
+                    <td><span class="status warning"><span class="dot"></span> Active</span></td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = alertRows || '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);">No alerts</td></tr>';
+            allBody.innerHTML = allRows || '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray-400);">No alerts</td></tr>';
+        }
+
+        // ============================================================
+        // RENDER: Billing
+        // ============================================================
+        function renderBilling() {
+            const tbody = document.getElementById('billingTableBody');
+            const rows = data.billing.map(b => `
+                <tr>
+                    <td><strong>${b.invoice}</strong></td>
+                    <td>${b.customer}</td>
+                    <td>${b.meter}</td>
+                    <td><strong>ZMW ${b.amount.toFixed(2)}</strong></td>
+                    <td>${b.period}</td>
+                    <td><span class="status ${b.status === 'paid' ? 'active' : 'warning'}"><span class="dot"></span> ${b.status.charAt(0).toUpperCase() + b.status.slice(1)}</span></td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray-400);">No billing records</td></tr>';
+        }
+
+        // ============================================================
+        // RENDER: Payments
+        // ============================================================
+        function renderPayments() {
+            const tbody = document.getElementById('paymentTableBody');
+            const rows = data.payments.map(p => `
+                <tr>
+                    <td><strong>${p.id}</strong></td>
+                    <td>${p.customer}</td>
+                    <td><strong>ZMW ${p.amount.toFixed(2)}</strong></td>
+                    <td>${p.units}</td>
+                    <td>${p.method}</td>
+                    <td>${p.date}</td>
+                    <td><span class="status ${p.status === 'completed' ? 'active' : 'warning'}"><span class="dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray-400);">No payment records</td></tr>';
+        }
+
+        // ============================================================
+        // RENDER: Modes Table
+        // ============================================================
+        function renderModes() {
+            const tbody = document.getElementById('modeTableBody');
+            const modeMap = {
+                prepaid: 'Prepaid',
+                periodic: 'Periodic',
+                service: 'Service'
+            };
+
+            const rows = data.meters.map(m => `
+                <tr>
+                    <td><input type="checkbox" class="mode-checkbox" data-id="${m.id}" onchange="toggleModeSelect('${m.id}')" /></td>
+                    <td><strong>${m.id}</strong></td>
+                    <td>${m.customer}</td>
+                    <td><span style="font-weight:600;color:var(--gray-600);">${modeMap[m.mode]}</span></td>
+                    <td>${m.units.toLocaleString()}</td>
+                    <td class="actions-cell">
+                        <button class="edit" onclick="changeMode('${m.id}')"><i class="fas fa-sliders-h"></i> Change</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray-400);">No meters</td></tr>';
+        }
+
+        // ============================================================
+        // MODE MANAGEMENT
+        // ============================================================
+        function toggleModeSelect(id) {
+            const idx = data.selectedModes.indexOf(id);
+            if (idx > -1) {
+                data.selectedModes.splice(idx, 1);
+            } else {
+                data.selectedModes.push(id);
+            }
+        }
+
+        function toggleAllModes() {
+            const checked = document.getElementById('selectAllModes').checked;
+            document.querySelectorAll('.mode-checkbox').forEach(cb => {
+                cb.checked = checked;
+                if (checked) {
+                    if (!data.selectedModes.includes(cb.dataset.id)) {
+                        data.selectedModes.push(cb.dataset.id);
+                    }
+                } else {
+                    data.selectedModes = [];
+                }
+            });
+        }
+
+        function applyBulkMode() {
+            const mode = document.getElementById('bulkModeSelect').value;
+            if (data.selectedModes.length === 0) {
+                showToast('⚠️ Please select at least one meter', 'warning');
+                return;
+            }
+            data.meters.forEach(m => {
+                if (data.selectedModes.includes(m.id)) {
+                    m.mode = mode;
+                }
+            });
+            data.selectedModes = [];
+            document.querySelectorAll('.mode-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllModes').checked = false;
+            renderModes();
+            renderMeters();
+            showToast(`✅ ${data.selectedModes.length} meters updated to ${mode} mode`, 'success');
+        }
+
+        function changeMode(id) {
+            const modes = ['prepaid', 'periodic', 'service'];
+            const labels = ['Prepaid', 'Periodic', 'Service'];
+            const meter = data.meters.find(m => m.id === id);
+            if (!meter) return;
+            const idx = (modes.indexOf(meter.mode) + 1) % modes.length;
+            meter.mode = modes[idx];
+            renderModes();
+            renderMeters();
+            showToast(`🔄 ${meter.id} changed to ${labels[idx]} mode`, 'success');
+        }
+
+        // ============================================================
+        // CRUD OPERATIONS
+        // ============================================================
+        function addMeter() {
+            const serial = document.getElementById('newMeterSerial').value.trim();
+            const customer = document.getElementById('newMeterCustomer').value.trim();
+            const phone = document.getElementById('newMeterPhone').value.trim();
+            const mode = document.getElementById('newMeterMode').value;
+            const units = parseInt(document.getElementById('newMeterUnits').value) || 2100;
+
+            if (!serial || !customer || !phone) {
+                showToast('⚠️ Please fill in all fields', 'warning');
+                return;
+            }
+
+            // Check for duplicate serial
+            if (data.meters.find(m => m.id === serial)) {
+                showToast('⚠️ Meter serial already exists', 'error');
+                return;
+            }
+
+            data.meters.push({
+                id: serial,
+                customer: customer,
+                phone: phone,
+                mode: mode,
+                units: units,
+                status: 'active',
+                lastReading: 'Just now'
+            });
+
+            closeModal('addMeter');
+            document.getElementById('newMeterSerial').value = '';
+            document.getElementById('newMeterCustomer').value = '';
+            document.getElementById('newMeterPhone').value = '';
+            renderMeters();
+            renderCustomers();
+            renderModes();
+            showToast(`✅ Meter ${serial} added successfully`, 'success');
+        }
+
+        function addCustomer() {
+            const name = document.getElementById('newCustomerName').value.trim();
+            const phone = document.getElementById('newCustomerPhone').value.trim();
+            const meterSerial = document.getElementById('newCustomerMeter').value.trim();
+
+            if (!name || !phone) {
+                showToast('⚠️ Please fill in name and phone', 'warning');
+                return;
+            }
+
+            // If meter serial provided, assign to existing meter or create new
+            if (meterSerial) {
+                const existing = data.meters.find(m => m.id === meterSerial);
+                if (existing) {
+                    existing.customer = name;
+                    existing.phone = phone;
+                } else {
+                    data.meters.push({
+                        id: meterSerial,
+                        customer: name,
+                        phone: phone,
+                        mode: 'prepaid',
+                        units: 2100,
+                        status: 'active',
+                        lastReading: 'Just now'
+                    });
+                }
+            } else {
+                // Create new meter with auto-generated ID
+                const newId = `GET-${String(data.meterIdCounter).padStart(3, '0')}-2026`;
+                data.meters.push({
+                    id: newId,
+                    customer: name,
+                    phone: phone,
+                    mode: 'prepaid',
+                    units: 2100,
+                    status: 'active',
+                    lastReading: 'Just now'
+                });
+                data.meterIdCounter++;
+            }
+
+            closeModal('addCustomer');
+            document.getElementById('newCustomerName').value = '';
+            document.getElementById('newCustomerPhone').value = '';
+            document.getElementById('newCustomerMeter').value = '';
+            renderMeters();
+            renderCustomers();
+            renderModes();
+            showToast(`✅ Customer ${name} added successfully`, 'success');
+        }
+
+        function viewMeter(id) {
+            const meter = data.meters.find(m => m.id === id);
+            if (!meter) {
+                showToast('⚠️ Meter not found', 'error');
+                return;
+            }
+
+            document.getElementById('viewMeterId').textContent = `Meter: ${meter.id}`;
+            document.getElementById('viewCustomer').textContent = meter.customer;
+            document.getElementById('viewPhone').textContent = meter.phone;
+            document.getElementById('viewMode').textContent = meter.mode.charAt(0).toUpperCase() + meter.mode.slice(1);
+            document.getElementById('viewUnits').textContent = meter.units.toLocaleString() + ' L';
+            document.getElementById('viewStatus').textContent = meter.status === 'active' ? '🟢 Active' :
+                meter.status === 'warning' ? '🟡 Warning' : '🔴 Inactive';
+            document.getElementById('viewLastReading').textContent = meter.lastReading;
+
+            openModal('viewMeter');
+        }
+
+        function deleteMeter(id) {
+            if (confirm(`Are you sure you want to delete meter ${id}?`)) {
+                data.meters = data.meters.filter(m => m.id !== id);
+                renderMeters();
+                renderCustomers();
+                renderModes();
+                showToast(`🗑️ Meter ${id} deleted`, 'error');
+            }
+        }
+
+        // ============================================================
+        // FILTER FUNCTIONS
+        // ============================================================
+        function filterMeters() {
+            const query = document.getElementById('meterSearch').value;
+            renderMeters(query);
+        }
+
+        function filterMetersAll() {
+            const query = document.getElementById('meterSearchAll').value;
+            renderMeters(query);
+        }
+
+        function filterCustomers() {
+            const query = document.getElementById('customerSearch').value;
+            renderCustomers(query);
+        }
+
+        // ============================================================
+        // CONNECTION STATUS SIMULATION
+        // ============================================================
+        function updateConnectionStatus() {
+            const dot = document.getElementById('connectionDot');
+            const text = document.getElementById('connectionText');
+
+            // Simulate occasional disconnect/reconnect
+            if (Math.random() > 0.9) {
+                dot.className = 'dot offline';
+                text.textContent = 'Offline - Retrying...';
+                setTimeout(() => {
+                    dot.className = 'dot';
+                    text.textContent = 'Cloud Connected';
+                    showToast('🔄 Reconnected to cloud', 'success');
+                }, 3000);
+            }
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+        function init() {
+            renderConsumptionChart();
+            renderRevenueChart();
+            renderMeters();
+            renderCustomers();
+            renderAlerts();
+            renderBilling();
+            renderPayments();
+            renderModes();
+
+            // Update connection status every 30 seconds
+            setInterval(updateConnectionStatus, 30000);
+
+            // Simulate real-time updates
+            setInterval(() => {
+                // Randomly update some units
+                data.meters.forEach(m => {
+                    if (m.units > 0 && Math.random() > 0.7) {
+                        m.units = Math.max(0, m.units - Math.random() * 5);
+                        if (m.units <= 50 && m.status !== 'warning') m.status = 'warning';
+                        if (m.units === 0) m.status = 'inactive';
+                    }
+                });
+                // Update dashboard stats periodically
+                renderMeters();
+                renderCustomers();
+            }, 10000);
+
+            console.log('🚀 GetCAD Utility Admin Platform initialized');
+            console.log('📊 Total Meters:', data.meters.length);
+            console.log('👥 Total Customers:', data.meters.filter(m => m.customer).length);
+            console.log('⚠️ Active Alerts:', data.alerts.length);
+        }
+
+        // Run initialization
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

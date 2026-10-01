@@ -1,0 +1,823 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>GetCAD Technologies Ltd - Electronics & Mechanical Design</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* reset + base */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; color:#1e293b; line-height:1.6; background:#fff; overflow-x:hidden; }
+    a { text-decoration:none; color:inherit; }
+    img { max-width:100%; display:block; }
+    .container { max-width:1200px; margin:0 auto; padding:0 24px; }
+    :root {
+      --primary:#0a2463; --primary-light:#1e3a8a; --primary-dark:#061840;
+      --secondary:#0d9488; --secondary-light:#14b8a6; --secondary-dark:#0f766e;
+      --accent:#f59e0b; --accent-light:#fbbf24;
+      --success:#16a34a; --danger:#dc2626;
+      --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0; --gray-300:#cbd5e1;
+      --gray-400:#94a3b8; --gray-500:#64748b; --gray-600:#475569; --gray-700:#334155;
+      --gray-800:#1e293b; --gray-900:#0f172a;
+      --shadow:0 4px 20px rgba(0,0,0,0.08); --shadow-lg:0 10px 40px rgba(0,0,0,0.12);
+      --radius:16px; --radius-sm:10px; --radius-xs:6px;
+      --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      --font:'Inter',sans-serif;
+    }
+    .btn { display:inline-flex; align-items:center; gap:10px; padding:14px 32px; border:none; border-radius:50px; font-size:15px; font-weight:700; cursor:pointer; transition:var(--transition); font-family:var(--font); }
+    .btn-primary { background:var(--secondary); color:#fff; box-shadow:0 4px 16px rgba(13,148,136,0.35); }
+    .btn-primary:hover { background:var(--secondary-dark); transform:translateY(-3px) scale(1.02); }
+    .btn-secondary { background:var(--primary); color:#fff; box-shadow:0 4px 16px rgba(10,36,99,0.3); }
+    .btn-secondary:hover { background:var(--primary-light); transform:translateY(-3px) scale(1.02); }
+    .btn-success { background:var(--success); color:#fff; }
+    .btn-success:hover { background:#15803d; transform:translateY(-3px) scale(1.02); }
+
+    /* header */
+    .header { background:var(--primary); padding:0 16px; position:fixed; top:0; left:0; right:0; z-index:1000; box-shadow:0 2px 20px rgba(0,0,0,0.15); }
+    .header .container { display:flex; justify-content:space-between; align-items:center; padding:10px 0; }
+    .logo { display:flex; align-items:center; gap:8px; font-weight:800; font-size:20px; color:#fff; }
+    .logo .icon { width:36px; height:36px; background:var(--secondary); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff; font-weight:900; }
+    .logo span { color:var(--secondary-light); }
+
+    /* hamburger button - 3 parallel lines */
+    .hamburger { display:block; background:none; border:none; cursor:pointer; padding:8px 4px; z-index:1001; }
+    .hamburger span { display:block; width:28px; height:3px; background:#fff; margin:5px 0; border-radius:2px; transition:var(--transition); }
+    .hamburger:hover span { background:var(--secondary-light); }
+
+    /* mobile nav - hidden by default, shown when .open */
+    .nav-mobile { display:none; flex-direction:column; background:var(--primary-dark); padding:20px 16px; border-radius:var(--radius-sm); position:absolute; top:68px; left:16px; right:16px; gap:12px; box-shadow:0 20px 40px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); }
+    .nav-mobile.open { display:flex; }
+    .nav-mobile a { color:rgba(255,255,255,0.8); font-size:15px; font-weight:500; transition:var(--transition); padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .nav-mobile a:last-child { border-bottom:none; }
+    .nav-mobile a:hover { color:#fff; }
+    .nav-mobile .btn-quote { background:var(--success); color:#fff; padding:10px 20px; border-radius:50px; font-weight:700; font-size:14px; text-align:center; border:none; margin-top:4px; }
+    .nav-mobile .btn-quote:hover { background:#15803d; transform:scale(1.03); }
+    .nav-mobile a.active-link { color:#fff !important; font-weight:700; }
+
+    /* desktop nav */
+    .nav-desktop { display:none; align-items:center; cursor: pointer; gap:28px; }
+    .nav-desktop a { color:rgba(255,255,255,0.75); font-size:14px; font-weight:500; transition:var(--transition); position:relative; }
+    .nav-desktop a:hover { color:#fff; }
+    .nav-desktop a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--secondary-light); transition:var(--transition); }
+    .nav-desktop a:hover::after { width:100%; }
+    .nav-desktop .btn-quote { background:var(--success); color:#fff; padding:8px 20px; border-radius:50px; font-weight:700; font-size:13px; }
+    .nav-desktop .btn-quote:hover { background:#15803d; transform:scale(1.05); }
+    .nav-desktop a.active-link { color:#fff !important; font-weight:700; }
+    .nav-desktop a.active-link::after { width:100% !important; }
+
+    /* sections */
+    .section { display:none; padding:60px 0; animation:fadeIn 0.4s ease; }
+    .section.active { display:block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    /* home hero */
+    .section#home { display:block; min-height:100vh; display:flex; align-items:center; position:relative; padding-top:80px; background:linear-gradient(180deg,#dbeafe 0%,#fff 70%); }
+    .section#home .container { display:grid; grid-template-columns:1fr; gap:40px; align-items:center; padding-top:20px; padding-bottom:40px; position:relative; z-index:2; }
+    .hero-carousel { position:absolute; inset:0; overflow:hidden; }
+    .hero-carousel .slide { position:absolute; inset:0; opacity:0; width: 100%; height: 100%; margin-top: 10px; transition:opacity 1.5s ease; background-size:cover; background-position:center; background-repeat: no-repeat;}
+    .hero-carousel .slide.active { opacity: 1; }
+    .hero-carousel .slide::after { content: ''; position: absolute; inset: 0; /*background: linear-gradient(180deg, rgba(255,255,255,0.88)0%, rgba(255,255,255,0.7)100%);*/ pointer-events: none;}
+    /*
+    .hero-carousel .slide:nth-child(1) { background:linear-gradient(135deg,#0a2463,#1e3a8a,#0d9488); }
+    .hero-carousel .slide:nth-child(2) { background:linear-gradient(135deg,#0d9488,#14b8a6,#0a2463); }
+    .hero-carousel .slide:nth-child(3) { background:linear-gradient(135deg,#1e3a8a,#0d9488,#0a2463); }----*/
+    
+    .hero-content-container { position:relative; z-index:2; padding:10px 0; }
+    .hero-content h1 { font-size:32px; font-weight:900; line-height:1.1; color:var(--primary); margin-bottom:12px; }
+    .hero-content h1 span { color:var(--secondary); }
+    .hero-content p { font-size:16px; color:var(--gray-600); margin-bottom:8px; max-width:100%; line-height: 2.0;}
+    .hero-content .sub-text { font-size:14px; color:var(--gray-500); margin-bottom:20px; }
+    .hero-buttons { display:flex; gap:12px; flex-wrap:wrap; }
+    .hero-buttons .btn { flex:1 1 auto; justify-content:center; }
+    .carousel-dots { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:12px; z-index:3; }
+    .carousel-dots .dot { width:12px; height:12px; border-radius:50%; background:rgba(10,36,99,0.25); cursor:pointer; transition:var(--transition); border:none; }
+    .carousel-dots .dot.active { background:var(--secondary); transform:scale(1.2); }
+
+    /* section header */
+    .section-header { text-align:center; max-width:680px; margin:0 auto 40px; }
+    .section-header .tag { display:inline-block; background:rgba(13,148,136,0.1); color:var(--secondary); padding:4px 16px; border-radius:40px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+    .section-header h2 { font-size:30px; font-weight:800; color:var(--primary); margin-bottom:8px; }
+    .section-header h2 span { color:var(--secondary); }
+    .section-header p { color:var(--gray-500); font-size:16px; line-height:1.7; }
+
+    /* services */
+    .services-grid { display:grid; grid-template-columns:1fr; gap:24px; }
+    .service-card { background:#fff; border-radius:var(--radius); padding:28px 20px; box-shadow:var(--shadow); border:1px solid var(--gray-100); text-align:center; transition:var(--transition); }
+    .service-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-lg); }
+    .service-card .icon { width:60px; height:60px; border-radius:16px; background:rgba(13,148,136,0.1); color:var(--secondary); display:flex; align-items:center; justify-content:center; font-size:26px; margin:0 auto 14px; }
+    .service-card h4 { font-size:18px; font-weight:700; color:var(--primary); margin-bottom:6px; }
+    .service-card p { font-size:14px; color:var(--gray-500); margin-bottom:14px; line-height:1.6; }
+    .service-card .features { list-style:none; text-align:left; font-size:13px; color:var(--gray-600); }
+    .service-card .features li { padding:4px 0; display:flex; align-items:center; gap:8px; }
+    .service-card .features li i { color:var(--secondary); font-size:12px; }
+
+    /* water meter */
+    .section#water-meter { background:linear-gradient(180deg,#0a2463 0%,#0d9488 100%); color:#fff; }
+    .section#water-meter .section-header h2 { color:#fff; }
+    .section#water-meter .section-header h2 span { color:var(--accent-light); }
+    .section#water-meter .section-header p { color:rgba(255,255,255,0.7); }
+    .meter-grid { display:grid; grid-template-columns:1fr; gap:40px; align-items:center; }
+    .meter-grid .image-placeholder { background:rgba(255,255,255,0.08); border-radius:var(--radius); padding:30px 20px; text-align:center; border:2px dashed rgba(255,255,255,0.2); transition:var(--transition); }
+    .meter-grid .image-placeholder i { font-size:60px; color:rgba(255,255,255,0.3); margin-bottom:12px; }
+    .meter-features { display:grid; gap:14px; }
+    .meter-features .feature { display:flex; gap:12px; align-items:flex-start; background:rgba(255,255,255,0.06); padding:14px 16px; border-radius:var(--radius-sm); transition:var(--transition); }
+    .meter-features .feature i { color:var(--accent-light); font-size:18px; margin-top:2px; flex-shrink:0; }
+    .meter-features .feature h5 { font-size:15px; font-weight:700; }
+    .meter-features .feature p { font-size:13px; opacity:0.85; }
+    .meter-advancements { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+    .meter-advancements .adv { background:rgba(255,255,255,0.06); border-radius:var(--radius-sm); padding:12px 10px; text-align:center; font-size:12px; font-weight:600; transition:var(--transition); }
+    .meter-stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:30px; }
+    .meter-stats .stat { background:rgba(255,255,255,0.06); padding:16px; border-radius:var(--radius-sm); text-align:center; }
+    .meter-stats .stat .number { font-size:24px; font-weight:900; color:var(--accent-light); }
+    .meter-stats .stat .label { font-size:12px; opacity:0.7; }
+    .meter-expanded-details { margin-top:30px; padding:20px 16px; background:rgba(255,255,255,0.06); border-radius:var(--radius); }
+    .meter-expanded-details h3 { font-size:18px; font-weight:700; color:var(--accent-light); margin-bottom:12px; }
+    .meter-expanded-details .detail-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+    .meter-expanded-details .detail-item { background:rgba(255,255,255,0.04); padding:12px 16px; border-radius:var(--radius-sm); }
+    .meter-expanded-details .detail-item .label { font-size:10px; text-transform:uppercase; opacity:0.5; font-weight:600; }
+    .meter-expanded-details .detail-item .value { font-size:14px; font-weight:600; margin-top:2px; }
+    .meter-expanded-details .detail-item .value .highlight { color:var(--accent-light); }
+    .meter-comparison { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
+    .meter-comparison .comp-item { background:rgba(255,255,255,0.04); padding:12px 14px; border-radius:var(--radius-sm); text-align:center; }
+    .meter-comparison .comp-item .feature { font-size:11px; opacity:0.5; }
+    .meter-comparison .comp-item .getcad-value { font-size:16px; font-weight:800; color:var(--accent-light); }
+    .meter-comparison .comp-item .other-value { font-size:12px; opacity:0.5; }
+
+    /* research */
+    .research-grid { display:grid; grid-template-columns:1fr; gap:20px; }
+    .research-card { background:#fff; border-radius:var(--radius); padding:20px 16px; box-shadow:var(--shadow); border:1px solid var(--gray-100); text-align:center; transition:var(--transition); }
+    .research-card .icon { font-size:30px; color:var(--secondary); margin-bottom:8px; }
+    .research-card h5 { font-size:15px; font-weight:700; color:var(--primary); }
+    .research-card p { font-size:12px; color:var(--gray-500); line-height:1.5; }
+    .research-card .status { display:inline-block; font-size:10px; font-weight:700; padding:2px 12px; border-radius:20px; margin-top:8px; }
+    .research-card .status.planning { background:#fef3c7; color:#d97706; }
+    .research-card .status.developing { background:#dbeafe; color:#2563eb; }
+    .research-card .status.prototype { background:#dcfce7; color:#16a34a; }
+    .research-card .status.coming { background:#fce4ec; color:#dc2626; }
+
+    /* documents */
+    .documents-container { margin:30px 0; background:#fff; border-radius:var(--radius); padding:24px 16px; box-shadow:var(--shadow); border:1px solid var(--gray-100); }
+    .documents-header { display:flex; gap:14px; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; }
+    .documents-icon { flex-shrink:0; width:48px; height:48px; border-radius:16px; background:rgba(13,148,136,0.1); color:var(--secondary); display:flex; align-items:center; justify-content:center; font-size:24px; }
+    .documents-header h3 { font-size:18px; font-weight:800; color:var(--primary); }
+    .documents-header p { font-size:13px; color:var(--gray-500); line-height:1.6; }
+    .documents-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+    .document-card { display:flex; flex-direction:column; gap:10px; padding:14px 16px; background:var(--gray-50); border-radius:var(--radius-sm); border:1px solid var(--gray-100); transition:var(--transition); }
+    .document-card .doc-icon { width:36px; height:36px; border-radius:8px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .document-card .doc-title { font-size:14px; font-weight:600; color:var(--gray-800); }
+    .document-card .doc-meta { display:flex; flex-wrap:wrap; gap:10px; font-size:11px; color:var(--gray-400); }
+    .document-card .doc-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+    .doc-btn { padding:5px 14px; border:none; border-radius:var(--radius-xs); font-size:12px; font-weight:600; cursor:pointer; transition:var(--transition); font-family:var(--font); display:inline-flex; align-items:center; gap:4px; }
+    .doc-btn.view-btn { background:#dbeafe; color:#2563eb; }
+    .doc-btn.download-btn { background:#dcfce7; color:#16a34a; }
+
+    /* funding cta */
+    .funding-cta { text-align:center; margin-top:30px; padding:30px 20px; background:var(--gray-50); border-radius:var(--radius); border:2px dashed var(--gray-300); transition:var(--transition); }
+    .funding-cta h3 { font-size:20px; font-weight:800; color:var(--primary); }
+    .funding-cta p { color:var(--gray-500); max-width:500px; margin:8px auto 16px; line-height:1.7; font-size:14px; }
+
+    /* steps */
+    .steps-grid { display:grid; grid-template-columns:1fr; gap:20px; }
+    .step { text-align:center; padding:20px 16px; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--gray-100); transition:var(--transition); position:relative; }
+    .step .number { width:44px; height:44px; border-radius:50%; background:var(--secondary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; margin:0 auto 10px; }
+    .step h5 { font-size:15px; font-weight:700; color:var(--primary); }
+    .step p { font-size:13px; color:var(--gray-500); margin-top:4px; line-height:1.5; }
+    .step .arrow { display:none; }
+
+    /* marketplace */
+    .marketplace-card { background:#fff; border-radius:var(--radius); padding:40px 20px; text-align:center; box-shadow:var(--shadow); border:1px solid var(--gray-200); max-width:600px; margin:0 auto; }
+    .marketplace-card i { font-size:48px; color:var(--gray-300); margin-bottom:12px; }
+    .marketplace-card h3 { font-size:22px; font-weight:700; color:var(--gray-600); }
+    .marketplace-card p { color:var(--gray-400); font-size:14px; line-height:1.7; }
+
+    /* contact */
+    .contact-wrapper { display:grid; grid-template-columns:1fr; gap:40px; margin-top:20px; }
+    .contact-info h4 { font-size:16px; font-weight:700; color:var(--primary); margin-bottom:10px; }
+    .info-card { background:#fff; padding:16px 20px; border-radius:var(--radius-sm); box-shadow:var(--shadow); color: #5a5858; border:1px solid var(--gray-100); }
+    .contact-btn { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; transition:var(--transition); border:1px solid var(--gray-200); margin-bottom:6px; }
+    .contact-btn.phone-btn { color:var(--success); background:#f0fdf4; border-color:#bbf7d0; }
+    .contact-btn.email-btn { color:var(--primary); background:#eff6ff; border-color:#bfdbfe; }
+    .social-buttons { display:flex; gap:10px; flex-wrap:wrap; }
+    .social-btn { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; transition:var(--transition); border:none; cursor:pointer; color:#fff; }
+    .social-btn.facebook { background:#1877f2; }
+    .social-btn.whatsapp { background:#25d366; }
+    .social-btn.linkedin { background:#0a66c2; }
+    .social-btn:hover { transform:translateY(-4px) scale(1.08); }
+    .contact-form-wrapper { background:#fff; padding:24px 18px; border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--gray-100); }
+    .contact-form-wrapper h4 { font-size:18px; font-weight:700; color:var(--primary); margin-bottom:2px; }
+    .contact-form-wrapper .form-subtitle { font-size:13px; color:var(--gray-400); margin-bottom:16px; }
+    .contact-form-wrapper .form-row { display:grid; grid-template-columns:1fr; gap:12px; }
+    .contact-form-wrapper .form-group { margin-bottom:12px; }
+    .contact-form-wrapper .form-group label { display:block; font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; }
+    .contact-form-wrapper .form-group input,
+    .contact-form-wrapper .form-group textarea { width:100%; padding:10px 12px; border:1px solid var(--gray-200); border-radius:var(--radius-xs); font-size:14px; font-family:var(--font); transition:var(--transition); outline:none; background:var(--gray-50); }
+    .contact-form-wrapper .form-group input:focus,
+    .contact-form-wrapper .form-group textarea:focus { border-color:var(--secondary); background:#fff; box-shadow:0 0 0 3px rgba(13,148,136,0.15); }
+    .contact-form-wrapper .form-group textarea { min-height:100px; resize:vertical; }
+    .send-btn { display:block; margin:0 auto; padding:12px 32px; background:var(--success); color:#fff; border:none; border-radius:20px; font-size:16px; font-weight:700; cursor:pointer; transition:var(--transition); font-family:var(--font); width:50%; }
+    .send-btn:hover { background:#15803d; transform:translateY(-2px); }
+    .newsletter-section { margin-top:20px; padding-top:180px; border-top:1px solid var(--gray-200); }
+    .newsletter-section h5 { font-size:15px; font-weight:700; color:var(--primary); }
+    .newsletter-section p { font-size:13px; color:var(--gray-500); margin-bottom:10px; }
+    .newsletter-row { display:flex; flex-direction:column; gap:10px; }
+    .newsletter-row input { flex:1; padding:15px 18px; border:1px solid var(--gray-200); border-radius:20px; font-size:14px; font-family:var(--font); background:var(--gray-50); }
+    .newsletter-row button { padding:15px 20px; background:var(--secondary); color:#fff; width: 50%; align-items: center; justify-content:center;  border:none; border-radius:20px; font-size:14px; font-weight:600; cursor:pointer; transition:var(--transition); font-family:var(--font); }
+    .map-container { margin-top:10px; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+    .map-container iframe { width:100%; height:200px; border:none; display:block; }
+
+    /* footer */
+    .footer { background:var(--gray-900); color:rgba(255,255,255,0.7); padding:40px 0 20px; }
+    .footer-grid { display:grid; grid-template-columns:1fr; gap:30px; margin-bottom:30px; }
+    .footer-brand h3 { color:#fff; font-size:20px; font-weight:800; margin-bottom:6px; }
+    .footer-brand h3 span { color:var(--secondary-light); }
+    .footer-brand p { font-size:13px; max-width:300px; line-height:1.7; }
+    .footer-col h5 { color:#fff; font-size:14px; font-weight:700; margin-bottom:10px; }
+    .footer-col a { display:block; font-size:13px; padding:4px 0; transition:var(--transition); cursor:pointer; }
+    .footer-col a:hover { color:#fff; transform:translateX(4px); }
+    .footer-bottom { border-top:1px solid rgba(255,255,255,0.06); padding-top:16px; display:flex; flex-direction:column; gap:12px; align-items:center; font-size:12px; text-align:center; }
+    .footer-social { display:flex; gap:12px; }
+    .footer-social a { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; transition:var(--transition); color:rgba(255,255,255,0.5); }
+    .footer-social a:hover { background:var(--secondary); color:#fff; transform:translateY(-3px); }
+
+    /* modals */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:2000; justify-content:center; align-items:center; padding:16px; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:#fff; border-radius:var(--radius); padding:28px 20px; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; animation:modalIn 0.25s ease; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+    .modal-box .close { float:right; background:none; border:none; font-size:24px; color:var(--gray-400); cursor:pointer; transition:var(--transition); }
+    .modal-box .close:hover { color:var(--gray-800); transform:rotate(90deg); }
+    .modal-box h3 { font-size:20px; font-weight:800; color:var(--primary); margin-bottom:6px; }
+    .modal-box .subtitle { font-size:14px; color:var(--gray-500); margin-bottom:16px; }
+    .modal-box .form-group { margin-bottom:14px; }
+    .modal-box .form-group label { display:block; font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:4px; }
+    .modal-box .form-group input,
+    .modal-box .form-group select,
+    .modal-box .form-group textarea { width:100%; padding:10px 12px; border:1px solid var(--gray-200); border-radius:var(--radius-xs); font-size:14px; font-family:var(--font); transition:var(--transition); outline:none; }
+    .modal-box .form-group input:focus,
+    .modal-box .form-group select:focus,
+    .modal-box .form-group textarea:focus { border-color:var(--secondary); box-shadow:0 0 0 3px rgba(13,148,136,0.15); }
+    .modal-box .modal-actions { display:flex; gap:12px; margin-top:18px; }
+    .modal-box .modal-actions button { flex:1; padding:12px; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700; cursor:pointer; transition:var(--transition); font-family:var(--font); }
+    .modal-box .modal-actions .cancel { background:var(--gray-100); color:var(--gray-600); }
+    .modal-box .modal-actions .submit { background:var(--secondary); color:#fff; }
+    .modal-box .modal-actions .submit:hover { background:var(--secondary-dark); }
+
+    /* toast */
+    .toast-container { position:fixed; bottom:20px; right:16px; z-index:3000; display:flex; flex-direction:column; gap:8px; max-width:90%; }
+    .toast { background:var(--gray-900); color:#fff; padding:12px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; box-shadow:0 4px 20px rgba(0,0,0,0.2); animation:slideIn 0.35s ease; display:flex; align-items:center; gap:10px; }
+    .toast.success { border-left:4px solid var(--success); }
+    .toast.error { border-left:4px solid var(--danger); }
+    @keyframes slideIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+
+    /* chat */
+    .chat-button { position:fixed; bottom:20px; right:16px; z-index:9999; width:58px; height:58px; border-radius:50%; background:linear-gradient(135deg,#25D366,#128C7E); color:#fff; border:none; box-shadow:0 4px 24px rgba(37,211,102,0.4); cursor:pointer; transition:all 0.3s ease; display:flex; align-items:center; justify-content:center; font-size:28px; }
+    .chat-button .badge { position:absolute; top:-4px; right:-4px; background:#dc2626; color:#fff; font-size:10px; font-weight:700; min-width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; animation:pulse-badge 2s infinite; }
+    @keyframes pulse-badge { 0%,100% { transform:scale(1); } 50% { transform:scale(1.15); } }
+    .chat-window { position:fixed; bottom:80px; right:12px; z-index:9998; width:calc(100vw - 24px); max-width:400px; height:480px; max-height:calc(100vh - 140px); background:#efeae2; border-radius:20px 20px 12px 12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:none; flex-direction:column; overflow:hidden; animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .chat-window.open { display:flex; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .chat-header { background:#075e54; color:#fff; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .chat-header .left { display:flex; align-items:center; gap:10px; }
+    .chat-header .left .avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#25D366,#128C7E); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; }
+    .chat-header .left .info .name { font-size:14px; font-weight:700; }
+    .chat-header .left .info .status { font-size:10px; opacity:0.85; display:flex; align-items:center; gap:4px; }
+    .chat-header .left .info .status .dot { width:8px; height:8px; border-radius:50%; background:#4ade80; display:inline-block; animation:pulse-dot 1.5s infinite; }
+    @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .chat-header .actions button { background:none; border:none; color:rgba(255,255,255,0.7); cursor:pointer; font-size:16px; padding:4px 6px; border-radius:50%; transition:all 0.2s; width:32px; height:32px; }
+    .chat-header .actions button:hover { background:rgba(255,255,255,0.1); color:#fff; }
+    .chat-messages { flex:1; overflow-y:auto; padding:10px 12px; background:#efeae2; background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d1d1d1' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+    .chat-messages .message { margin-bottom:8px; display:flex; gap:6px; animation:messageIn 0.25s ease; }
+    .chat-messages .message.bot { justify-content:flex-start; }
+    .chat-messages .message.bot .avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#075e54,#128C7E); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:2px; }
+    .chat-messages .message.bot .bubble { background:#fff; padding:8px 12px; border-radius:12px 12px 12px 4px; box-shadow:0 1px 2px rgba(0,0,0,0.06); max-width:90%; font-size:13px; line-height:1.5; color:#1e293b; }
+    .chat-messages .message.user { justify-content:flex-end; }
+    .chat-messages .message.user .bubble { background:#d9fdd3; padding:8px 12px; border-radius:12px 12px 4px 12px; max-width:90%; font-size:13px; line-height:1.5; color:#1e293b; }
+    .chat-messages .message .time { font-size:9px; color:#94a3b8; margin-top:2px; display:block; }
+    .chat-messages .message.bot .time { padding-left:4px; }
+    .chat-messages .message.user .time { text-align:right; padding-right:4px; }
+    .message-actions { display:flex; gap:10px; margin-top:6px; padding-top:6px; border-top:1px solid var(--gray-100); }
+    .message-actions button { background:none; border:none; font-size:13px; color:var(--gray-400); cursor:pointer; transition:var(--transition); padding:2px 4px; border-radius:4px; display:flex; align-items:center; gap:4px; font-family:var(--font); }
+    .message-actions button:hover { color:var(--secondary); background:rgba(13,148,136,0.06); }
+    .message-actions button.liked { color:var(--secondary); }
+    .typing-indicator { display:none; padding:4px 0; }
+    .typing-indicator.active { display:block; }
+    .typing-indicator .dots { display:flex; gap:4px; padding:6px 12px; background:#fff; border-radius:12px 12px 12px 4px; width:fit-content; }
+    .typing-indicator .dots span { width:8px; height:8px; border-radius:50%; background:#94a3b8; animation:typing 1.4s infinite; }
+    .typing-indicator .dots span:nth-child(2) { animation-delay:0.2s; }
+    .typing-indicator .dots span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes typing { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-5px); } }
+    .quick-actions { padding:6px 10px 8px; display:flex; gap:6px; flex-wrap:wrap; background:#efeae2; border-top:1px solid rgba(0,0,0,0.04); }
+    .quick-actions button { padding:4px 12px; border:none; border-radius:16px; background:rgba(7,94,84,0.08); color:#075e54; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:var(--font); white-space:nowrap; }
+    .quick-actions button:hover { background:rgba(7,94,84,0.18); transform:scale(1.04); }
+    .chat-input { padding:6px 10px 10px; border-top:1px solid rgba(0,0,0,0.05); display:flex; gap:6px; background:#efeae2; flex-shrink:0; align-items:center; }
+    .chat-input .input-wrapper { flex:1; display:flex; align-items:center; background:#fff; border-radius:24px; padding:2px 4px 2px 14px; }
+    .chat-input .input-wrapper input { flex:1; padding:8px 0; border:none; font-size:13px; font-family:var(--font); outline:none; background:transparent; color:#1e293b; min-width:0; }
+    .chat-input .send-btn { padding:8px 16px; background:#25D366; color:#fff; border:none; border-radius:50%; width:40px; height:40px; font-size:16px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .chat-input .send-btn:hover { background:#128C7E; transform:scale(1.05); }
+    .chat-input .send-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .action-card { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 14px; margin:4px 0; }
+    .action-card .title { font-weight:700; color:#075e54; font-size:13px; }
+    .action-card .subtitle { font-size:11px; color:#64748b; }
+    .action-card .buttons { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .action-card .buttons button { padding:4px 12px; border:none; border-radius:16px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:var(--font); display:flex; align-items:center; gap:4px; }
+    .action-card .buttons button:hover { transform:scale(1.04); }
+    .action-card .buttons .call-btn { background:#25D366; color:#fff; }
+    .action-card .buttons .email-btn { background:#075e54; color:#fff; }
+    .action-card .buttons .fund-btn { background:#f59e0b; color:#fff; }
+    .action-card .buttons .close-btn { background:#e2e8f0; color:#475569; }
+
+    /* pic grid */
+    .pic-grid { display:grid; grid-template-columns:1fr; gap:20px; margin-top:30px; }
+    .pic-card { border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); background:#fff; border:1px solid var(--gray-100); transition:var(--transition); }
+    .pic-card .image { height:150px; background:linear-gradient(135deg,var(--gray-200),var(--gray-300)); display:flex; align-items:center; justify-content:center; font-size:40px; color:var(--gray-400); transition:var(--transition); }
+    .pic-card .caption { padding:14px 16px; text-align:center; }
+    .pic-card .caption h5 { font-size:14px; font-weight:700; color:var(--primary); }
+    .pic-card .caption p { font-size:12px; color:var(--gray-500); line-height:1.5; }
+
+    /* doc viewer */
+    .doc-viewer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:3000; justify-content:center; align-items:center; padding:16px; }
+    .doc-viewer-overlay.open { display:flex; }
+    .doc-viewer-container { background:#fff; border-radius:var(--radius); width:100%; max-width:900px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 30px 80px rgba(0,0,0,0.5); animation:modalIn 0.25s ease; }
+    .doc-viewer-header { display:flex; justify-content:space-between; align-items:center; padding:12px 18px; border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .doc-viewer-title { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:700; color:var(--primary); }
+    .doc-viewer-close { background:none; border:none; font-size:22px; color:var(--gray-400); cursor:pointer; padding:0 6px; }
+    .doc-viewer-toolbar { display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; padding:10px 16px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+    .doc-viewer-meta { display:flex; gap:12px; font-size:12px; color:var(--gray-500); flex-wrap:wrap; }
+    .doc-viewer-actions { display:flex; gap:6px; flex-wrap:wrap; }
+    .doc-viewer-content { flex:1; overflow-y:auto; padding:16px 20px; background:#f8fafc; min-height:200px; max-height:calc(90vh - 160px); }
+    .doc-page { background:#fff; border-radius:var(--radius-sm); padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,0.06); max-width:700px; margin:0 auto; }
+    .doc-page-content { font-size:13px; line-height:1.7; color:var(--gray-700); }
+    .doc-page-content h3 { color:var(--primary); font-size:16px; font-weight:700; margin:14px 0 6px; border-bottom:2px solid var(--gray-200); padding-bottom:4px; }
+    .doc-page-content p { margin:4px 0; }
+    .doc-page-content ul { margin:6px 0 10px 20px; color:var(--gray-600); }
+    .doc-page-content li { margin:2px 0; }
+    .doc-page-number { text-align:center; margin-top:16px; font-size:11px; color:var(--gray-400); border-top:1px solid var(--gray-200); padding-top:12px; }
+    .doc-viewer-footer { padding:10px 16px; border-top:1px solid var(--gray-200); display:flex; justify-content:space-between; font-size:11px; color:var(--gray-400); flex-shrink:0; background:#fff; border-radius:0 0 var(--radius) var(--radius); }
+
+    .hover-lift { transition:var(--transition); }
+    .hover-lift:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+    .sim-link { color:#127a4a; font-weight:600; }
+
+    /* responsive */
+    @media (min-width: 768px) {
+        .hamburger { display:none; }
+        .nav-desktop { display:flex; }
+        .nav-mobile { display:none !important; }
+        .services-grid { grid-template-columns:1fr 1fr; }
+        .research-grid { grid-template-columns:1fr 1fr; }
+        .steps-grid { grid-template-columns:1fr 1fr; }
+        .meter-grid { grid-template-columns:1fr 1fr; gap:40px; }
+        .meter-expanded-details .detail-grid { grid-template-columns:1fr 1fr; }
+        .meter-comparison { grid-template-columns:repeat(3,1fr); }
+        .contact-wrapper { grid-template-columns:1fr 1fr; gap:40px; }
+        .footer-grid { grid-template-columns:1fr 1fr; }
+        .hero-content h1 { font-size:40px; }
+        .section#home .container { grid-template-columns:1fr 1fr; gap:50px; }
+        .hero-content p { max-width:520px; }
+        .contact-form-wrapper .form-row { grid-template-columns:1fr 1fr; }
+        .documents-grid { grid-template-columns:1fr 1fr; }
+        .pic-grid { grid-template-columns:1fr 1fr 1fr; }
+        .meter-stats { grid-template-columns:repeat(4,1fr); }
+        .chat-window { right:24px; width:400px; height:520px; bottom:90px; }
+        .chat-button { bottom:24px; right:24px; width:64px; height:64px; font-size:30px; }
+    }
+    @media (min-width: 1024px) {
+        .services-grid { grid-template-columns:repeat(3,1fr); }
+        .research-grid { grid-template-columns:repeat(4,1fr); }
+        .steps-grid { grid-template-columns:repeat(4,1fr); }
+        .step .arrow { display:block; position:absolute; right:-18px; top:50%; transform:translateY(-50%); color:var(--gray-300); font-size:18px; }
+        .footer-grid { grid-template-columns:2fr 1fr 1fr 1fr; }
+        .hero-content h1 { font-size:48px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container">
+    <a href="#" class="logo"><div class="icon">G</div>Get<span>CAD</span></a>
+
+    <!-- Desktop Navigation -->
+    <nav class="nav-desktop" id="desktopNav">
+      <a class="active-link" data-section="home" onclick="event.preventDefault(); showSection('home')">Home</a>
+      <a data-section="services" onclick="event.preventDefault(); showSection('services')">Services</a>
+      <a data-section="water-meter" onclick="event.preventDefault(); showSection('water-meter')">Water Meter</a>
+      <a data-section="research" onclick="event.preventDefault(); showSection('research')">Innovation</a>
+      <a data-section="how-it-works" onclick="event.preventDefault(); showSection('how-it-works')">How It Works</a>
+      <a data-section="marketplace" onclick="event.preventDefault(); showSection('marketplace')">Marketplace</a>
+      <a data-section="contact" onclick="event.preventDefault(); showSection('contact')">Contact</a>
+      <a href="#" class="btn-quote" onclick="event.preventDefault(); openModal('quote')"><i class="fas fa-paper-plane"></i> Get a Quote</a>
+    </nav>
+
+    <!-- Hamburger Button (3 parallel lines) -->
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Mobile Navigation (hidden by default) -->
+    <nav class="nav-mobile" id="mobileNav">
+      <a class="active-link" data-section="home" onclick="event.preventDefault(); showSection('home')">Home</a>
+      <a data-section="services" onclick="event.preventDefault(); showSection('services')">Services</a>
+      <a data-section="water-meter" onclick="event.preventDefault(); showSection('water-meter')">Water Meter</a>
+      <a data-section="research" onclick="event.preventDefault(); showSection('research')">Innovation</a>
+      <a data-section="how-it-works" onclick="event.preventDefault(); showSection('how-it-works')">How It Works</a>
+      <a data-section="marketplace" onclick="event.preventDefault(); showSection('marketplace')">Marketplace</a>
+      <a data-section="contact" onclick="event.preventDefault(); showSection('contact')">Contact</a>
+      <a href="#" class="btn-quote" onclick="event.preventDefault(); openModal('quote')"><i class="fas fa-paper-plane"></i> Get a Quote</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HOME -->
+<section class="section active" id="home">
+  <div class="hero-carousel">
+    <div class="slide active" id="slide1" style="background-image: url('items/getcad-pic1.png');"></div>
+    <div class="slide" id="slide2" style="background-image: url('items/water-flow-pic1.png');"></div>
+    <div class="slide" id="slide3" style="background-image: url('items/water-flow-pic3.png');"></div>
+  </div>
+  <div class="carousel-dots">
+    <button class="dot active" onclick="goToSlide(0)"></button>
+    <button class="dot" onclick="goToSlide(1)"></button>
+    <button class="dot" onclick="goToSlide(2)"></button>
+  </div>
+  <div class="container">
+    <div class="hero-content-container">
+      <div class="hero-content">
+        <h1>Engineering <span>Tomorrow's</span> Innovations</h1>
+        <p>GetCAD Technologies specializes in <strong>electronics</strong> & <strong>mechanical design engineering</strong>, all you need is just get a quote. We are also developing a new pre-paid water,<strong>smart utility solutions</strong> for Africa, and the rest of the world at large. We are not reaching the smart meter only, our team is still on search for our local common problems, and come up with innovative solutions, ...</p>
+        <div class="sub-text"><i class="fas fa-check-circle" style="color:var(--secondary);"></i> PCB Design & Assembly &nbsp;|&nbsp; <i class="fas fa-check-circle" style="color:var(--secondary);"></i> Tank water level monitor &nbsp;|&nbsp; <i class="fas fa-check-circle" style="color:var(--secondary);"></i> Smart Metering (water and electricity) &nbsp;|&nbsp; <i class="fas fa-check-circle" style="color:var(--secondary);"></i> IoT Solutions &nbsp;|&nbsp; 
+        <i class="fas fa-check-circle" style="color:var(--secondary);"></i> SimHub (Multi-sim) Mifi &nbsp;|&nbsp; <i class="fas fa-check-circle" style="color:var(--secondary);"></i> ... and many more. 
+        </div>
+        <div class="hero-buttons">
+          <a href="#" class="btn btn-secondary" onclick="event.preventDefault(); showSection('services')">Explore Services</a>
+          <a href="#" class="btn btn-primary" onclick="event.preventDefault(); openModal('quote')"><i class="fas fa-paper-plane"></i> Get a Quote</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-header"><span class="tag">What We Offer</span><h2>Our <span>Services</span></h2><p>From concept to finished product — we bring your electronics and mechanical projects to real life with professional expertise. All you need is just get quote and submit your idea.</p></div>
+    <div class="services-grid">
+      <div class="service-card hover-lift"><div class="icon"><i class="fas fa-microchip"></i></div><h4>Electronics Design</h4><p>Complete electronics design services from concept to production-ready PCB.</p><ul class="features"><li><i class="fas fa-check"></i> Schematic & Simulation</li><li><i class="fas fa-check"></i> PCB Layout & Routing</li><li><i class="fas fa-check"></i> Firmware (C/C++/Python)</li><li><i class="fas fa-check"></i> Prototype Validation</li></ul></div>
+      <div class="service-card hover-lift"><div class="icon"><i class="fas fa-cube"></i></div><h4>Mechanical Design</h4><p>Professional 3D modelling for enclosures, housings, and mechanical parts.</p><ul class="features"><li><i class="fas fa-check"></i> 3D CAD (SolidWorks, Fusion)</li><li><i class="fas fa-check"></i> Enclosure Design</li><li><i class="fas fa-check"></i> Structural Analysis (FEA)</li><li><i class="fas fa-check"></i> 2D Technical Drawings</li></ul></div>
+      <div class="service-card hover-lift"><div class="icon"><i class="fas fa-industry"></i></div><h4>Manufacturing</h4><p>End-to-end manufacturing support from prototyping to full production.</p><ul class="features"><li><i class="fas fa-check"></i> PCB Fabrication</li><li><i class="fas fa-check"></i> SMD / Through-Hole Assembly</li><li><i class="fas fa-check"></i> 3D Printing (FDM, SLA, SLS)(though currently not availabel)</li><li><i class="fas fa-check"></i> Quality Testing</li></ul></div>
+    </div>
+    <div class="pic-grid">
+      <div class="pic-card hover-lift"><div class="image"><i class="fas fa-microchip"></i></div><div class="caption"><h5>PCB Design & Assembly</h5><p>Professional PCB assembly.</p></div></div>
+      <div class="pic-card hover-lift"><div class="image"><i class="fas fa-cubes"></i></div><div class="caption"><h5>3D Printing & Prototyping (currently not available)</h5><p>Rapid prototyping and 3D printing services.</p></div></div>
+      <div class="pic-card hover-lift"><div class="image"><i class="fas fa-tools"></i></div><div class="caption"><h5>Assembly & Finishing</h5><p>Full assembly and finishing services.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WATER METER -->
+<section class="section" id="water-meter">
+  <div class="container">
+    <div class="section-header"><span class="tag" style="background:rgba(255,255,255,0.15);color:var(--accent-light);">Flagship Product</span><h2 style="color:#fff;">Smart Prepaid <span style="color:var(--accent-light);">Water Meter</span><br><span style="color: #129439">Overview</span></h2><p style="color:rgba(255,255,255,0.7);">Revolutionary IoT-enabled water metering built for utility challenges, with multiple modes, dual-app control, and real-time interaction.</p>
+      <br>The Pre-paid Water Meter with modern electronic devices that measures water flow, displays consumption data on an LCD, uploads data to cloud servers via GSM, automatically shuts off water when units are depleted, and connects via Bluetooth to a mobile application through which users or water customers are able to see their units remaining or bills, buy units, be able to turn ON or OFF manually.
+      <br>Not only that, it serves as an intelligent node in a comprehensive water distribution network. It transcends basic prepaid functionality by offering multiple operational modes, dual-app control, and real-time utility-customer interaction. 
+          The system empowers utilities with unprecedented remote control and data-driven decision-making, while providing customers with flexibility, transparency, and control over their water usage and expenditure. It is a holistic solution designed to maximize revenue assurance, optimize operational efficiency, and enhance customer satisfaction through adaptive service models.
+      <br><h4>Hardware Core (Meter End):</h4>
+    Precision Flow Sensor & Metering Body: Measures water volume with Class C accuracy.
+    Solenoid (or Motor) Shut-Off Valve: The physical actuator for remote and automatic flow control.
+    Advanced Microcontroller Unit (MCU): The onboard computer that executes the core firmware. Its critical new function is to seamlessly switch between multiple, configurable operation modes (Auto, On-Service, Periodic) as dictated by the utility admin or customer request.
+    Dual Communication Modules: GSM/GPRS for constant cloud connectivity to the utility server, and Bluetooth Low Energy (BLE) for direct customer app interaction.
+    LCD Display & User Interface: Shows real-time data, active mode, credit, and warnings.<br>
+
+    <h4>Software Ecosystem (Dual-App Platform), the <a class="h-link" style="color: #2d8547" href="assets/app-index.html">GetCAD Water Management App</a>:</h4>
+    Utility Admin Application (Web/ <a class="h-link" style="color: #2d8547" href="assets/dashboard-index.html"><strong> Utility Dashboard</strong></a>): This is the utility's command center. Installed at headquarters and regional offices, it provides a real-time map and dashboard of all deployed meters. 
+    <br><br>This meter is still under development.
+</div>
+    <div class="meter-grid">
+      <div><div class="image-placeholder hover-lift"><i class="fas fa-tint"></i><p style="font-size:16px;color:rgba(255,255,255,0.7);">Advanced Prepaid Water Meter</p><p style="font-size:12px;color:rgba(255,255,255,0.4);">IoT-enabled with GSM, Bluetooth &amp; Cloud</p><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"><span style="background:rgba(255,255,255,0.1);padding:4px 14px;border-radius:40px;font-size:11px;">GSM</span><span style="background:rgba(255,255,255,0.1);padding:4px 14px;border-radius:40px;font-size:11px;">Bluetooth</span><span style="background:rgba(255,255,255,0.1);padding:4px 14px;border-radius:40px;font-size:11px;">3 Modes</span><span style="background:rgba(255,255,255,0.1);padding:4px 14px;border-radius:40px;font-size:11px;">SMS Alerts</span></div></div></div>
+      <div><div class="meter-features"><div class="feature hover-lift"><i class="fas fa-tachometer-alt"></i><div><h5>Three Operating Modes</h5><p><strong>Prepaid:</strong> Pay-as-you-go. <strong>Periodic:</strong> 30-day credit. <strong>Service:</strong> Fixed-period access.</p></div></div><div class="feature hover-lift"><i class="fas fa-mobile-alt"></i><div><h5>Mobile App & SMS</h5><p>Track usage, buy units via mobile money, receive SMS warnings before shutoff.</p></div></div><div class="feature hover-lift"><i class="fas fa-cloud-upload-alt"></i><div><h5>Cloud Admin Platform</h5><p>Monitor meters, detect tampering, manage modes, and generate reports.</p></div></div><div class="feature hover-lift"><i class="fas fa-shield-alt"></i><div><h5>Tamper Detection</h5><p>Real-time alerts with automatic shutoff for unauthorized access.</p></div></div></div></div>
+    </div>
+    <!---<div class="meter-expanded-details"><h3>Specifications & Advantages</h3><div class="detail-grid"><div class="detail-item"><div class="label">Accuracy</div><div class="value"><span class="highlight">±2%</span> (Class B)</div></div><div class="detail-item"><div class="label">Flow Range</div><div class="value"><span class="highlight">15-3000</span> L/h</div></div><div class="detail-item"><div class="label">Pressure</div><div class="value"><span class="highlight">1.6</span> MPa</div></div><div class="detail-item"><div class="label">Protection</div><div class="value"><span class="highlight">IP68</span> Waterproof</div></div><div class="detail-item"><div class="label">Battery Life</div><div class="value"><span class="highlight">10+</span> Years</div></div><div class="detail-item"><div class="label">Compliance</div><div class="value"><span class="highlight">SANS 1529, ZABS</span></div></div></div><div class="meter-comparison"><div class="comp-item"><div class="feature">Operating Modes</div><div class="getcad-value">✅ 3 modes</div><div class="other-value">❌ Fixed</div></div><div class="comp-item"><div class="feature">Local Manufacturing</div><div class="getcad-value">✅ Yes</div><div class="other-value">❌ Imported</div></div><div class="comp-item"><div class="feature">Mobile Money</div><div class="getcad-value">✅ Yes</div><div class="other-value">❌ No</div></div><div class="comp-item"><div class="feature">SMS Alerts</div><div class="getcad-value">✅ Yes</div><div class="other-value">⚠️ Limited</div></div><div class="comp-item"><div class="feature">Tamper Detection</div><div class="getcad-value">✅ Advanced</div><div class="other-value">⚠️ Basic</div></div><div class="comp-item"><div class="feature">Battery Life</div><div class="getcad-value">✅ 10+ Yrs</div><div class="other-value">⚠️ 5-7 Yrs</div></div></div></div> ---->
+    <div class="meter-stats"><div class="stat"><div class="number">50%</div><div class="label">NRW Reduction</div></div><div class="stat"><div class="number">99%</div><div class="label">Billing Accuracy</div></div><div class="stat"><div class="number">100%</div><div class="label">Revenue Collection</div></div><div class="stat"><div class="number">10+</div><div class="label">Year Battery</div></div></div>
+  </div>
+</section>
+
+<!-- RESEARCH AND INNOVATION -->
+<section class="section" id="research">
+  <div class="container">
+    <div class="section-header"><span class="tag">Research & Development</span><h2>Innovating <span>Africa's Future</span></h2><p>Developing cutting-edge technologies for the better future, smart metering, IoT, and sustainable energy, and establish our local manufacturing companies.</p></div>
+    <div class="research-grid">
+      <div class="research-card hover-lift"><div class="icon"><i class="fas fa-tint"></i></div><h5>Smart Water Meter</h5><p>IoT-enabled prepaid water meter with GSM, Bluetooth, and 3 modes. Shuts OFF once units are finnished and turn ON again once it is recharged</p><span class="status prototype">🚀 Prototype Ready</span></div>
+      <div class="research-card hover-lift"><div class="icon"><i class="fas fa-wifi"></i></div><h5>Multi-SIM MiFi (SimHub)</h5><p>Intelligent hotspot with app-controlled SIM switching for both calls, SMS, data. sync its multiple simcards to mobile phone, or simply as simcards extender to the phone</p><span class="status developing">⚙️ Developing</span><div><a href="simhub/sim-index.html" style="font-size:12px;color:var(--secondary);display:block;margin-top:6px;"><i class="fas fa-external-link-alt"></i> <span class="sim-link">more on SimHub ...</span></a></div></div>
+      <div class="research-card hover-lift"><div class="icon"><i class="fas fa-bolt"></i></div><h5>Smart Electricity Meter</h5><p>Prepaid electricity meter with IoT features for smart grid integration. Reducing the cost of the electric measuring systems.</p><span class="status planning">📋 Planning</span></div>
+      <div class="research-card hover-lift"><div class="icon"><i class="fas fa-battery-three-quarters"></i></div><h5>DIY Power Bank</h5><p>DIY power banks and regulators for embedded systems and makers. ... and many more projects comming.</p><span class="status coming">🔜 Coming Soon</span></div>
+      <div class="research-card hover-lift"><div class="icon"><i class="fas fa-tint"></i></div><h5>Tank Water Level Monitor</h5><p>Monitors the water level in tanks and controll water pumps; swtich them ON or OFF in the required times automatically. Comes with a mobile app  where to see or observe water levels, and be able to force turn ON or force turn OFF the water pumps ...</p><span class="status prototype">🚀 Prototype Ready</span></div>
+    </div>
+    <!-- Documents -->
+    <div class="documents-container hover-glow"><div class="documents-header"><div class="documents-icon"><i class="fas fa-book-open"></i></div><div><h3>Investment & Research Documents</h3><p>Access our investment prospectus, whitepapers, and market analysis.</p></div></div><div class="documents-grid"><div class="document-card hover-lift"><div class="doc-icon"><i class="fas fa-file-pdf"></i></div><div><div class="doc-title">GetCAD Investment Prospectus 2026</div><div class="doc-meta"><span><i class="fas fa-calendar-alt"></i> July 2026</span><span><i class="fas fa-file-alt"></i> PDF, 2.4 MB</span></div></div><div class="doc-actions"><button class="doc-btn view-btn" onclick="viewDocument('GetCAD Investment Prospectus 2026')"><i class="fas fa-eye"></i> View</button><button class="doc-btn download-btn" onclick="downloadDocument('investment-prospectus-2026.pdf')"><i class="fas fa-download"></i> Download</button></div></div><div class="document-card hover-lift"><div class="doc-icon"><i class="fas fa-file-pdf"></i></div><div><div class="doc-title">Smart Water Meter Technical Whitepaper</div><div class="doc-meta"><span><i class="fas fa-calendar-alt"></i> June 2026</span><span><i class="fas fa-file-alt"></i> PDF, 3.8 MB</span></div></div><div class="doc-actions"><button class="doc-btn view-btn" onclick="viewDocument('Smart Water Meter Technical Whitepaper')"><i class="fas fa-eye"></i> View</button><button class="doc-btn download-btn" onclick="downloadDocument('smart-water-meter-whitepaper.pdf')"><i class="fas fa-download"></i> Download</button></div></div><div class="document-card hover-lift"><div class="doc-icon"><i class="fas fa-file-pdf"></i></div><div><div class="doc-title">Market Analysis & Growth Strategy</div><div class="doc-meta"><span><i class="fas fa-calendar-alt"></i> May 2026</span><span><i class="fas fa-file-alt"></i> PDF, 1.9 MB</span></div></div><div class="doc-actions"><button class="doc-btn view-btn" onclick="viewDocument('Market Analysis & Growth Strategy')"><i class="fas fa-eye"></i> View</button><button class="doc-btn download-btn" onclick="downloadDocument('market-analysis-growth-strategy.pdf')"><i class="fas fa-download"></i> Download</button></div></div><div class="document-card hover-lift"><div class="doc-icon"><i class="fas fa-file-pdf"></i></div><div><div class="doc-title">IoT & Cloud Architecture Overview</div><div class="doc-meta"><span><i class="fas fa-calendar-alt"></i> April 2026</span><span><i class="fas fa-file-alt"></i> PDF, 4.2 MB</span></div></div><div class="doc-actions"><button class="doc-btn view-btn" onclick="viewDocument('IoT & Cloud Architecture Overview')"><i class="fas fa-eye"></i> View</button><button class="doc-btn download-btn" onclick="downloadDocument('iot-cloud-architecture.pdf')"><i class="fas fa-download"></i> Download</button></div></div><div class="document-card hover-lift"><div class="doc-icon"><i class="fas fa-file-pdf"></i></div><div><div class="doc-title">Financial Projections & ROI Analysis</div><div class="doc-meta"><span><i class="fas fa-calendar-alt"></i> March 2026</span><span><i class="fas fa-file-alt"></i> PDF, 1.5 MB</span></div></div><div class="doc-actions"><button class="doc-btn view-btn" onclick="viewDocument('Financial Projections & ROI Analysis')"><i class="fas fa-eye"></i> View</button><button class="doc-btn download-btn" onclick="downloadDocument('financial-projections-roi.pdf')"><i class="fas fa-download"></i> Download</button></div></div></div></div>
+    <div class="funding-cta hover-lift"><h3>Join Our Innovation Journey</h3><p>GetCAD is still a startup company, some services are currently unavailable due to financial constraints. So, We are seeking funders and strategic partners, to fund or invest in which ever way. Your investment will help us impprove in our services, manufacture locally, create jobs, and solve critical infrastructure challenges.</p><button class="btn btn-primary" onclick="openModal('funding')"><i class="fas fa-hand-holding-usd"></i> Become a Funder</button></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-header"><span class="tag">Simple Process</span><h2>How It <span>Works</span></h2><p>Submit your project idea and let us bring it to life from concept to finished product.</p></div>
+    <div class="steps-grid"><div class="step hover-lift"><div class="number">1</div><h5>Submit Your Idea</h5><p>Share your project details and vision.</p><span class="arrow"><i class="fas fa-chevron-right"></i></span></div><div class="step hover-lift"><div class="number">2</div><h5>Get a Quote</h5><p>We review and provide a detailed project quote.</p><span class="arrow"><i class="fas fa-chevron-right"></i></span></div><div class="step hover-lift"><div class="number">3</div><h5>Design & Develop</h5><p>Our team designs and iterates until it is perfect.</p><span class="arrow"><i class="fas fa-chevron-right"></i></span></div><div class="step hover-lift"><div class="number">4</div><h5>Deliver Product</h5><p>We fabricate, test, and deliver your finished product.</p></div></div>
+    <div style="text-align:center;margin-top:30px;"><a href="#" class="btn btn-primary" onclick="event.preventDefault(); showSection('contact')"><i class="fas fa-paper-plane"></i> Start Your Project</a></div>
+    
+    <div class="pic-grid">
+      <div class="pic-card hover-lift"><div class="image"><i class="fas fa-graduation-cap"></i></div><div class="caption"><h5>School Projects</h5><p>Complete electronics and science projects for students.</p></div></div>
+      <div class="pic-card hover-lift"><div class="image"><i class="fas fa-home"></i></div><div class="caption"><h5>Home Automation</h5><p>Smart home solutions and custom electronic installations.</p></div></div>
+      <div class="pic-card hover-lift"><div class="image"><i class="fas fa-industry"></i></div><div class="caption"><h5>Industrial Projects</h5><p>Embedded systems, control panels, and industrial automation.</p></div></div></div>
+  </div>
+</section>
+
+<!-- MARKETPLACE -->
+<section class="section" id="marketplace">
+  <div class="container">
+    <div class="section-header"><span class="tag">Coming Soon</span><h2>Our <span>Marketplace</span></h2><p>Buy pre-designed electronics modules, components, and project kits.</p></div>
+    <div class="marketplace-card hover-lift"><i class="fas fa-store-alt"></i><h3>🛒 Marketplace Coming Soon</h3><p>We are working on an online store for PCBs, 3D-printed parts, and project kits.</p><p style="font-size:12px;color:var(--gray-400);margin-top:6px;"><i class="fas fa-clock"></i> Launch expected Q1 2027</p><button class="btn btn-secondary" style="margin-top:14px;" onclick="showToast('📧 We\'ll notify you when we launch!','success')"><i class="fas fa-bell"></i> Notify Me</button></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="section-header"><span class="tag">Get in Touch</span><h2>Let's <span>Connect</span></h2><p>Have a project in mind? Reach out through any of our channels.</p></div>
+    <div class="contact-wrapper">
+      <div class="contact-info"><h4><i class="fas fa-map-marker-alt" style="color:var(--secondary);"></i> Visit Us</h4><div class="info-card"><p><strong>GetCAD Technologies Ltd</strong><br />GetCAD is still a startup company, founded by Robert Ng'ambi in Chama District of eastern province of zambia. It started in the early months of 2025. We are still planning to relocate in Lusaka, soon. Currectly located in chama, along F.T.C Road near Nkhanga Prymary School,<br />P.O Box 540049. CHAMA. </p></div><h4 style="margin-top:20px;"><i class="fas fa-phone" style="color:var(--secondary);"></i> Call Us</h4><div class="info-card"><a href="tel:+260973388699" class="contact-btn phone-btn"><i class="fas fa-phone-alt"></i> +260 973 388 699</a><a href="tel:+260764569476" class="contact-btn phone-btn"><i class="fas fa-phone-alt"></i> +260 764 569 476</a></div><h4 style="margin-top:20px;"><i class="fas fa-envelope" style="color:var(--secondary);"></i> Email Us</h4><div class="info-card"><a href="mailto:robertngambi808@gmail.com" class="contact-btn email-btn"><i class="fas fa-envelope"></i> robertngambi808@gmail.com</a><a href="mailto:getcadservices@gmail.com" class="contact-btn email-btn"><i class="fas fa-envelope"></i> getcadservices@gmail.com</a></div><h4 style="margin-top:20px;"><i class="fas fa-share-alt" style="color:var(--secondary);"></i> Connect</h4><div class="social-buttons"><a href="#" class="social-btn facebook" target="_blank"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a><a href="#" class="social-btn linkedin" target="_blank"><i class="fab fa-linkedin-in"></i></a></div><div style="margin-top:20px;"><h4><i class="fas fa-map" style="color:var(--secondary);"></i> Find Us</h4><div class="map-container"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7688.0!2d28.2833!3d-15.4167!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f0b1b1b1b1b1%3A0x0!2zMTXCsDI1JzAwLjAiUyAyOMKwMTcnMDAuMCJF!5e0!3m2!1sen!2szm!4v1700000000000" allowfullscreen loading="lazy"></iframe></div></div></div>
+      <div class="contact-form-wrapper hover-lift"><h4><i class="fas fa-paper-plane" style="color:var(--secondary);"></i> Send Us a Message</h4><p class="form-subtitle">We'll get back to you within 24 hours.</p><form id="contactForm" onsubmit="event.preventDefault(); submitContactForm();"><div class="form-row"><div class="form-group"><label>Your Name <span style="color:var(--danger);">*</span></label><input type="text" id="contactName" placeholder="e.g. John Mwape" required /></div><div class="form-group"><label>Phone number<span style="color:var(--danger);">*</span></label><input type="tel" id="contactPhone" placeholder="+260 97X XXX XXX" required /></div></div><div class="form-group"><label>Email <span style="color:var(--danger);">*</span></label><input type="email" id="contactEmail" placeholder="john@example.com" required /></div><div class="form-group"><label>Message <span style="color:var(--danger);">*</span></label><textarea id="contactMessage" placeholder="Share any info with us..." required></textarea></div><button type="submit" class="btn send-btn"><i class="fas fa-paper-plane"></i> Send Message</button></form><div class="newsletter-section"><h4><i class="fas fa-envelope-open-text" style="color:var(--secondary);"></i> Subscribe to Our Newsletter</h4><p>Stay updated with our latest innovations and company newsletters.</p><div class="newsletter-row"><input type="email" id="newsletterEmail" placeholder="Enter your email" /><button style="align-items: center;" onclick="subscribeNewsletter()">Subscribe</button></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><h3>Get<span>CAD</span></h3><p style="color:rgba(255,255,255,0.5);">Electronics & Mechanical Design — Innovating Africa's future through technology.</p><p style="margin-top:6px;font-size:13px;"><i class="fas fa-map-marker-alt" style="color:var(--secondary);"></i> Lusaka, Zambia</p><p style="font-size:13px;"><i class="fas fa-envelope" style="color:var(--secondary);"></i> getcadservices@gmail.com</p><p style="font-size:13px;"><i class="fas fa-phone" style="color:var(--secondary);"></i> +260 973 388 699 &nbsp;|&nbsp; +260 764 569 476</p></div>
+  <div class="footer-col"><h5>Services</h5><a onclick="event.preventDefault(); showSection('services')">Electronics Design</a><a onclick="event.preventDefault(); showSection('services')">Mechanical Design</a><a onclick="event.preventDefault(); showSection('services')">PCB Assembly</a><!----<a onclick="event.preventDefault(); showSection('services')">3D Printing</a>-----></div>
+  <div class="footer-col"><h5>Innovations</h5><a onclick="event.preventDefault(); showSection('water-meter')">Smart Water Meter</a><a onclick="event.preventDefault(); showSection('research')">Multi-SIM MiFi</a><a onclick="event.preventDefault(); showSection('research')">Electricity Meter</a><a onclick="event.preventDefault(); showSection('research')">DIY Power Banks</a><a href="water-flow-controller/web-index.html">Tank water level monitor</a></div>
+  <div class="footer-col"><h5>Company</h5><a onclick="event.preventDefault(); showSection('home')">Home</a><a onclick="event.preventDefault(); showSection('how-it-works')">How It Works</a><a onclick="event.preventDefault(); showSection('marketplace')">Marketplace</a><a onclick="event.preventDefault(); showSection('contact')">Contact</a><a onclick="event.preventDefault(); openModal('funding')">Become a Funder</a></div></div><div class="footer-bottom"><span>&copy; 2026 GetCAD Technologies Ltd. All rights reserved.</span><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-whatsapp"></i></a></div></div></div></footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalQuote"><div class="modal-box"><button class="close" onclick="closeModal('quote')">&times;</button><h3><i class="fas fa-file-invoice" style="color:var(--secondary);"></i> Request a Quote</h3><div class="subtitle">Tell us about your project and we'll send a detailed quote within 24 hours.</div><form id="quoteForm" action="https://formspree.io/f/your-quote-form-id" method="POST"><div class="form-group"><label>Your Name <span style="color:var(--danger);">*</span></label><input type="text" name="name" id="quoteName" placeholder="John Mwape" required /></div><div class="form-group"><label>Email <span style="color:var(--danger);">*</span></label><input type="email" name="email" id="quoteEmail" placeholder="john@example.com" required /></div><div class="form-group"><label>Phone</label><input type="text" name="phone" id="quotePhone" placeholder="+260 97X XXX XXX" /></div><div class="form-group"><label>Project Type <span style="color:var(--danger);">*</span></label><select name="projectType" id="quoteType"><option value="electronics">Electronics Design</option><option value="mechanical">Mechanical Design</option><option value="pcb">PCB Fabrication</option><option value="3d">3D Printing</option><option value="assembly">Assembly & Soldering</option><option value="school">School/Science Project</option><option value="home">Home Automation</option><option value="industrial">Industrial Project</option><option value="other">Other</option></select></div><div class="form-group"><label>Project Details <span style="color:var(--danger);">*</span></label><textarea name="projectDetails" id="quoteDetails" placeholder="Describe your project..." required></textarea></div><div class="modal-actions"><button type="button" class="cancel" onclick="closeModal('quote')">Cancel</button><button type="submit" class="submit">Submit Quote Request</button></div></form></div></div>
+<div class="modal-overlay" id="modalFunding"><div class="modal-box"><button class="close" onclick="closeModal('funding')">&times;</button><h3><i class="fas fa-hand-holding-usd" style="color:var(--accent);"></i> Partner with Us</h3><div class="subtitle">Be part of Africa's next big technology breakthrough.</div><div style="background:var(--gray-50);padding:14px;border-radius:var(--radius-sm);margin-bottom:14px;"><p style="font-size:13px;color:var(--gray-600);"><strong>Why fund GetCAD?</strong></p><ul style="font-size:12px;color:var(--gray-500);list-style:none;"><li><i class="fas fa-check" style="color:var(--secondary);"></i> Growing market (11.83% CAGR)</li><li><i class="fas fa-check" style="color:var(--secondary);"></i> Import substitution opportunity</li><li><i class="fas fa-check" style="color:var(--secondary);"></i> Break-even: 24 months</li><li><i class="fas fa-check" style="color:var(--secondary);"></i> Local manufacturing & job creation</li></ul></div><form id="fundingForm" action="https://formspree.io/f/your-funding-form-id" method="POST"><div class="form-group"><label>Your Name <span style="color:var(--danger);">*</span></label><input type="text" name="name" id="fundName" placeholder="Full name" required /></div><div class="form-group"><label>Organization</label><input type="text" name="organization" id="fundOrg" placeholder="Company or organization" /></div><div class="form-group"><label>Email <span style="color:var(--danger);">*</span></label><input type="email" name="email" id="fundEmail" placeholder="email@example.com" required /></div><div class="form-group"><label>Phone <span style="color:var(--danger);">*</span></label><input type="text" name="phone" id="fundPhone" placeholder="+260 97X XXX XXX" required /></div><div class="form-group"><label>Investment Interest</label><select name="investmentInterest" id="fundInterest"><option value="50-100k">$50,000 – $100,000</option><option value="100-250k">$100,000 – $250,000</option><option value="250-500k">$250,000 – $500,000</option><option value="500k-1m">$500,000 – $1,000,000</option><option value="1m+">$1,000,000+</option></select></div><div class="form-group"><label>Message</label><textarea name="message" id="fundMessage" placeholder="Any questions or comments..."></textarea></div><div class="modal-actions"><button type="button" class="cancel" onclick="closeModal('funding')">Cancel</button><button type="submit" class="submit" style="background:var(--accent);color:var(--gray-900);">Partner with Us</button></div></form></div></div>
+
+<!-- CHAT -->
+<button class="chat-button" id="chatButton" onclick="toggleChat()"><i class="fas fa-comment-dots"></i><span class="badge">1</span></button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-header"><div class="left"><div class="avatar">G</div><div class="info"><div class="name">GetCAD Assistant</div><div class="status"><span class="dot"></span> Online</div></div></div><div class="actions"><button onclick="resetChat()" title="New Chat"><i class="fas fa-undo-alt"></i></button><button onclick="toggleChat()" title="Close"><i class="fas fa-times"></i></button></div></div>
+  <div class="chat-messages" id="chatMessages"><div class="message bot"><div class="avatar">G</div><div><div class="bubble">👋 Hi there! I'm your GetCAD assistant.<br><br>I can help with:<br>• <strong>GetCAD</strong> – services & projects<br>• <strong>Smart Water Meter</strong> – flagship product<br>• <strong>SimHub</strong> – Multi-SIM MiFi<br>• <strong>Investments</strong> – funding opportunities<br>• <strong>Contact</strong> – reach our team<br><br>What would you like to know?<div class="message-actions"><button onclick="likeMessage(this)"><i class="far fa-thumbs-up"></i> <span class="count">0</span></button><button onclick="speakMessage(this)"><i class="fas fa-volume-up"></i></button></div></div><span class="time">Just now</span></div></div></div>
+  <div class="typing-indicator" id="typingIndicator"><div class="dots"><span></span><span></span><span></span></div></div>
+  <div class="quick-actions" id="quickActions"><button onclick="sendQuickReply('What is GetCAD?')">About GetCAD</button><button onclick="sendQuickReply('Tell me about the Smart Water Meter')">Water Meter</button><button onclick="sendQuickReply('What is SimHub?')">SimHub</button><button onclick="sendQuickReply('How can I invest?')">Invest</button><button onclick="sendQuickReply('Contact GetCAD')">Contact</button></div>
+  <div class="chat-input"><div class="input-wrapper"><input type="text" id="chatInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()" /></div><button class="send-btn" id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  // ===== NAVIGATION =====
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+    const target = document.getElementById(sectionId);
+    if (target) { target.style.display = 'block'; target.classList.add('active'); }
+    // update both desktop and mobile nav links
+    document.querySelectorAll('.nav-desktop a[data-section], .nav-mobile a[data-section]').forEach(link => {
+      link.classList.remove('active-link');
+      if (link.dataset.section === sectionId) link.classList.add('active-link');
+    });
+    // close mobile nav
+    document.getElementById('mobileNav').classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (sectionId === 'home') startCarousel(); else if (carouselInterval) { clearInterval(carouselInterval); carouselInterval = null; }
+  }
+
+  // toggle mobile nav – open/close
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobileNav');
+    nav.classList.toggle('open');
+  }
+
+  // close mobile nav when a link is clicked (via inline onclick)
+  // we also handle it in showSection
+
+  // ===== CAROUSEL =====
+  let currentSlide = 0, carouselInterval = null;
+  function goToSlide(index) {
+    document.querySelectorAll('.hero-carousel .slide').forEach((s,i) => s.classList.toggle('active', i === index));
+    document.querySelectorAll('.carousel-dots .dot').forEach((d,i) => d.classList.toggle('active', i === index));
+    currentSlide = index;
+  }
+  function nextSlide() { goToSlide((currentSlide + 1) % 3); }
+  function startCarousel() { if (carouselInterval) clearInterval(carouselInterval); carouselInterval = setInterval(nextSlide, 8000); }
+
+  // ===== TOAST =====
+  function showToast(msg, type='') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+    t.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(40px)'; setTimeout(() => t.remove(), 400); }, 3500);
+  }
+
+  // ===== MODALS =====
+  function openModal(type) { const map={quote:'modalQuote',funding:'modalFunding'}; document.getElementById(map[type]).classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeModal(type) { const map={quote:'modalQuote',funding:'modalFunding'}; document.getElementById(map[type]).classList.remove('open'); document.body.style.overflow=''; }
+  document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) { this.classList.remove('open'); document.body.style.overflow=''; } }));
+
+  // ===== FORMS (simplified) =====
+  document.getElementById('quoteForm').addEventListener('submit', function(e) {
+    e.preventDefault(); const btn = this.querySelector('.submit'), orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+    fetch(this.action, { method: 'POST', body: new FormData(this), headers: { 'Accept': 'application/json' } })
+      .then(r => { if (r.ok) { showToast('✅ Quote submitted! We\'ll respond within 24h.', 'success'); this.reset(); closeModal('quote'); } else showToast('❌ Submission failed.', 'error'); })
+      .catch(() => showToast('❌ Network error.', 'error'))
+      .finally(() => { btn.innerHTML = orig; btn.disabled = false; });
+  });
+  document.getElementById('fundingForm').addEventListener('submit', function(e) {
+    e.preventDefault(); const btn = this.querySelector('.submit'), orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+    fetch(this.action, { method: 'POST', body: new FormData(this), headers: { 'Accept': 'application/json' } })
+      .then(r => { if (r.ok) { showToast('🙏 Thank you! Our team will contact you.', 'success'); this.reset(); closeModal('funding'); } else showToast('❌ Submission failed.', 'error'); })
+      .catch(() => showToast('❌ Network error.', 'error'))
+      .finally(() => { btn.innerHTML = orig; btn.disabled = false; });
+  });
+  function submitContactForm() {
+    const form = document.getElementById('contactForm'); const btn = form.querySelector('.send-btn'), orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+    fetch('https://formspree.io/f/your-contact-form-id', { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } })
+      .then(r => { if (r.ok) { showToast('✅ Message sent! We\'ll respond within 24h.', 'success'); form.reset(); } else showToast('❌ Failed to send.', 'error'); })
+      .catch(() => showToast('❌ Network error.', 'error'))
+      .finally(() => { btn.innerHTML = orig; btn.disabled = false; });
+  }
+  function subscribeNewsletter() {
+    const email = document.getElementById('newsletterEmail').value.trim();
+    if (!email || !email.includes('@')) { showToast('⚠️ Please enter a valid email.', ''); return; }
+    const btn = document.querySelector('.newsletter-section button'), orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+    fetch('https://formspree.io/f/your-newsletter-form-id', { method: 'POST', body: JSON.stringify({ email }), headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } })
+      .then(r => { if (r.ok) { showToast('✅ Subscribed!', 'success'); document.getElementById('newsletterEmail').value = ''; } else showToast('❌ Subscription failed.', 'error'); })
+      .catch(() => showToast('❌ Network error.', 'error'))
+      .finally(() => { btn.innerHTML = orig; btn.disabled = false; });
+  }
+
+  // ===== DOCUMENTS (simplified) =====
+  const docsData = [
+    { id:1, title:'GetCAD Investment Prospectus 2026', filename:'investment-prospectus-2026.pdf', size:'2.4 MB', date:'July 2026', views:45, content:'GetCAD Technologies Investment Prospectus 2026\n\nExecutive Summary\nGetCAD Technologies Ltd is a Zambian technology startup established in 2025, positioned to revolutionize the water utility sector through local manufacturing of advanced IoT-enabled prepaid water meters.\n\nMarket Opportunity\nThe Zambian water meter market has experienced significant growth with an 11.83% CAGR from 2020 to 2024 and a remarkable 229.11% surge in 2024 alone.\n\nInvestment Highlights\n• Funding Required: $600,000\n• Break-even: 24 months\n• Projected Year 5 Revenue: $8.72M\n• Projected Year 5 Net Profit: $3.1M\n\nUse of Funds\n• Facility Construction & Setup: $120,000 (20%)\n• Manufacturing Equipment: $215,000 (36%)\n• Raw Materials & Components: $130,000 (22%)\n• Product Certification: $30,000 (5%)\n• Staff Salaries: $75,000 (12%)\n• Marketing & Launch: $20,000 (3%)\n• Operations & Contingency: $10,000 (2%)' },
+    { id:2, title:'Smart Water Meter Technical Whitepaper', filename:'smart-water-meter-whitepaper.pdf', size:'3.8 MB', date:'June 2026', views:32, content:'GetCAD Smart Water Meter - Technical Whitepaper\n\nProduct Overview\nThe GetCAD Advanced Pre-paid Water Meter is a modern electronic device that measures water flow through a high-precision sensor, displays consumption data on an integrated LCD screen, uploads data to cloud servers via GSM, and automatically shuts off water when units are depleted.\n\nHardware Architecture\n• AT90U - Main microcontroller\n• SIM800C - GSM module\n• DS3231M - Real-time clock\n• DRV8833PW - Motor driver\n• Flow Sensor - Hall effect\n• 16x2 LCD - Display\n• RGB LED - Mode indicator\n\nTechnical Specifications\n• Accuracy: ±2% (Class B)\n• Flow Range: 15-3000 L/h\n• Pressure: 1.6 MPa\n• Protection: IP68\n• Battery: 3.6V Lithium (10+ years)\n• Communication: GSM + Bluetooth 4.0' },
+    { id:3, title:'Market Analysis & Growth Strategy', filename:'market-analysis-growth-strategy.pdf', size:'1.9 MB', date:'May 2026', views:28, content:'GetCAD Market Analysis & Growth Strategy\n\nMarket Overview\nZambia\'s water meter market has experienced significant growth with an 11.83% CAGR from 2020 to 2024.\n\nCompetitive Landscape\n• South Africa: 35%\n• Slovenia: 20%\n• China: 18%\n• Hong Kong: 12%\n• Italy: 10%\n\nGrowth Strategy\nPhase 1 (Year 1-2):\n• Secure ZABS certification\n• Pilot program with LWSC\n• Initial production: 5,000 units\n\nPhase 2 (Year 3-4):\n• Expand to all 11 utilities\n• Scale production to 50,000 units\n\nPhase 3 (Year 5+):\n• Regional SADC expansion\n• Production capacity: 65,000+ units' },
+    { id:4, title:'IoT & Cloud Architecture Overview', filename:'iot-cloud-architecture.pdf', size:'4.2 MB', date:'April 2026', views:19, content:'GetCAD IoT & Cloud Architecture Overview\n\nSystem Architecture\n┌─────────────────────────────────────────────────────────┐\n│              GETCAD IoT CLOUD PLATFORM                │\n├───────────────┬───────────────────┬───────────────────┤\n│   API Gateway │    Database       │   Real-Time       │\n│   (REST)      │    (MongoDB)      │   (WebSockets)    │\n└───────┬───────┴─────────┬─────────┴─────────┬─────────┘\n        │                 │                   │\n        ▼                 ▼                   ▼\n┌─────────────────────────────────────────────────────────┐\n│              Cellular Network (GSM/4G)                 │\n└─────────────────────────────────────────────────────────┘\n\nKey Components\n1. Meter Firmware (C on AT90U)\n2. GSM Communication (SIM800C via MQTT/HTTP)\n3. Cloud Backend (Node.js + Express)\n4. Database (MongoDB)\n5. Real-time Updates (Socket.IO)\n\nSecurity Features\n• JWT Authentication\n• SSL/TLS Encryption\n• API Rate Limiting' },
+    { id:5, title:'Financial Projections & ROI Analysis', filename:'financial-projections-roi.pdf', size:'1.5 MB', date:'March 2026', views:41, content:'GetCAD Financial Projections & ROI Analysis\n\nRevenue Projections\n┌──────────┬────────────┬────────────┬────────────┐\n│  Year    │  Revenue   │  Profit    │  Units     │\n├──────────┼────────────┼────────────┼────────────┤\n│  Year 1  │  $662,500  │  -$75,000  │  5,000     │\n│  Year 2  │  $1,995,000│  $425,000  │  15,000    │\n│  Year 3  │  $4,655,000│  $1,400,000│  35,000    │\n│  Year 4  │  $6,680,000│  $2,200,000│  50,000    │\n│  Year 5  │  $8,720,000│  $3,100,000│  65,000    │\n└──────────┴────────────┴────────────┴────────────┘\n\nBreak-Even Analysis\n• Break-even Point: Month 16-18\n• Break-even Units: ~10,000 units annually\n• Investment Required: $600,000\n• 5-Year ROI: 417%\n• IRR: 45%+\n• Payback Period: 3.5 years' }
+  ];
+
+  function viewDocument(title) {
+    const doc = docsData.find(d => d.title === title);
+    if (!doc) { showToast('⚠️ Document not found', 'error'); return; }
+    doc.views = (doc.views || 0) + 1;
+    const viewer = document.createElement('div');
+    viewer.className = 'doc-viewer-overlay open';
+    viewer.id = 'docViewerOverlay';
+    const lines = doc.content ? doc.content.split('\n') : ['No content'];
+    let html = '';
+    lines.forEach(line => {
+      const t = line.trim();
+      if (t.startsWith('•')) html += `<li>${t.substring(1).trim()}</li>`;
+      else if (t.match(/^\d+\./)) html += `<li>${t}</li>`;
+      else if (t === t.toUpperCase() && t.length > 3 && !t.includes('│')) html += `<h3>${t}</h3>`;
+      else if (t.includes('│') || t.includes('┌') || t.includes('├') || t.includes('└')) {
+        if (t.includes('┌') || t.includes('├') || t.includes('└')) html += `<div style="background:#f1f5f9;padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;margin:4px 0;color:#475569;">${t}</div>`;
+        else { const cells = t.split('│').filter(c => c.trim()); html += `<tr>${cells.map(c => `<td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;">${c.trim()}</td>`).join('')}</tr>`; }
+      } else if (t) html += `<p>${t}</p>`;
+    });
+    viewer.innerHTML = `
+      <div class="doc-viewer-container">
+        <div class="doc-viewer-header"><div class="doc-viewer-title"><i class="fas fa-file-pdf" style="color:#dc2626;font-size:22px;"></i><span>${doc.title}</span></div><button class="doc-viewer-close" onclick="closeDocViewer()"><i class="fas fa-times"></i></button></div>
+        <div class="doc-viewer-toolbar"><div class="doc-viewer-meta"><span><i class="fas fa-calendar-alt"></i> ${doc.date}</span><span><i class="fas fa-file-alt"></i> ${doc.size}</span><span><i class="fas fa-eye"></i> ${doc.views} views</span></div><div class="doc-viewer-actions"><button class="doc-btn download-btn" onclick="downloadDocument('${doc.filename}')"><i class="fas fa-download"></i> Download PDF</button><button class="doc-btn print-btn" onclick="printDocument()"><i class="fas fa-print"></i> Print</button><button class="doc-btn fullscreen-btn" onclick="toggleFullscreen()"><i class="fas fa-expand"></i> Fullscreen</button></div></div>
+        <div class="doc-viewer-content" id="docViewerContent"><div class="doc-page"><div class="doc-page-content">${html}</div><div class="doc-page-number">Page 1 of 1</div></div></div>
+        <div class="doc-viewer-footer"><span><i class="fas fa-lock" style="font-size:11px;"></i> Secure document</span><span>GetCAD Technologies Ltd © 2026</span></div>
+      </div>`;
+    document.body.appendChild(viewer);
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDocViewer() { const o = document.getElementById('docViewerOverlay'); if(o){ o.remove(); document.body.style.overflow = ''; } }
+  function downloadDocument(fn) { showToast(`📥 Downloading "${fn}"...`, ''); setTimeout(() => showToast(`✅ "${fn}" downloaded!`, 'success'), 1200); }
+  function printDocument() {
+    const c = document.getElementById('docViewerContent'); if(!c) return;
+    const w = window.open('', '_blank'); if(!w) { showToast('⚠️ Allow pop-ups to print', 'error'); return; }
+    const title = document.querySelector('.doc-viewer-title span')?.textContent || 'Document';
+    w.document.write(`<html><head><title>${title}</title><style>body{font-family:Inter,sans-serif;padding:40px;max-width:800px;margin:0 auto;}h3{color:#0a2463;}</style></head><body><h1>${title}</h1>${c.innerHTML}</body></html>`);
+    w.document.close(); setTimeout(() => w.print(), 400);
+  }
+  function toggleFullscreen() { const c = document.querySelector('.doc-viewer-container'); if(!c) return; if(!document.fullscreenElement) c.requestFullscreen?.()?.catch(()=>{}); else document.exitFullscreen?.(); }
+
+  // ===== CHAT ASSISTANT =====
+  let chatOpen = false;
+  const kb = { company:{ name:'GetCAD Technologies Ltd', founded:2025, location:'Lusaka, Zambia', address:'Light Industrial Area, Along Cha Cha Cha Road, Plot No. 1012, P.O. Box 11003, Lusaka, Zambia', email:'robertngambi808@gmail.com', email2:'getcadservices@gmail.com', phone:'+260 973 388 699', phone2:'+260 764 569 476', mission:'To provide smart, locally manufactured water metering solutions that reduce Non-Revenue Water, improve utility revenue collection, and empower Zambian consumers.' }, waterMeter:{ name:'Smart Prepaid Water Meter', description:'IoT-enabled prepaid water meter with GSM connectivity, Bluetooth, and three flexible operating modes.', features:['Three Operating Modes: Prepaid, Periodic, and Service','GSM connectivity for cloud communication','Bluetooth for mobile app connection','Real-time usage tracking and SMS alerts','Tamper detection and automatic shutoff','10+ year battery life','IP68 waterproof rating'] }, simhub:{ name:'SimHub - Multi-SIM MiFi Device', description:'Intelligent hotspot with app-controlled SIM switching for calls, SMS, and data.', website:'https://simhub.org', status:'Currently in development' }, funding:{ required:'$600,000', equity:'15-20%', breakEven:'24 months', year5Revenue:'$8.72M', year5Profit:'$3.1M', roi:'417% over 5 years' } };
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    const w = document.getElementById('chatWindow'), b = document.getElementById('chatButton');
+    if (chatOpen) { w.classList.add('open'); b.style.display = 'none'; setTimeout(() => document.getElementById('chatInput').focus(), 300); } else { w.classList.remove('open'); b.style.display = 'flex'; }
+  }
+
+  function getAIResponse(q) {
+    const lq = q.toLowerCase().trim();
+    if (lq.match(/^(hi|hello|hey|greetings|howdy|sup|yo|hola)/)) return { type:'text', response:['Hello 👋 Welcome to GetCAD!','How can I assist? I can help with:','• Our services','• Smart Water Meter','• SimHub (Multi-SIM MiFi)','• Investment opportunities','• Contact info','','Just type your question!'] };
+    if (lq.match(/contact|reach|email|phone|call|message|talk|speak|support|help|get in touch|contact us/)) return { type:'contact', response:['📞 **Contact GetCAD**','','**Call:**',`• ${kb.company.phone}`,`• ${kb.company.phone2}`,'','**Email:**',`• ${kb.company.email}`,`• ${kb.company.email2}`,'','**Visit:**',`${kb.company.address}`,'','Would you like to call or email now?'], actions:{ type:'contact', phone:kb.company.phone, phone2:kb.company.phone2, email:kb.company.email, email2:kb.company.email2 } };
+    if (lq.match(/invest|funding|funder|investment|investor|capital|seed|startup funding|partner|donate|support|sponsor|finance|money|financial/)) return { type:'funding', response:['💰 **Investment Opportunity**','',`Funding Required: ${kb.funding.required}`,`Equity Offered: ${kb.funding.equity}`,`Break-even: ${kb.funding.breakEven}`,`Year 5 Revenue: ${kb.funding.year5Revenue}`,`Year 5 Net Profit: ${kb.funding.year5Profit}`,`5-Year ROI: ${kb.funding.roi}`,'','Would you like to become a funder?'], actions:{ type:'funding', openModal:'funding' } };
+    if (lq.match(/what is getcad|about getcad|tell me about getcad|getcad technologies|getcad company|who is getcad|what does getcad do|getcad overview/)) return { type:'text', response:[`**GetCAD Technologies Ltd**`,'',`Founded: ${kb.company.founded}`,`Location: ${kb.company.location}`,'',`**Mission:** ${kb.company.mission}`,'','We specialize in electronics design, mechanical engineering, and smart utility solutions for Africa.'] };
+    if (lq.match(/water meter|smart meter|prepaid meter|meter|smart water|getcad meter|water units|water flow|water consumption/)) {
+      const wm = kb.waterMeter;
+      return { type:'text', response:[`**${wm.name}**`,'',wm.description,'','**Features:**', ...wm.features.map(f=>`• ${f}`),'','**Advantages:**','• 30-40% cost advantage over imports','• Local manufacturing in Zambia','• Mobile money integration','• ZABS certified','• 10+ year battery life'] };
+    }
+    if (lq.match(/simhub|sim hub|multi sim|mifi|multi-sim|hotspot|sim switch|simhub device|simhub product|simhub com|www.simhub/)) return { type:'simhub', response:[`**${kb.simhub.name}**`,'',kb.simhub.description,'',`🔗 **Website:** ${kb.simhub.website}`,`📌 **Status:** ${kb.simhub.status}`,'','Would you like more details?'], actions:{ type:'simhub', website:'https://simhub.org' } };
+    return { type:'text', response:["I'm not sure I understand. Could you rephrase?","","💡 Try asking about:","• 'GetCAD' – company overview","• 'Water Meter' – smart prepaid meter","• 'SimHub' – Multi-SIM MiFi","• 'Contact' – call or email us","• 'Invest' or 'Funding' – investment opportunity","","📧 Or email us at getcadservices@gmail.com"] };
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chatInput'); const msg = input.value.trim();
+    if (!msg) return;
+    addMessage('user', msg);
+    input.value = ''; input.disabled = true; document.getElementById('sendBtn').disabled = true;
+    document.getElementById('typingIndicator').classList.add('active');
+    setTimeout(() => {
+      document.getElementById('typingIndicator').classList.remove('active');
+      const result = getAIResponse(msg);
+      addMessage('bot', result.response.join('\n\n'));
+      if (result.actions) handleActions(result.actions);
+      input.disabled = false; document.getElementById('sendBtn').disabled = false; input.focus(); scrollChat();
+    }, 300 + Math.random() * 400);
+  }
+
+  function sendQuickReply(text) { document.getElementById('chatInput').value = text; sendMessage(); }
+
+  function addMessage(type, text) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `message ${type}`;
+    const time = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>').replace(/•/g, '•');
+    if (type === 'bot') {
+      div.innerHTML = `<div class="avatar">G</div><div><div class="bubble">${formatted}<div class="message-actions"><button onclick="likeMessage(this)"><i class="far fa-thumbs-up"></i> <span class="count">0</span></button><button onclick="speakMessage(this)"><i class="fas fa-volume-up"></i></button></div></div><span class="time">${time}</span></div>`;
+    } else {
+      div.innerHTML = `<div class="bubble">${formatted}</div><span class="time">${time}</span>`;
+    }
+    container.appendChild(div);
+    scrollChat();
+  }
+
+  function likeMessage(btn) { const c = btn.querySelector('.count'); let n = parseInt(c.textContent); n++; c.textContent = n; btn.querySelector('i').className = 'fas fa-thumbs-up'; btn.classList.add('liked'); showToast('👍 Liked!', ''); }
+  function speakMessage(btn) {
+    const bubble = btn.closest('.bubble'); const text = bubble.textContent.replace(/[0-9]+/g,'').trim();
+    if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=0.9; window.speechSynthesis.speak(u); showToast('🔊 Speaking...', ''); } else showToast('⚠️ TTS not supported.', 'error');
+  }
+
+  function handleActions(actions) {
+    const container = document.getElementById('chatMessages');
+    const card = document.createElement('div');
+    card.className = 'message bot';
+    let btns = '';
+    if (actions.type === 'contact') {
+      btns = `<button class="call-btn" onclick="window.location.href='tel:${actions.phone}'"><i class="fas fa-phone"></i> Call ${actions.phone}</button><button class="call-btn" onclick="window.location.href='tel:${actions.phone2}'"><i class="fas fa-phone"></i> Call ${actions.phone2}</button><button class="email-btn" onclick="window.location.href='mailto:${actions.email}'"><i class="fas fa-envelope"></i> Email</button>`;
+    } else if (actions.type === 'funding') {
+      btns = `<button class="fund-btn" onclick="openModal('funding')"><i class="fas fa-hand-holding-usd"></i> Open Funding Form</button><button class="email-btn" onclick="window.location.href='mailto:${kb.company.email2}?subject=Investment%20Inquiry'"><i class="fas fa-envelope"></i> Email Inquiry</button>`;
+    } else if (actions.type === 'simhub') {
+      btns = `<button class="fund-btn" style="background:#3b82f6;" onclick="window.open('${actions.website}','_blank')"><i class="fas fa-external-link-alt"></i> Visit SimHub</button>`;
+    }
+    card.innerHTML = `<div class="avatar">G</div><div><div class="bubble" style="padding:6px 10px;max-width:95%;"><div class="action-card"><div class="title">${actions.type === 'contact' ? '📞 Connect' : actions.type === 'funding' ? '💰 Fund' : '🌐 Visit'}</div><div class="subtitle">${actions.type === 'contact' ? 'Choose how to reach us' : actions.type === 'funding' ? 'Partner with GetCAD' : 'Learn more about SimHub'}</div><div class="buttons">${btns}<button class="close-btn" onclick="this.closest('.action-card').style.display='none'"><i class="fas fa-times"></i> Dismiss</button></div></div></div><span class="time">Just now</span></div>`;
+    container.appendChild(card);
+    scrollChat();
+  }
+
+  function scrollChat() { const c = document.getElementById('chatMessages'); c.scrollTop = c.scrollHeight; }
+
+  function resetChat() {
+    const c = document.getElementById('chatMessages');
+    c.innerHTML = `<div class="message bot"><div class="avatar">G</div><div><div class="bubble">👋 Hi there! I'm your GetCAD assistant.<br><br>I can help with:<br>• <strong>GetCAD</strong> – services & projects<br>• <strong>Smart Water Meter</strong> – flagship product<br>• <strong>SimHub</strong> – Multi-SIM MiFi<br>• <strong>Investments</strong> – funding opportunities<br>• <strong>Contact</strong> – reach our team<br><br>What would you like to know?<div class="message-actions"><button onclick="likeMessage(this)"><i class="far fa-thumbs-up"></i> <span class="count">0</span></button><button onclick="speakMessage(this)"><i class="fas fa-volume-up"></i></button></div></div><span class="time">Just now</span></div></div>`;
+    document.getElementById('chatInput').value = ''; document.getElementById('chatInput').disabled = false; document.getElementById('sendBtn').disabled = false;
+  }
+
+  // ===== INIT =====
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.section').forEach(s => { s.style.display = 'none'; });
+    const home = document.getElementById('home'); if (home) { home.style.display = 'block'; home.classList.add('active'); }
+    document.querySelectorAll('.nav-desktop a[data-section], .nav-mobile a[data-section]').forEach(link => {
+      if (link.dataset.section === 'home') link.classList.add('active-link');
+    });
+    startCarousel();
+    if (!sessionStorage.getItem('getcad_chat_visited')) {
+      setTimeout(() => { const badge = document.querySelector('.chat-button .badge'); if (badge) { badge.style.animation = 'pulse-badge 0.3s infinite'; setTimeout(() => badge.style.animation = 'pulse-badge 2s infinite', 3000); } }, 6000);
+      sessionStorage.setItem('getcad_chat_visited', 'true');
+    }
+    console.log('🚀 GetCAD Technologies Ltd website loaded');
+  });
+</script>
+</body>
+</html>

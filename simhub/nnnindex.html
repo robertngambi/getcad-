@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamburger + Tab Sections</title>
+  <style>
+    /* ===== RESET & GLOBAL ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ===== NAVBAR (with hamburger) ===== */
+    .navbar {
+      position: relative;
+      background: #0f172a;
+      color: white;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 1001;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.5px;
+      color: #facc15;
+    }
+
+    /* ----- desktop tab list (hidden on mobile) ----- */
+    .nav-tabs {
+      display: flex;
+      gap: 1.8rem;
+      list-style: none;
+    }
+
+    .nav-tabs li a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      padding: 0.4rem 0;
+      border-bottom: 3px solid transparent;
+      transition: 0.2s;
+    }
+
+    .nav-tabs li a:hover,
+    .nav-tabs li a.active {
+      color: white;
+      border-bottom-color: #facc15;
+    }
+
+    /* ----- HAMBURGER BUTTON (hidden on desktop) ----- */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .hamburger:hover {
+      background: #1e293b;
+    }
+
+    .hamburger .bar {
+      display: block;
+      width: 28px;
+      height: 3px;
+      margin: 6px 0;
+      background: white;
+      border-radius: 4px;
+      transition: 0.3s;
+    }
+
+    /* ----- MOBILE DROPDOWN (hidden by default) ----- */
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top:100%;
+      left: 0;
+      width: 100%;
+      background: #0f172a;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-top: 1px solid #1e293b;
+      padding: 1rem 0 1.5rem;
+      margin-top: 0.8rem;
+      z-index: 1000;
+    }
+
+    .mobile-menu ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      align-items: center;
+    }
+
+    .mobile-menu ul li a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 1.3rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      transition: background 0.2s, color 0.2s;
+      display: inline-block;
+    }
+
+    .mobile-menu ul li a:hover,
+    .mobile-menu ul li a.active {
+      background: #facc15;
+      color: #0f172a;
+    }
+
+    /* show mobile menu when .show class is added (via JS) */
+    .mobile-menu.show {
+      display: block;
+    }
+
+    /* ===== SECTIONS ===== */
+    .sections-container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .section {
+      display: none;   /* hidden by default */
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e9eef3;
+      animation: fade 0.25s ease;
+    }
+
+    .section.active {
+      display: block;   /* only active section is shown */
+    }
+
+    @keyframes fade {
+      from { opacity: 0.4; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #0f172a;
+      border-left: 6px solid #facc15;
+      padding-left: 1.2rem;
+    }
+
+    .section p {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: #334155;
+      margin-bottom: 0.8rem;
+    }
+
+    .section small {
+      color: #64748b;
+    }
+
+    /* ===== RESPONSIVE (mobile) ===== */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0.8rem 1.2rem;
+      }
+
+      /* hide desktop tab list */
+      .nav-tabs {
+        display: none;
+      }
+
+      /* show hamburger */
+      .hamburger {
+        display: block;
+      }
+
+      /* when menu is open, rotate bars into an X (optional) */
+      .hamburger.active .bar:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+      }
+      .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+      }
+
+      .mobile-menu ul li a {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* for very small screens */
+    @media (max-width: 480px) {
+      .section {
+        padding: 1.8rem 1.2rem;
+      }
+      .section h2 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">MySite</div>
+
+    <!-- Desktop tabs (hidden on mobile via CSS) -->
+    <ul class="nav-tabs" id="desktopTabs">
+      <li><a href="#" data-section="home" class="active">Home</a></li>
+      <li><a href="#" data-section="about">About</a></li>
+      <li><a href="#" data-section="services">Services</a></li>
+      <li><a href="#" data-section="contacts">Contacts</a></li>
+      <li><a href="#" data-section="buy">Buy Us</a></li>
+    </ul>
+
+    <!-- Hamburger button (visible on mobile only) -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <!-- Mobile dropdown menu (hidden by default) -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="#" data-section="home" class="active">Home</a></li>
+        <li><a href="#" data-section="about">About</a></li>
+        <li><a href="#" data-section="services">Services</a></li>
+        <li><a href="#" data-section="contacts">Contacts</a></li>
+        <li><a href="#" data-section="buy">Buy Us</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- SECTIONS CONTAINER -->
+  <main class="sections-container">
+    <!-- HOME -->
+    <section id="home" class="section active">
+      <h2>🏠 Home</h2>
+      <p>Welcome to our homepage. This is the home section — you are viewing it because you clicked "Home".</p>
+      <p><small>Only one section is visible at a time. Use the navigation (or hamburger on mobile) to switch.</small></p>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2>📄 About</h2>
+      <p>Learn more about our story, mission, and the people behind the work.</p>
+      <p><small>This section appears only when "About" is selected.</small></p>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="section">
+      <h2>⚙️ Services</h2>
+      <p>We offer web development, UI/UX design, consulting, and more.</p>
+      <p><small>Click the Services tab to see this content.</small></p>
+    </section>
+
+    <!-- CONTACTS -->
+    <section id="contacts" class="section">
+      <h2>📞 Contacts</h2>
+      <p>Email: hello@example.com<br>Phone: +1 (555) 123-4567</p>
+      <p><small>Reach out — we’d love to hear from you.</small></p>
+    </section>
+
+    <!-- BUY US -->
+    <section id="buy" class="section">
+      <h2>🛒 Buy Us</h2>
+      <p>Support our work by buying us a coffee or purchasing our premium products.</p>
+      <p><small>Thank you for your support!</small></p>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      // ----- GET ELEMENTS -----
+      const hamburger = document.getElementById('hamburgerBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      // All links that have data-section (both desktop and mobile)
+      const allNavLinks = document.querySelectorAll('a[data-section]');
+      // All sections
+      const allSections = document.querySelectorAll('.section');
+
+      // ----- 1. HAMBURGER TOGGLE (mobile menu) -----
+      hamburger.addEventListener('click', function(e) {
+        e.stopPropagation();   // avoid weird bubbling
+        mobileMenu.classList.toggle('show');
+        hamburger.classList.toggle('active');
+      });
+
+      // Close mobile menu when clicking outside of it (optional but nice)
+      document.addEventListener('click', function(event) {
+        // if mobile menu is open and click target is not inside navbar/menu
+        if (mobileMenu.classList.contains('show')) {
+          const isClickInsideNavbar = event.target.closest('.navbar');
+          if (!isClickInsideNavbar) {
+            mobileMenu.classList.remove('show');
+            hamburger.classList.remove('active');
+          }
+        }
+      });
+
+      // ----- 2. SECTION SWITCHING (TABS) -----
+      function switchSection(sectionId) {
+        // 2a. hide all sections, then show the target section
+        allSections.forEach(section => {
+          section.classList.remove('active');
+        });
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+          targetSection.classList.add('active');
+        }
+
+        // 2b. update active class on all nav links (desktop + mobile)
+        allNavLinks.forEach(link => {
+          link.classList.remove('active');
+          // if link's data-section matches the chosen sectionId, mark as active
+          if (link.getAttribute('data-section') === sectionId) {
+            link.classList.add('active');
+          }
+        });
+
+        // 2c. (Optional) close mobile menu after selecting a section
+        //     only if we are in mobile view (hamburger visible)
+        if (window.getComputedStyle(hamburger).display !== 'none') {
+          mobileMenu.classList.remove('show');
+          hamburger.classList.remove('active');
+        }
+      }
+
+      // ----- 3. ATTACH CLICK EVENTS TO ALL NAVIGATION LINKS -----
+      allNavLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+          event.preventDefault();   // prevent page jump / hash
+
+          const sectionId = this.getAttribute('data-section');
+          if (!sectionId) return;
+
+          switchSection(sectionId);
+        });
+      });
+
+      // ----- 4. (BONUS) close mobile menu if screen is resized to desktop -----
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+          mobileMenu.classList.remove('show');
+          hamburger.classList.remove('active');
+        }
+      });
+
+      // ----- 5. INIT: make sure only the active section is visible (already home active by default) -----
+      // but we also want to sync active link based on the visible section (if needed)
+      // The initial HTML has "home" active on both link and section, so it's fine.
+      // Just ensure that if something strange happens, we set it.
+      // (optional) call switchSection('home') but that might cause a tiny flash.
+      // not needed, but we can double-check:
+      // (only run if no section has .active? but we have one.)
+    })();
+  </script>
+
+  <!-- small note: click on mobile menu links also closes menu because we attach same handler -->
+</body>
+</html>

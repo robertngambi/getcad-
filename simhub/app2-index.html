@@ -1,0 +1,4149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#059669">
+<title>SimHub Connect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ============================================================
+   RESET & TOKENS
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#059669;
+  --primary-dark:#047857;
+  --primary-light:#10b981;
+  --primary-grad:linear-gradient(135deg,#059669 0%,#10b981 100%);
+  --accent:#34d399;
+  --cyan:#0891b2;
+  --cyan-light:#22d3ee;
+  --cyan-grad:linear-gradient(135deg,#0891b2,#22d3ee);
+  --purple:#7c3aed;
+  --purple-grad:linear-gradient(135deg,#7c3aed,#a78bfa);
+  --amber:#d97706;
+  --amber-grad:linear-gradient(135deg,#d97706,#fbbf24);
+  --blue:#2563eb;
+  --blue-grad:linear-gradient(135deg,#2563eb,#60a5fa);
+  --slate-grad:linear-gradient(135deg,#0f172a,#334155);
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#0f172a;
+  --text-body:#374151;
+  --text-light:#6b7280;
+  --text-muted:#9ca3af;
+  --border:#e5e7eb;
+  --border-soft:#f1f5f9;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --info:#3b82f6;
+  --success:#10b981;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+  --shadow-md:0 4px 12px rgba(15,23,42,.08);
+  --shadow-lg:0 12px 30px rgba(15,23,42,.15);
+  --shadow-xl:0 20px 60px rgba(15,23,42,.22);
+  --radius-sm:10px;
+  --radius-md:14px;
+  --radius-lg:20px;
+  --radius-xl:28px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#0f172a;
+  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* ============================================================
+   PHONE FRAME STAGE (desktop preview)
+   ============================================================ */
+.phone-stage{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;
+  padding:20px;overflow:hidden;
+}
+.phone-frame{
+  position:relative;
+  width:390px;height:844px;
+  background:#000;
+  border-radius:52px;
+  padding:12px;
+  box-shadow:
+    0 0 0 2px #334155,
+    0 0 0 8px #0f172a,
+    0 40px 100px rgba(0,0,0,.6),
+    0 0 80px rgba(5,150,105,.15);
+  flex-shrink:0;
+}
+.phone-frame::before{
+  content:'';
+  position:absolute;
+  top:22px;left:50%;transform:translateX(-50%);
+  width:100px;height:26px;
+  background:#000;border-radius:20px;z-index:100;
+}
+.phone-frame::after{
+  content:'';
+  position:absolute;
+  top:28px;left:50%;
+  transform:translateX(-50%) translateX(35px);
+  width:8px;height:8px;
+  background:#1a2a3a;border-radius:50%;
+  z-index:101;
+  box-shadow:inset 0 0 2px rgba(255,255,255,.3);
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app{
+  position:relative;
+  width:100%;height:100%;
+  background:var(--bg);
+  border-radius:42px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  font-size:14px;
+  color:var(--text-body);
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+.status-bar{
+  position:relative;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 22px 6px;
+  font-size:13px;font-weight:600;color:var(--text);
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(20px);
+  flex-shrink:0;
+}
+.sb-left,.sb-right{display:flex;align-items:center;gap:6px}
+.sb-right i{font-size:13px}
+
+/* ============================================================
+   APP HEADER — UNIFIED (single color, no dark green box)
+   ============================================================ */
+.app-header{
+  position:relative;z-index:40;
+  background:var(--primary);
+  color:#fff;
+  padding:10px 18px 14px;
+  flex-shrink:0;
+  box-shadow:0 2px 12px rgba(5,150,105,.2);
+}
+.header-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.header-title{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;font-size:17px;letter-spacing:.2px;
+}
+.header-title .logo-dot{
+  width:30px;height:30px;
+  background:rgba(255,255,255,.18);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  backdrop-filter:blur(10px);
+}
+.header-actions{display:flex;align-items:center;gap:8px}
+.header-actions button{
+  background:rgba(255,255,255,.15);
+  border:none;color:#fff;
+  width:34px;height:34px;border-radius:10px;
+  font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  transition:background .2s;
+}
+.header-actions button:active{background:rgba(255,255,255,.28)}
+.header-actions .badge{
+  position:absolute;top:-4px;right:-4px;
+  background:#fbbf24;color:#78350f;
+  font-size:9px;font-weight:800;
+  min-width:16px;height:16px;
+  border-radius:8px;
+  padding:0 4px;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid var(--primary);
+}
+
+/* Device status row — same color family, no dark green box */
+.device-bar{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(0,0,0,.12);
+  border-radius:12px;
+  padding:8px 12px;
+  font-size:11.5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.device-bar::-webkit-scrollbar{display:none}
+.db-item{
+  display:flex;align-items:center;gap:6px;
+  font-weight:600;white-space:nowrap;flex-shrink:0;
+}
+.conn-indicator{
+  display:flex;align-items:center;gap:5px;
+  font-size:10.5px;
+  background:rgba(255,255,255,.15);
+  padding:3px 9px;border-radius:20px;
+  font-weight:600;
+  margin-left:auto;flex-shrink:0;
+}
+.conn-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#34d399;
+  box-shadow:0 0 0 0 rgba(52,211,153,.7);
+  animation:connPulse 2s infinite;
+}
+.conn-dot.offline{background:#f87171;animation:none}
+.conn-dot.wifi{background:#22d3ee}
+@keyframes connPulse{
+  0%{box-shadow:0 0 0 0 rgba(52,211,153,.7)}
+  70%{box-shadow:0 0 0 7px rgba(52,211,153,0)}
+  100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}
+}
+
+/* Battery */
+.battery-wrap{display:flex;align-items:center;gap:5px;font-weight:700}
+.battery-shell{
+  width:24px;height:12px;
+  border:1.6px solid rgba(255,255,255,.85);
+  border-radius:4px;
+  position:relative;padding:1.5px;
+}
+.battery-shell::after{
+  content:'';position:absolute;
+  right:-3.5px;top:50%;transform:translateY(-50%);
+  width:2.5px;height:6px;
+  background:rgba(255,255,255,.85);
+  border-radius:0 2px 2px 0;
+}
+.battery-fill{
+  height:100%;width:78%;
+  background:#34d399;border-radius:2px;
+  transition:width .5s ease,background .3s;
+}
+.battery-fill.low{background:#fbbf24}
+.battery-fill.critical{background:#f87171}
+
+/* Dynamic SIM signal chips (6 slots) */
+.sim-signal-group{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.sim-signal{
+  display:flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;
+  padding:3px 7px;border-radius:8px;
+  background:rgba(255,255,255,.12);
+  transition:all .3s;
+}
+.sim-signal.active{background:rgba(255,255,255,.25)}
+.sim-signal.offline{opacity:.4}
+.sim-signal .ss-label{
+  font-size:9px;letter-spacing:.3px;
+}
+.signal-bars{
+  display:flex;align-items:flex-end;gap:1.5px;height:10px;
+}
+.signal-bars span{
+  width:2.5px;background:rgba(255,255,255,.9);
+  border-radius:1px;
+}
+.signal-bars span:nth-child(1){height:3px}
+.signal-bars span:nth-child(2){height:6px}
+.signal-bars span:nth-child(3){height:8px}
+.signal-bars span:nth-child(4){height:10px}
+.signal-bars.sig-0 span{background:rgba(255,255,255,.25)}
+.signal-bars.sig-1 span:nth-child(n+2){background:rgba(255,255,255,.25)}
+.signal-bars.sig-2 span:nth-child(n+3){background:rgba(255,255,255,.25)}
+.signal-bars.sig-3 span:nth-child(n+4){background:rgba(255,255,255,.25)}
+
+/* ============================================================
+   APP BODY
+   ============================================================ */
+.app-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:18px 16px calc(88px + var(--safe-bottom));
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+}
+.app-body::-webkit-scrollbar{width:0}
+
+/* ============================================================
+   PAGES
+   ============================================================ */
+.page{display:none;animation:fadeIn .28s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.page-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:16px;
+}
+.page-head .back-btn{
+  width:36px;height:36px;
+  background:#fff;border:1px solid var(--border);
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text);
+  font-size:15px;box-shadow:var(--shadow-sm);
+}
+.page-head .back-btn:active{transform:scale(.94)}
+.page-head h2{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:20px;font-weight:700;color:var(--text);
+}
+.page-head .head-actions{margin-left:auto;display:flex;gap:8px}
+.icon-btn{
+  width:36px;height:36px;
+  background:#fff;border:1px solid var(--border);
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--primary);font-size:14px;
+  box-shadow:var(--shadow-sm);
+}
+.icon-btn:active{transform:scale(.94)}
+
+/* ============================================================
+   CARDS / LISTS / CHIPS
+   ============================================================ */
+.welcome-card{
+  background:var(--primary-grad);
+  border-radius:var(--radius-lg);
+  padding:20px;color:#fff;
+  margin-bottom:18px;position:relative;overflow:hidden;
+}
+.welcome-card::after{
+  content:'';position:absolute;
+  right:-40px;top:-40px;width:140px;height:140px;
+  background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%);
+  border-radius:50%;
+}
+.welcome-card h3{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:19px;margin-bottom:4px;position:relative;
+}
+.welcome-card p{font-size:12px;opacity:.9;position:relative}
+.welcome-meta{display:flex;gap:16px;margin-top:14px;position:relative}
+.welcome-meta .wm{font-size:11px;opacity:.9}
+.welcome-meta .wm strong{display:block;font-size:15px;font-weight:700;margin-top:2px}
+
+.app-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:12px;margin-bottom:18px;
+}
+.app-tile{
+  background:#fff;border-radius:var(--radius-md);
+  padding:16px 14px;
+  box-shadow:var(--shadow-sm);
+  border:1px solid var(--border);
+  cursor:pointer;position:relative;
+  transition:transform .18s ease,box-shadow .18s ease;
+  overflow:hidden;
+}
+.app-tile:active{transform:scale(.96);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.app-tile .tile-icon{
+  width:44px;height:44px;
+  border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;color:#fff;margin-bottom:11px;
+}
+.tile-icon.c-green{background:var(--primary-grad)}
+.tile-icon.c-cyan{background:var(--cyan-grad)}
+.tile-icon.c-blue{background:var(--blue-grad)}
+.tile-icon.c-purple{background:var(--purple-grad)}
+.tile-icon.c-amber{background:var(--amber-grad)}
+.tile-icon.c-slate{background:var(--slate-grad)}
+.tile-icon.c-teal{background:linear-gradient(135deg,#0d9488,#2dd4bf)}
+.tile-icon.c-red{background:linear-gradient(135deg,#dc2626,#f87171)}
+.app-tile h4{
+  font-size:13.5px;font-weight:700;color:var(--text);
+  margin-bottom:2px;font-family:'Space Grotesk',sans-serif;
+}
+.app-tile p{font-size:10.5px;color:var(--text-light);line-height:1.35}
+.app-tile .tile-badge{
+  position:absolute;top:12px;right:12px;
+  background:var(--danger);color:#fff;
+  font-size:9px;font-weight:800;
+  min-width:18px;height:18px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 5px;
+}
+.app-tile .tile-badge.green{background:var(--primary)}
+.app-tile .tile-badge.blue{background:var(--info)}
+.app-tile .tile-lock{
+  position:absolute;top:12px;right:12px;
+  background:#6b7280;color:#fff;
+  font-size:10px;
+  width:18px;height:18px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.sec-title{
+  font-size:11px;font-weight:800;
+  color:var(--text-muted);
+  letter-spacing:1.2px;text-transform:uppercase;
+  margin:0 0 10px 4px;
+}
+
+.quick-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.qs-card{
+  background:#fff;border-radius:var(--radius-md);
+  padding:12px 10px;text-align:center;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+}
+.qs-card .qs-val{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:18px;font-weight:700;color:var(--primary);
+}
+.qs-card .qs-lbl{
+  font-size:9.5px;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.5px;
+  font-weight:600;margin-top:2px;
+}
+
+/* Search + filter */
+.list-toolbar{display:flex;gap:8px;margin-bottom:12px}
+.search-box{flex:1;position:relative}
+.search-box input{
+  width:100%;padding:11px 14px 11px 38px;
+  border:1px solid var(--border);
+  border-radius:12px;background:#fff;
+  font-size:13px;font-family:inherit;color:var(--text);
+  box-shadow:var(--shadow-sm);
+}
+.search-box input:focus{outline:none;border-color:var(--primary)}
+.search-box i{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  color:var(--text-muted);font-size:13px;
+}
+
+.chip-row{
+  display:flex;gap:7px;overflow-x:auto;
+  padding-bottom:10px;margin-bottom:6px;
+  scrollbar-width:none;
+}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{
+  padding:7px 14px;border-radius:20px;
+  background:#fff;border:1px solid var(--border);
+  font-size:12px;font-weight:600;color:var(--text-body);
+  white-space:nowrap;cursor:pointer;transition:all .18s;
+}
+.chip.active{
+  background:var(--primary);color:#fff;border-color:var(--primary);
+  box-shadow:0 3px 10px rgba(5,150,105,.3);
+}
+
+/* List items */
+.list-item{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border-radius:var(--radius-md);
+  padding:12px 14px;margin-bottom:8px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  cursor:pointer;transition:transform .15s ease;
+}
+.list-item:active{transform:scale(.985);background:#fafafa}
+.li-avatar{
+  width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;color:#fff;
+  flex-shrink:0;position:relative;
+}
+.li-avatar .sim-dot{
+  position:absolute;bottom:-1px;right:-1px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--info);border:2px solid #fff;
+  font-size:8px;font-weight:800;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.sim-dot.sim2{background:#f59e0b}
+.sim-dot.sim3{background:#7c3aed}
+.sim-dot.sim4{background:#0d9488}
+.sim-dot.sim5{background:#dc2626}
+.sim-dot.sim6{background:#475569}
+.sim-dot.phone{background:#22d3ee}
+
+.li-body{flex:1;min-width:0}
+.li-body .li-name{
+  font-weight:600;font-size:13.5px;color:var(--text);
+  display:flex;align-items:center;gap:6px;
+}
+.li-body .li-name.missed{color:var(--danger)}
+.li-body .li-name .missed-tag{
+  font-size:9px;font-weight:800;color:var(--danger);
+  background:#fee2e2;padding:1px 6px;border-radius:5px;
+  letter-spacing:.3px;
+}
+.li-body .li-sub{
+  font-size:11.5px;color:var(--text-light);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-top:1px;
+}
+.li-meta{
+  text-align:right;flex-shrink:0;
+  font-size:10.5px;color:var(--text-muted);
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+}
+.li-meta .li-time{font-weight:600}
+.li-meta .unread-pill{
+  background:var(--primary);color:#fff;
+  font-size:9px;font-weight:800;
+  min-width:17px;height:17px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 5px;
+}
+.direction.incoming{color:var(--primary)}
+.direction.outgoing{color:var(--info)}
+.direction.missed{color:var(--danger)}
+
+/* Empty state */
+.empty{text-align:center;padding:50px 20px;color:var(--text-muted)}
+.empty i{font-size:42px;opacity:.35;margin-bottom:12px;display:block}
+.empty p{font-size:13px}
+
+/* ============================================================
+   TAB BAR
+   ============================================================ */
+.tab-bar{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;
+  padding:8px 8px calc(8px + var(--safe-bottom));
+  z-index:60;
+  border-radius:0 0 42px 42px;
+}
+.tab-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;
+  color:var(--text-muted);
+  font-size:9.5px;font-weight:600;
+  padding:6px 12px;border-radius:12px;
+  font-family:inherit;transition:all .2s;
+  position:relative;
+}
+.tab-item i{font-size:18px}
+.tab-item.active{color:var(--primary)}
+.tab-item .tab-badge{
+  position:absolute;top:0;right:6px;
+  background:var(--danger);color:#fff;
+  font-size:8px;font-weight:800;
+  min-width:15px;height:15px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border:1.5px solid #fff;
+}
+
+/* ============================================================
+   FAB
+   ============================================================ */
+.fab{
+  position:absolute;right:18px;
+  bottom:calc(94px + var(--safe-bottom));
+  min-width:52px;height:52px;
+  border-radius:26px;
+  background:var(--primary-grad);color:#fff;
+  border:none;cursor:pointer;font-size:19px;
+  padding:0 18px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 8px 24px rgba(5,150,105,.45);
+  z-index:58;
+  font-weight:700;font-size:12px;
+  font-family:inherit;
+}
+.fab:active{transform:scale(.94)}
+.fab.cyan{background:var(--cyan-grad);box-shadow:0 8px 24px rgba(8,145,178,.5)}
+.fab.green{background:var(--primary-grad);box-shadow:0 8px 24px rgba(5,150,105,.5)}
+.fab.blue{background:var(--blue-grad);box-shadow:0 8px 24px rgba(37,99,235,.5)}
+
+/* ============================================================
+   DATA HERO
+   ============================================================ */
+.data-hero{
+  background:var(--slate-grad);
+  color:#fff;border-radius:var(--radius-lg);
+  padding:22px 20px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.data-hero::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:130px;height:130px;border-radius:50%;
+  background:radial-gradient(circle,rgba(52,211,153,.3),transparent 70%);
+}
+.data-hero .dh-label{font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:1px}
+.data-hero .dh-usage{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:32px;font-weight:800;margin:4px 0 2px;
+}
+.data-hero .dh-usage span{font-size:14px;font-weight:500;opacity:.7}
+.data-hero .dh-sub{font-size:12px;opacity:.75}
+.progress-track{
+  height:8px;background:rgba(255,255,255,.15);
+  border-radius:10px;margin-top:14px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,#34d399,#10b981);
+  border-radius:10px;transition:width .6s ease;
+}
+
+/* Settings groups */
+.settings-group{
+  background:#fff;border-radius:var(--radius-md);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  margin-bottom:14px;overflow:hidden;
+}
+.settings-group .sg-title{
+  font-size:11px;font-weight:800;
+  color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:1px;
+  padding:12px 16px 6px;
+}
+.setting-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;
+  border-bottom:1px solid #f3f4f6;
+}
+.setting-row:last-child{border-bottom:none}
+.setting-row .sr-icon{
+  width:34px;height:34px;border-radius:10px;
+  background:#f0fdf4;color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.setting-row .sr-body{flex:1;min-width:0}
+.setting-row .sr-title{font-weight:600;font-size:13.5px;color:var(--text)}
+.setting-row .sr-desc{font-size:11px;color:var(--text-light);margin-top:1px}
+
+/* Switch */
+.switch{
+  position:relative;width:44px;height:26px;
+  background:#d1d5db;border-radius:14px;
+  cursor:pointer;transition:background .25s;
+  flex-shrink:0;
+}
+.switch::after{
+  content:'';position:absolute;
+  top:3px;left:3px;width:20px;height:20px;
+  background:#fff;border-radius:50%;
+  box-shadow:0 2px 5px rgba(0,0,0,.2);
+  transition:transform .25s;
+}
+.switch.on{background:var(--primary)}
+.switch.on::after{transform:translateX(18px)}
+
+/* SIM selector */
+.sim-selector{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sim-option{
+  flex:1 1 45%;min-width:100px;
+  background:#fff;border:2px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:12px;text-align:center;cursor:pointer;
+  transition:all .2s;
+}
+.sim-option.selected{
+  border-color:var(--primary);background:#f0fdf4;
+  box-shadow:0 4px 14px rgba(5,150,105,.15);
+}
+.sim-option .so-label{
+  font-size:10px;font-weight:800;
+  color:var(--text-muted);letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.sim-option .so-name{font-weight:700;font-size:13px;color:var(--text);margin:3px 0}
+.sim-option .so-status{font-size:10.5px;color:var(--primary);font-weight:600}
+.sim-option .so-status.weak{color:var(--warning)}
+.sim-option .so-status.off{color:var(--text-muted)}
+
+/* ============================================================
+   HUB SERVICES
+   ============================================================ */
+.tier-banner{
+  display:flex;align-items:center;gap:9px;
+  background:var(--purple-grad);
+  color:#fff;border-radius:var(--radius-md);
+  padding:10px 14px;margin-bottom:14px;
+  font-size:11.5px;font-weight:600;
+}
+.tier-banner i{font-size:15px}
+.tier-banner.cyan{background:var(--cyan-grad)}
+.tier-banner.green{background:var(--primary-grad)}
+.tier-banner.enterprise{background:var(--slate-grad)}
+.tier-banner.blue{background:var(--blue-grad)}
+.tier-banner.amber{background:var(--amber-grad)}
+
+/* Auth */
+.auth-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#064e3b,#0f172a);
+  z-index:400;display:none;
+  align-items:center;justify-content:center;
+  border-radius:42px;padding:24px 20px;
+  overflow-y:auto;
+}
+.auth-overlay.active{display:flex}
+.auth-card{
+  width:100%;max-width:340px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:24px;padding:26px 22px;
+  backdrop-filter:blur(18px);
+  color:#fff;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.auth-logo{
+  width:64px;height:64px;border-radius:20px;
+  background:var(--cyan-grad);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;color:#fff;
+  margin:0 auto 14px;
+  box-shadow:0 12px 30px rgba(8,145,178,.5);
+}
+.auth-card h2{font-family:'Space Grotesk',sans-serif;font-size:20px;margin-bottom:6px}
+.auth-card .auth-sub{font-size:12px;opacity:.75;margin-bottom:22px;line-height:1.5}
+.auth-btn{
+  width:100%;padding:13px;border-radius:14px;border:none;
+  font-size:13.5px;font-weight:700;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:10px;transition:transform .15s;
+}
+.auth-btn:active{transform:scale(.97)}
+.auth-btn.google{background:#fff;color:#1f2937}
+.auth-btn.apple{background:#000;color:#fff;border:1px solid #333}
+.auth-btn.email{background:var(--cyan-grad);color:#fff}
+.auth-btn i{font-size:16px}
+.auth-divider{
+  display:flex;align-items:center;gap:10px;
+  color:rgba(255,255,255,.4);font-size:11px;margin:14px 0;
+}
+.auth-divider::before,.auth-divider::after{
+  content:'';flex:1;height:1px;background:rgba(255,255,255,.15);
+}
+.auth-terms{font-size:10.5px;opacity:.6;margin-top:14px;line-height:1.5}
+.auth-terms a{color:#22d3ee;text-decoration:none}
+
+/* Signup success */
+.success-modal{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:500;display:none;
+  align-items:center;justify-content:center;
+  border-radius:42px;padding:24px;
+}
+.success-modal.active{display:flex}
+.success-card{
+  background:#fff;border-radius:24px;
+  padding:32px 24px;text-align:center;
+  max-width:320px;width:100%;
+  animation:modalIn .35s ease;
+}
+.success-icon{
+  width:70px;height:70px;border-radius:50%;
+  background:#d1fae5;color:#059669;
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;margin:0 auto 16px;
+}
+.success-card h3{font-family:'Space Grotesk',sans-serif;font-size:19px;color:var(--text);margin-bottom:6px}
+.success-card p{font-size:13px;color:var(--text-light);margin-bottom:20px;line-height:1.5}
+
+/* Call screens */
+.call-screen{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#0f172a,#1e293b 60%,#064e3b);
+  z-index:350;display:none;flex-direction:column;
+  color:#fff;border-radius:42px;overflow:hidden;
+}
+.call-screen.active{display:flex}
+.call-top{padding:40px 22px 20px;text-align:center;position:relative}
+.call-avatar-lg{
+  width:110px;height:110px;border-radius:50%;
+  background:var(--cyan-grad);
+  display:flex;align-items:center;justify-content:center;
+  font-size:42px;font-weight:700;margin:0 auto 16px;
+  box-shadow:0 20px 50px rgba(8,145,178,.4);
+  position:relative;
+}
+.call-avatar-lg::after{
+  content:'';position:absolute;inset:-8px;
+  border:2px solid rgba(34,211,238,.4);border-radius:50%;
+  animation:callPulse 2s infinite;
+}
+@keyframes callPulse{
+  0%{transform:scale(1);opacity:.8}
+  100%{transform:scale(1.15);opacity:0}
+}
+.call-name{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.call-status{font-size:13px;opacity:.75;margin-bottom:8px}
+.call-timer{font-size:15px;font-weight:600;color:#22d3ee;font-family:'Space Grotesk',sans-serif;letter-spacing:1px}
+.call-sim-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.12);
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:600;margin-top:12px;
+}
+.call-body{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.call-actions{display:flex;justify-content:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.call-action-btn{
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(255,255,255,.12);
+  border:none;color:#fff;
+  font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;backdrop-filter:blur(10px);
+}
+.call-action-btn:active{transform:scale(.92)}
+.call-action-btn.muted{background:#f59e0b}
+.call-action-btn.end-call{background:#dc2626;width:64px;height:64px;font-size:22px}
+.call-action-btn.add-call{background:var(--cyan)}
+
+.conf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px;margin-bottom:16px}
+.conf-tile{
+  aspect-ratio:1;
+  background:linear-gradient(135deg,#1e293b,#334155);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:700;position:relative;overflow:hidden;
+  border:2px solid transparent;
+}
+.conf-tile.active{border-color:#22d3ee;box-shadow:0 0 0 2px rgba(34,211,238,.3)}
+.conf-tile .conf-name{
+  position:absolute;bottom:6px;left:8px;
+  font-size:10px;font-weight:600;
+  background:rgba(0,0,0,.5);padding:2px 8px;border-radius:6px;
+}
+.conf-tile .conf-remove{
+  position:absolute;top:6px;right:6px;
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(220,38,38,.85);
+  border:none;color:#fff;font-size:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Video */
+.video-screen{
+  position:absolute;inset:0;background:#000;
+  z-index:350;display:none;flex-direction:column;
+  color:#fff;border-radius:42px;overflow:hidden;
+}
+.video-screen.active{display:flex}
+.video-main{
+  flex:1;position:relative;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  display:flex;align-items:center;justify-content:center;
+  font-size:80px;overflow:hidden;
+}
+.video-main .vm-avatar{
+  width:140px;height:140px;border-radius:50%;
+  background:var(--cyan-grad);
+  display:flex;align-items:center;justify-content:center;
+  font-size:56px;font-weight:700;
+}
+.video-main .vm-label{
+  position:absolute;bottom:16px;left:16px;
+  background:rgba(0,0,0,.55);
+  padding:5px 12px;border-radius:20px;
+  font-size:12px;font-weight:600;
+}
+.self-view{
+  position:absolute;bottom:14px;right:14px;
+  width:90px;height:120px;
+  background:linear-gradient(135deg,#334155,#0f172a);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;
+  border:2px solid #22d3ee;
+  z-index:10;overflow:hidden;
+}
+.self-view .sv-label{
+  position:absolute;bottom:2px;left:0;right:0;
+  text-align:center;font-size:8.5px;
+  background:rgba(0,0,0,.5);padding:2px;
+}
+.self-view .cam-controls{
+  position:absolute;bottom:16px;left:0;right:0;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:2px;gap:4px;
+}
+.self-view .cam-btn{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  border:none;color:#fff;font-size:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;padding:0;
+  backdrop-filter:blur(6px);
+}
+.self-view .cam-btn:active{transform:scale(.88)}
+.self-view .cam-btn.active{
+  background:#fbbf24;color:#1a1a2e;
+  box-shadow:0 0 8px rgba(251,191,36,.7);
+}
+.self-view .cam-btn.cam-flip.active{
+  background:#22d3ee;color:#0f172a;
+  box-shadow:0 0 8px rgba(34,211,238,.7);
+}
+.self-view.left{
+  left:14px;right:auto;
+  border:2px dashed #fbbf24;
+  box-shadow:0 0 0 2px rgba(251,191,36,.25);
+}
+.self-view.locked::after{
+  content:'\f023';
+  font-family:'Font Awesome 6 Free';
+  font-weight:900;
+  position:absolute;top:4px;right:4px;
+  font-size:9px;color:#fbbf24;
+}
+.thumb-strip{
+  display:flex;gap:8px;padding:10px 14px;
+  background:rgba(0,0,0,.4);
+  overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+}
+.thumb-strip::-webkit-scrollbar{display:none}
+.thumb-item{
+  flex-shrink:0;width:64px;height:64px;
+  background:linear-gradient(135deg,#334155,#1e293b);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;cursor:pointer;
+  border:2px solid transparent;position:relative;
+}
+.thumb-item.active{border-color:#22d3ee}
+.thumb-item .thumb-x{
+  position:absolute;top:-4px;right:-4px;
+  width:18px;height:18px;border-radius:50%;
+  background:#dc2626;border:2px solid #0f172a;
+  color:#fff;font-size:9px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Chat / Announcement */
+.chat-tab-bar{
+  display:flex;background:#fff;
+  border-bottom:1px solid var(--border);
+  padding:0 8px;position:sticky;top:0;
+  z-index:10;margin:-18px -16px 14px;
+}
+.chat-tab{
+  flex:1;padding:14px 6px;text-align:center;
+  font-size:12.5px;font-weight:600;
+  color:var(--text-light);
+  background:none;border:none;cursor:pointer;
+  font-family:inherit;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+}
+.chat-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+.chat-item{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border-radius:var(--radius-md);
+  padding:12px 14px;margin-bottom:8px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);cursor:pointer;
+}
+.chat-item:active{background:#fafafa}
+.chat-online{
+  position:absolute;bottom:-1px;right:-1px;
+  width:13px;height:13px;border-radius:50%;
+  background:#22c55e;border:2px solid #fff;
+}
+
+.msg-thread{display:flex;flex-direction:column;gap:10px;padding-bottom:12px}
+.bubble{
+  max-width:78%;padding:10px 14px;
+  border-radius:18px;font-size:13px;
+  line-height:1.45;position:relative;
+  word-wrap:break-word;
+}
+.bubble.in{
+  background:#fff;color:var(--text);
+  border-bottom-left-radius:5px;align-self:flex-start;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);
+}
+.bubble.out{
+  background:var(--primary-grad);color:#fff;
+  border-bottom-right-radius:5px;align-self:flex-end;
+}
+.bubble .bubble-time{
+  font-size:9.5px;opacity:.6;margin-top:4px;display:block;
+}
+.bubble .ticks{font-size:9.5px;margin-left:6px;color:rgba(255,255,255,.7)}
+.bubble .ticks.read{color:#fbbf24}
+.bubble .reply-preview{
+  background:rgba(0,0,0,.15);
+  border-left:3px solid rgba(255,255,255,.5);
+  padding:5px 8px;border-radius:8px;
+  margin-bottom:6px;font-size:11px;opacity:.85;
+}
+.bubble.in .reply-preview{
+  background:rgba(0,0,0,.06);border-left-color:var(--primary);
+}
+.reaction-row{display:flex;gap:4px;margin-top:4px;font-size:14px}
+.reaction-row span{
+  background:#f3f4f6;padding:2px 6px;border-radius:10px;font-size:11px;
+}
+.bubble-actions{
+  display:flex;gap:8px;margin-top:6px;font-size:10px;opacity:.75;
+}
+.bubble-actions button{
+  background:none;border:none;color:inherit;
+  cursor:pointer;font-family:inherit;font-size:10px;padding:2px 4px;
+}
+
+.composer{
+  position:absolute;
+  left:12px;right:12px;
+  bottom:calc(78px + var(--safe-bottom));
+  background:#fff;border:1px solid var(--border);
+  border-radius:22px;
+  padding:8px 8px 8px 16px;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:var(--shadow-md);z-index:55;
+}
+.composer input{
+  flex:1;border:none;background:none;
+  font-size:13.5px;font-family:inherit;
+  color:var(--text);outline:none;
+}
+.composer .send-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--primary-grad);color:#fff;
+  border:none;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.composer .send-btn.blue{background:var(--blue-grad)}
+.composer .attach-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:#f3f4f6;color:var(--text-light);
+  border:none;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+/* Announcement */
+.ann-item{
+  background:#fff;border-radius:var(--radius-md);
+  padding:14px;margin-bottom:10px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+}
+.ann-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ann-head h5{font-size:13.5px;font-weight:700;color:var(--text)}
+.ann-head .ann-time{font-size:10.5px;color:var(--text-muted)}
+.ann-body{font-size:12.5px;color:var(--text-light);line-height:1.5;margin-bottom:8px}
+.ann-meta{display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--text-muted)}
+.ann-meta .ann-recipients{display:flex;align-items:center;gap:4px}
+.ann-actions{display:flex;gap:6px}
+.ann-actions button{
+  background:none;border:none;color:var(--primary);
+  font-size:11px;font-weight:600;cursor:pointer;
+  font-family:inherit;padding:4px 8px;border-radius:6px;
+}
+.ann-actions button.danger{color:var(--danger)}
+
+/* Contact picker */
+.contact-pick{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border-radius:var(--radius-md);
+  padding:12px 14px;margin-bottom:8px;
+  border:2px solid var(--border);cursor:pointer;
+  transition:all .2s;
+}
+.contact-pick.selected{
+  border-color:var(--primary);background:#f0fdf4;
+  box-shadow:0 4px 14px rgba(5,150,105,.12);
+}
+.contact-pick .cp-check{
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid #d1d5db;
+  display:flex;align-items:center;justify-content:center;
+  color:transparent;flex-shrink:0;transition:all .2s;
+}
+.contact-pick.selected .cp-check{
+  background:var(--primary);border-color:var(--primary);color:#fff;
+}
+
+/* ============================================================
+   ENTERPRISE NETWORK DASHBOARD
+   ============================================================ */
+.net-node{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border-radius:var(--radius-md);
+  padding:12px 14px;margin-bottom:8px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+}
+.net-node .nn-icon{
+  width:38px;height:38px;border-radius:11px;
+  background:#f0fdf4;color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+}
+.net-node .nn-body{flex:1}
+.net-node .nn-body h5{font-size:13px;font-weight:600;color:var(--text)}
+.net-node .nn-body p{font-size:11px;color:var(--text-light)}
+.net-status{
+  font-size:10px;font-weight:800;
+  padding:3px 9px;border-radius:10px;
+}
+.net-status.online{background:#d1fae5;color:#059669}
+.net-status.offline{background:#fee2e2;color:#dc2626}
+.net-status.degraded{background:#fef3c7;color:#d97706}
+
+/* Billing dashboard */
+.billing-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.billing-card{
+  background:#fff;border-radius:var(--radius-md);
+  padding:14px;border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+}
+.billing-card .bc-label{
+  font-size:10px;font-weight:800;
+  color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.billing-card .bc-value{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:22px;font-weight:800;
+  color:var(--text);margin:4px 0;
+}
+.billing-card .bc-trend{
+  font-size:11px;font-weight:600;
+  display:flex;align-items:center;gap:4px;
+}
+.bc-trend.up{color:var(--primary)}
+.bc-trend.down{color:var(--danger)}
+
+.usage-chart{
+  background:#fff;border-radius:var(--radius-md);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  padding:16px;margin-bottom:14px;
+}
+.usage-chart h5{
+  font-size:12px;font-weight:700;color:var(--text);
+  margin-bottom:12px;display:flex;justify-content:space-between;
+}
+.usage-chart h5 span{font-size:10.5px;color:var(--text-muted);font-weight:500}
+.chart-bars{
+  display:flex;align-items:flex-end;gap:6px;height:100px;
+}
+.chart-bars .cb{
+  flex:1;background:linear-gradient(180deg,#34d399,#059669);
+  border-radius:4px 4px 2px 2px;
+  position:relative;
+  transition:all .3s;
+}
+.chart-bars .cb.tall{background:linear-gradient(180deg,#22d3ee,#0891b2)}
+.chart-bars .cb:hover{opacity:.85}
+.chart-labels{
+  display:flex;gap:6px;margin-top:6px;
+}
+.chart-labels span{
+  flex:1;text-align:center;font-size:9px;
+  color:var(--text-muted);font-weight:600;
+}
+
+/* SIM slots grid */
+.sim-slot-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.sim-slot{
+  background:#fff;border-radius:var(--radius-md);
+  border:2px dashed var(--border);
+  padding:12px 8px;text-align:center;
+  position:relative;
+  transition:all .2s;
+}
+.sim-slot.filled{
+  border-style:solid;border-color:var(--primary);
+  background:linear-gradient(180deg,#f0fdf4,#fff);
+}
+.sim-slot .ss-icon{
+  width:36px;height:36px;margin:0 auto 8px;
+  border-radius:10px;
+  background:#f3f4f6;color:var(--text-muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+}
+.sim-slot.filled .ss-icon{
+  background:var(--primary-grad);color:#fff;
+}
+.sim-slot .ss-slot{
+  font-size:9.5px;font-weight:800;
+  color:var(--text-muted);letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.sim-slot .ss-name{
+  font-size:11px;font-weight:700;
+  color:var(--text);margin:2px 0;
+}
+.sim-slot .ss-bars{
+  display:flex;justify-content:center;
+  gap:2px;align-items:flex-end;height:12px;
+  margin-top:4px;
+}
+.sim-slot .ss-bars span{
+  width:3px;background:#d1d5db;border-radius:1px;
+}
+.sim-slot .ss-bars span:nth-child(1){height:4px}
+.sim-slot .ss-bars span:nth-child(2){height:7px}
+.sim-slot .ss-bars span:nth-child(3){height:10px}
+.sim-slot .ss-bars span:nth-child(4){height:12px}
+.sim-slot.filled .ss-bars span{background:var(--primary)}
+.sim-slot.filled .ss-bars.sig-0 span{background:#d1d5db}
+.sim-slot.filled .ss-bars.sig-1 span:nth-child(n+2){background:#d1d5db}
+.sim-slot.filled .ss-bars.sig-2 span:nth-child(n+3){background:#d1d5db}
+.sim-slot.filled .ss-bars.sig-3 span:nth-child(n+4){background:#d1d5db}
+
+/* ============================================================
+   MODAL / SHEETS / TOAST
+   ============================================================ */
+.sheet-overlay{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.5);
+  z-index:200;display:none;
+  align-items:flex-end;
+  border-radius:42px;overflow:hidden;
+}
+.sheet-overlay.active{display:flex}
+.sheet{
+  background:#fff;width:100%;
+  border-radius:28px 28px 0 0;
+  padding:22px 20px calc(22px + var(--safe-bottom));
+  animation:sheetUp .3s ease;
+  max-height:85%;overflow-y:auto;
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{
+  width:38px;height:4px;background:#d1d5db;
+  border-radius:3px;margin:0 auto 16px;
+}
+.sheet h3{font-family:'Space Grotesk',sans-serif;font-size:18px;margin-bottom:6px;color:var(--text)}
+.sheet .sheet-sub{font-size:12.5px;color:var(--text-light);margin-bottom:18px}
+.form-field{margin-bottom:14px}
+.form-field label{
+  display:block;font-size:11.5px;font-weight:700;
+  color:var(--text-body);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.4px;
+}
+.form-field input,
+.form-field select,
+.form-field textarea{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  font-size:13.5px;font-family:inherit;
+  color:var(--text);background:#f9fafb;
+  transition:all .2s;
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus{
+  outline:none;border-color:var(--primary);
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(5,150,105,.1);
+}
+.sheet-actions{display:flex;gap:10px;margin-top:20px}
+.btn-block{
+  flex:1;padding:13px;border-radius:14px;
+  border:none;font-size:14px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:transform .15s;
+}
+.btn-block:active{transform:scale(.97)}
+.btn-primary{background:var(--primary-grad);color:#fff;box-shadow:0 6px 18px rgba(5,150,105,.3)}
+.btn-ghost{background:#f3f4f6;color:var(--text-body)}
+.btn-danger{background:#fee2e2;color:#dc2626}
+.btn-cyan{background:var(--cyan-grad);color:#fff;box-shadow:0 6px 18px rgba(8,145,178,.3)}
+
+.toast{
+  position:absolute;left:50%;bottom:100px;
+  transform:translateX(-50%) translateY(20px);
+  background:#1f2937;color:#fff;
+  padding:10px 18px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  opacity:0;pointer-events:none;
+  transition:all .3s;z-index:300;
+  white-space:nowrap;max-width:90%;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:820px), (max-height:900px) and (pointer:coarse){
+  body{background:var(--bg)}
+  .phone-stage{padding:0;height:100dvh}
+  .phone-frame{
+    width:100%;height:100dvh;
+    border-radius:0;padding:0;box-shadow:none;
+  }
+  .phone-frame::before,.phone-frame::after{display:none}
+  .app{border-radius:0}
+  .tab-bar{border-radius:0}
+  .sheet-overlay{border-radius:0}
+  .auth-overlay{border-radius:0}
+  .success-modal{border-radius:0}
+  .call-screen{border-radius:0}
+  .video-screen{border-radius:0}
+}
+@media (max-width:380px){
+  .app-grid{gap:10px}
+  .app-tile{padding:14px 12px}
+  .app-tile .tile-icon{width:40px;height:40px;font-size:17px}
+  .sim-slot-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="phone-stage">
+  <div class="phone-frame">
+    <div class="app" id="app">
+
+      <!-- ===== STATUS BAR ===== -->
+      <div class="status-bar">
+        <div class="sb-left"><span id="clock">9:41</span></div>
+        <div class="sb-right">
+          <i class="fas fa-signal"></i>
+          <i class="fas fa-wifi"></i>
+          <i class="fas fa-battery-three-quarters"></i>
+        </div>
+      </div>
+
+      <!-- ===== APP HEADER (unified color, no dark green box) ===== -->
+      <header class="app-header">
+        <div class="header-top">
+          <div class="header-title">
+            <span class="logo-dot"><i class="fas fa-wifi"></i></span>
+            <span>SimHub</span>
+          </div>
+          <div class="header-actions">
+            <button onclick="openPairingSheet()" title="Pair device"><i class="fas fa-bluetooth-b"></i></button>
+            <button onclick="openNotifications()" title="Notifications">
+              <i class="fas fa-bell"></i>
+              <span class="badge" id="notifBadge">3</span>
+            </button>
+            <button onclick="go('settings')" title="Settings"><i class="fas fa-gear"></i></button>
+          </div>
+        </div>
+
+        <div class="device-bar">
+          <div class="db-item battery-wrap">
+            <div class="battery-shell"><div class="battery-fill" id="batteryFill" style="width:78%"></div></div>
+            <span id="batteryPct">78%</span>
+          </div>
+          <div class="sim-signal-group" id="simSignalGroup">
+            <!-- dynamically populated for up to 6 SIMs -->
+          </div>
+          <div class="conn-indicator">
+            <span class="conn-dot" id="connDot"></span>
+            <span id="connText">Offline</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===== APP BODY ===== -->
+      <main class="app-body" id="appBody">
+
+        <!-- ============ HOME ============ -->
+        <section class="page active" id="page-home">
+          <div class="welcome-card">
+            <h3>Hello, Robert 👋</h3>
+            <p>Your SimHub ecosystem at a glance.</p>
+            <div class="welcome-meta">
+              <div class="wm">Data Today<strong>1.2 GB</strong></div>
+              <div class="wm">Active Clients<strong>4 / 15</strong></div>
+              <div class="wm">Uptime<strong>99.8%</strong></div>
+            </div>
+          </div>
+
+          <p class="sec-title">Apps &amp; Services</p>
+          <div class="app-grid">
+            <div class="app-tile" onclick="go('contacts')">
+              <div class="tile-icon c-blue"><i class="fas fa-address-book"></i></div>
+              <h4>Contacts</h4>
+              <p>Recents, missed &amp; history</p>
+              <span class="tile-badge">5</span>
+            </div>
+            <div class="app-tile" onclick="go('contactbook')">
+              <div class="tile-icon c-teal"><i class="fas fa-book"></i></div>
+              <h4>Contact Book</h4>
+              <p>Device + SIM storage</p>
+            </div>
+            <div class="app-tile" onclick="go('messages')">
+              <div class="tile-icon c-purple"><i class="fas fa-comment-dots"></i></div>
+              <h4>Messages</h4>
+              <p>Inbox · Drafts · Outbox</p>
+              <span class="tile-badge">2</span>
+            </div>
+            <div class="app-tile" onclick="go('data')">
+              <div class="tile-icon c-green"><i class="fas fa-signal"></i></div>
+              <h4>Data Services</h4>
+              <p>SIM switching &amp; usage</p>
+            </div>
+            <div class="app-tile" onclick="go('hotspot')">
+              <div class="tile-icon c-amber"><i class="fas fa-tower-broadcast"></i></div>
+              <h4>Hotspot</h4>
+              <p>Clients &amp; time limits</p>
+              <span class="tile-badge green">4</span>
+            </div>
+            <div class="app-tile" onclick="go('network')">
+              <div class="tile-icon c-slate"><i class="fas fa-network-wired"></i></div>
+              <h4>Network Mgmt</h4>
+              <p>Enterprise dashboard</p>
+            </div>
+            <div class="app-tile" onclick="openHubServices()" id="hubTile">
+              <div class="tile-icon c-cyan"><i class="fas fa-satellite-dish"></i></div>
+              <h4>Hub Services</h4>
+              <p id="hubTileSub">Calls · Video · Chat</p>
+              <span class="tile-lock" id="hubLock" style="display:none"><i class="fas fa-lock"></i></span>
+            </div>
+            <div class="app-tile" onclick="go('buy')">
+              <div class="tile-icon c-green" style="background:var(--amber-grad)"><i class="fas fa-cart-shopping"></i></div>
+              <h4>Buy Data</h4>
+              <p>Top-up bundles</p>
+            </div>
+          </div>
+
+          <p class="sec-title">Today at a glance</p>
+          <div class="quick-stats">
+            <div class="qs-card"><div class="qs-val">5</div><div class="qs-lbl">Missed</div></div>
+            <div class="qs-card"><div class="qs-val">12</div><div class="qs-lbl">Calls</div></div>
+            <div class="qs-card"><div class="qs-val">28</div><div class="qs-lbl">SMS</div></div>
+          </div>
+
+          <p class="sec-title">SIM Slots</p>
+          <div class="sim-slot-grid" id="homeSimSlots"></div>
+        </section>
+
+        <!-- ============ CONTACTS ============ -->
+        <section class="page" id="page-contacts">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Contacts</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSheet('callSheet')"><i class="fas fa-phone-plus"></i></button>
+              <button class="icon-btn" onclick="clearCallLog()"><i class="fas fa-broom"></i></button>
+            </div>
+          </div>
+
+          <div class="tier-banner blue">
+            <i class="fas fa-circle-info"></i>
+            <span>This log shows calls from SimHub + native phone SIMs.</span>
+          </div>
+
+          <div class="list-toolbar">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="contactSearch" placeholder="Search calls..." oninput="filterList('callLogList',this.value)">
+            </div>
+          </div>
+
+          <div class="chip-row" id="callFilterChips">
+            <div class="chip active" onclick="filterCalls(this,'all')">All</div>
+            <div class="chip" onclick="filterCalls(this,'missed')">Missed</div>
+            <div class="chip" onclick="filterCalls(this,'incoming')">Incoming</div>
+            <div class="chip" onclick="filterCalls(this,'outgoing')">Outgoing</div>
+            <div class="chip" onclick="filterCalls(this,'simhub')">SimHub</div>
+            <div class="chip" onclick="filterCalls(this,'phone')">Phone SIM</div>
+          </div>
+
+          <div id="callLogList">
+            <div class="list-item" onclick="redialCall('Mwila Kaunda','+260 973 388 699')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#dc2626,#f87171)">
+                MK<span class="sim-dot">1</span>
+              </div>
+              <div class="li-body">
+                <div class="li-name missed">Mwila Kaunda <span class="missed-tag">MISSED</span></div>
+                <div class="li-sub">Incoming call · 3 rings</div>
+              </div>
+              <div class="li-meta">
+                <span class="li-time">10:42</span>
+                <span class="direction missed"><i class="fas fa-phone-slash"></i></span>
+              </div>
+            </div>
+
+            <div class="list-item" onclick="redialCall('Chanda Nkosi','+260 764 569 476')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">
+                CN<span class="sim-dot sim2">2</span>
+              </div>
+              <div class="li-body">
+                <div class="li-name missed">Chanda Nkosi <span class="missed-tag">MISSED</span></div>
+                <div class="li-sub">Incoming call · 2 rings</div>
+              </div>
+              <div class="li-meta">
+                <span class="li-time">09:15</span>
+                <span class="direction missed"><i class="fas fa-phone-slash"></i></span>
+              </div>
+            </div>
+
+            <div class="list-item" onclick="redialCall('Thandi Banda','+260 977 123 456')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#059669,#34d399)">
+                TB<span class="sim-dot">1</span>
+              </div>
+              <div class="li-body">
+                <div class="li-name">Thandi Banda</div>
+                <div class="li-sub">Outgoing · 12 min 34 sec</div>
+              </div>
+              <div class="li-meta">
+                <span class="li-time">Yesterday</span>
+                <span class="direction outgoing"><i class="fas fa-phone"></i></span>
+              </div>
+            </div>
+
+            <div class="list-item" onclick="redialCall('Grace Phiri','+260 966 100 200')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#0d9488,#2dd4bf)">
+                GP<span class="sim-dot phone">P1</span>
+              </div>
+              <div class="li-body">
+                <div class="li-name">Grace Phiri</div>
+                <div class="li-sub">Outgoing · 3 min 12 sec · Phone SIM1</div>
+              </div>
+              <div class="li-meta">
+                <span class="li-time">Yesterday</span>
+                <span class="direction outgoing"><i class="fas fa-phone"></i></span>
+              </div>
+            </div>
+
+            <div class="list-item" onclick="redialCall('Daniel Tembo','+260 977 300 400')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">
+                DT<span class="sim-dot phone">P2</span>
+              </div>
+              <div class="li-body">
+                <div class="li-name">Daniel Tembo</div>
+                <div class="li-sub">Incoming · 5 min 40 sec · Phone SIM2</div>
+              </div>
+              <div class="li-meta">
+                <span class="li-time">Yesterday</span>
+                <span class="direction incoming"><i class="fas fa-phone"></i></span>
+              </div>
+            </div>
+          </div>
+
+          <button class="fab cyan" onclick="openSheet('callSheet')">
+            <i class="fas fa-phone"></i> Start
+          </button>
+        </section>
+
+        <!-- ============ CONTACT BOOK ============ -->
+        <section class="page" id="page-contactbook">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Contact Book</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSystemAddContact()"><i class="fas fa-user-plus"></i></button>
+            </div>
+          </div>
+
+          <div class="list-toolbar">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Search contacts..." oninput="filterList('contactBookList',this.value)">
+            </div>
+          </div>
+
+          <div class="chip-row">
+            <div class="chip active" onclick="filterContacts(this,'all')">All</div>
+            <div class="chip" onclick="filterContacts(this,'device')">Device</div>
+            <div class="chip" onclick="filterContacts(this,'simhub')">SimHub SIMs</div>
+            <div class="chip" onclick="filterContacts(this,'phone')">Phone SIMs</div>
+          </div>
+
+          <div id="contactBookList">
+            <p class="sec-title">SimHub Contacts</p>
+
+            <div class="list-item" onclick="showToast('Opening Chanda Nkosi')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">CN<span class="sim-dot">1</span></div>
+              <div class="li-body">
+                <div class="li-name">Chanda Nkosi</div>
+                <div class="li-sub">+260 764 569 476 · Work</div>
+              </div>
+              <div class="li-meta"><i class="fas fa-chevron-right" style="color:#d1d5db"></i></div>
+            </div>
+
+            <div class="list-item" onclick="showToast('Opening Mwila Kaunda')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#dc2626,#f87171)">MK<span class="sim-dot">1</span></div>
+              <div class="li-body">
+                <div class="li-name">Mwila Kaunda</div>
+                <div class="li-sub">+260 973 388 699 · Family</div>
+              </div>
+              <div class="li-meta"><i class="fas fa-chevron-right" style="color:#d1d5db"></i></div>
+            </div>
+
+            <p class="sec-title" style="margin-top:16px">Phone Contacts</p>
+
+            <div class="list-item" onclick="showToast('Opening Grace Phiri')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#0d9488,#2dd4bf)">GP<span class="sim-dot phone">P1</span></div>
+              <div class="li-body">
+                <div class="li-name">Grace Phiri</div>
+                <div class="li-sub">+260 966 100 200 · Phone SIM1</div>
+              </div>
+              <div class="li-meta"><i class="fas fa-chevron-right" style="color:#d1d5db"></i></div>
+            </div>
+
+            <div class="list-item" onclick="showToast('Opening Daniel Tembo')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">DT<span class="sim-dot phone">P2</span></div>
+              <div class="li-body">
+                <div class="li-name">Daniel Tembo</div>
+                <div class="li-sub">+260 977 300 400 · Phone SIM2</div>
+              </div>
+              <div class="li-meta"><i class="fas fa-chevron-right" style="color:#d1d5db"></i></div>
+            </div>
+          </div>
+
+          <button class="fab green" onclick="openSheet('callSheet')">
+            <i class="fas fa-phone"></i> Call
+          </button>
+        </section>
+
+        <!-- ============ MESSAGES (SMS) ============ -->
+        <section class="page" id="page-messages">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Messages</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSystemMessageSheet()"><i class="fas fa-pen"></i></button>
+              <button class="icon-btn" onclick="openMassSMSComposer()" title="Send to many"><i class="fas fa-users"></i></button>
+            </div>
+          </div>
+
+          <div class="chip-row">
+            <div class="chip active" onclick="filterMessages(this,'all')">All Received</div>
+            <div class="chip" onclick="filterMessages(this,'simhub')">SimHub Inbox</div>
+            <div class="chip" onclick="filterMessages(this,'phone')">Phone SIMs</div>
+            <div class="chip" onclick="filterMessages(this,'outbox')">Outbox</div>
+            <div class="chip" onclick="filterMessages(this,'drafts')">Drafts</div>
+          </div>
+
+          <div class="tier-banner purple">
+            <i class="fas fa-inbox"></i>
+            <span>Reading all received SMS — from SimHub SIMs and phone SIMs.</span>
+          </div>
+
+          <div id="messageList">
+            <div class="list-item" onclick="openThread('Chanda Nkosi')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">CN<span class="sim-dot">1</span></div>
+              <div class="li-body">
+                <div class="li-name">Chanda Nkosi</div>
+                <div class="li-sub">Hey, are you available for the meeting at 3?</div>
+              </div>
+              <div class="li-meta">
+                <span class="li-time">10:38</span>
+                <span class="unread-pill">2</span>
+              </div>
+            </div>
+            <div class="list-item" onclick="openThread('MTN Zambia')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)">MT<span class="sim-dot">1</span></div>
+              <div class="li-body">
+                <div class="li-name">MTN Zambia</div>
+                <div class="li-sub">Your bundle of 5GB will expire in 24 hours.</div>
+              </div>
+              <div class="li-meta"><span class="li-time">09:12</span></div>
+            </div>
+            <div class="list-item" onclick="openThread('Grace Phiri')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#0d9488,#2dd4bf)">GP<span class="sim-dot phone">P1</span></div>
+              <div class="li-body">
+                <div class="li-name">Grace Phiri</div>
+                <div class="li-sub">Call me when you get this.</div>
+              </div>
+              <div class="li-meta"><span class="li-time">08:20</span></div>
+            </div>
+            <div class="list-item" onclick="openThread('Daniel Tembo')">
+              <div class="li-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">DT<span class="sim-dot phone">P2</span></div>
+              <div class="li-body">
+                <div class="li-name">Daniel Tembo</div>
+                <div class="li-sub">Meeting moved to 4pm.</div>
+              </div>
+              <div class="li-meta"><span class="li-time">07:55</span></div>
+            </div>
+          </div>
+
+          <button class="fab blue" onclick="openMassSMSComposer()">
+            <i class="fas fa-users"></i> Send to Many
+          </button>
+        </section>
+
+        <!-- ============ MESSAGE THREAD ============ -->
+        <section class="page" id="page-thread">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('messages')"><i class="fas fa-arrow-left"></i></button>
+            <h2 id="threadName">Chanda Nkosi</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSheet('callSheet')"><i class="fas fa-phone"></i></button>
+              <button class="icon-btn" onclick="showToast('Chat options')"><i class="fas fa-ellipsis-vertical"></i></button>
+            </div>
+          </div>
+
+          <div class="msg-thread">
+            <div class="bubble in">Hi Robert, good morning!<span class="bubble-time">09:12</span></div>
+            <div class="bubble out">Morning Chanda! How can I help?<span class="bubble-time">09:15 · <span class="ticks read">✓✓</span></span></div>
+            <div class="bubble in">Did you get the proposal?<span class="bubble-time">09:18</span></div>
+            <div class="bubble out">Yes — reviewing it now.<span class="bubble-time">09:22 · <span class="ticks read">✓✓</span></span></div>
+            <div class="bubble in">Available for a call at 3?<span class="bubble-time">10:38</span></div>
+          </div>
+
+          <div class="composer">
+            <input type="text" id="msgInput" placeholder="Type a message...">
+            <button class="send-btn" onclick="sendThreadMessage()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </section>
+
+        <!-- ============ DATA SERVICES ============ -->
+        <section class="page" id="page-data">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Data Services</h2>
+          </div>
+
+          <div class="data-hero">
+            <div class="dh-label">Total Used Today</div>
+            <div class="dh-usage">1.24 <span>GB</span></div>
+            <div class="dh-sub">of 5 GB daily limit · Resets at midnight</div>
+            <div class="progress-track"><div class="progress-fill" style="width:25%"></div></div>
+          </div>
+
+          <p class="sec-title">Active Data SIM</p>
+          <div class="sim-selector" id="dataSimSelector"></div>
+
+          <div class="settings-group">
+            <div class="sg-title">Data Control</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-tower-broadcast"></i></div>
+              <div class="sr-body"><div class="sr-title">Mobile Data</div><div class="sr-desc">Currently using active SIM</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Mobile data')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-arrows-rotate"></i></div>
+              <div class="sr-body"><div class="sr-title">Auto SIM Switching</div><div class="sr-desc">Switch to strongest network</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Auto switching')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-gauge-high"></i></div>
+              <div class="sr-body"><div class="sr-title">Data Saver Mode</div><div class="sr-desc">Reduce background usage</div></div>
+              <div class="switch" onclick="toggleSwitch(this,'Data saver')"></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Per-SIM Usage Today</div>
+            <div id="perSimUsage"></div>
+          </div>
+
+          <button class="btn-block btn-primary" style="margin-top:4px" onclick="go('buy')">
+            <i class="fas fa-cart-shopping"></i> Buy More Data
+          </button>
+        </section>
+
+        <!-- ============ HOTSPOT ============ -->
+        <section class="page" id="page-hotspot">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Hotspot Control</h2>
+          </div>
+
+          <div class="data-hero" style="background:var(--purple-grad)">
+            <div class="dh-label">Connected Clients</div>
+            <div class="dh-usage">4 <span>/ 15</span></div>
+            <div class="dh-sub">SSID: SimHub-2.4G · WPA2 secured</div>
+          </div>
+
+          <p class="sec-title">Access Mode</p>
+          <div class="chip-row" style="margin-bottom:12px">
+            <div class="chip active" onclick="setAccessMode(this,'Passkey')">🔒 Passkey</div>
+            <div class="chip" onclick="setAccessMode(this,'Open')">🌐 Open</div>
+            <div class="chip" onclick="setAccessMode(this,'Time Limit')">⏱ Time Limit</div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Hotspot Settings</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-tower-broadcast"></i></div>
+              <div class="sr-body"><div class="sr-title">Hotspot</div><div class="sr-desc">Broadcasting on 2.4 GHz</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Hotspot')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-key"></i></div>
+              <div class="sr-body"><div class="sr-title">Passkey</div><div class="sr-desc">simhub@2024</div></div>
+              <button class="icon-btn" onclick="copyPasskey()"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-user-check"></i></div>
+              <div class="sr-body"><div class="sr-title">Approve New Devices</div><div class="sr-desc">Manually approve connections</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Approval')"></div>
+            </div>
+          </div>
+
+          <p class="sec-title">Time-Limited Access</p>
+
+          <div class="list-item">
+            <div class="li-avatar" style="background:var(--cyan-grad)">LT</div>
+            <div class="li-body">
+              <div class="li-name">Laptop-Thandi</div>
+              <div class="li-sub">MAC: A4:2B:8C:1D:3E:4F · 18 Mbps</div>
+              <div class="li-sub" style="color:var(--primary);font-weight:700">⏱ 2h 14m remaining</div>
+            </div>
+            <button class="icon-btn" onclick="showToast('Session extended +1h')"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="list-item">
+            <div class="li-avatar" style="background:var(--cyan-grad)">IP</div>
+            <div class="li-body">
+              <div class="li-name">iPhone-Chanda</div>
+              <div class="li-sub">MAC: B8:11:22:33:44:55 · 24 Mbps</div>
+              <div class="li-sub" style="color:var(--primary);font-weight:700">⏱ 4h 02m remaining</div>
+            </div>
+            <button class="icon-btn" onclick="showToast('Session extended +1h')"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="list-item">
+            <div class="li-avatar" style="background:linear-gradient(135deg,#dc2626,#f87171)">TB</div>
+            <div class="li-body">
+              <div class="li-name">Tablet-Mwila</div>
+              <div class="li-sub">MAC: C2:99:88:77:66:55 · 8 Mbps</div>
+              <div class="li-sub" style="color:var(--danger);font-weight:700">⏱ Session expired</div>
+            </div>
+            <button class="icon-btn" onclick="showToast('Access renewed +1h')"><i class="fas fa-rotate-right"></i></button>
+          </div>
+
+          <button class="btn-block btn-primary" style="margin-top:12px" onclick="openSheet('timeLimitSheet')">
+            <i class="fas fa-clock"></i> Set Time for New Client
+          </button>
+        </section>
+
+        <!-- ============ ENTERPRISE NETWORK DASHBOARD ============ -->
+        <section class="page" id="page-network">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Network Management</h2>
+          </div>
+
+          <div class="tier-banner enterprise">
+            <i class="fas fa-crown"></i>
+            <span>Enterprise Tier · SimHub Enterprise models</span>
+          </div>
+
+          <div class="data-hero" style="background:var(--slate-grad)">
+            <div class="dh-label">Extended Coverage Range</div>
+            <div class="dh-usage">320 <span>metres</span></div>
+            <div class="dh-sub">Wired mesh · 6 access points online</div>
+          </div>
+
+          <p class="sec-title">Billing Dashboard</p>
+          <div class="billing-grid">
+            <div class="billing-card">
+              <div class="bc-label">This Month</div>
+              <div class="bc-value">K 4,280</div>
+              <div class="bc-trend up"><i class="fas fa-arrow-up"></i> +12.4%</div>
+            </div>
+            <div class="billing-card">
+              <div class="bc-label">Data Used</div>
+              <div class="bc-value">186 GB</div>
+              <div class="bc-trend up"><i class="fas fa-arrow-up"></i> +8.2%</div>
+            </div>
+            <div class="billing-card">
+              <div class="bc-label">Active Clients</div>
+              <div class="bc-value">42</div>
+              <div class="bc-trend up"><i class="fas fa-arrow-up"></i> +5</div>
+            </div>
+            <div class="billing-card">
+              <div class="bc-label">Revenue / GB</div>
+              <div class="bc-value">K 23</div>
+              <div class="bc-trend down"><i class="fas fa-arrow-down"></i> -3.1%</div>
+            </div>
+          </div>
+
+          <div class="usage-chart">
+            <h5>Weekly Data Usage <span>Last 7 days</span></h5>
+            <div class="chart-bars">
+              <div class="cb" style="height:45%"></div>
+              <div class="cb" style="height:62%"></div>
+              <div class="cb" style="height:38%"></div>
+              <div class="cb tall" style="height:88%"></div>
+              <div class="cb" style="height:55%"></div>
+              <div class="cb" style="height:72%"></div>
+              <div class="cb tall" style="height:95%"></div>
+            </div>
+            <div class="chart-labels">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
+              <span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+          </div>
+
+          <p class="sec-title">Mesh Nodes</p>
+          <div class="net-node">
+            <div class="nn-icon"><i class="fas fa-tower-cell"></i></div>
+            <div class="nn-body"><h5>Main SimHub Hub</h5><p>Reception · 15 clients</p></div>
+            <span class="net-status online">Online</span>
+          </div>
+          <div class="net-node">
+            <div class="nn-icon"><i class="fas fa-wifi"></i></div>
+            <div class="nn-body"><h5>AP — Conference Room</h5><p>4 clients · 45 Mbps</p></div>
+            <span class="net-status online">Online</span>
+          </div>
+          <div class="net-node">
+            <div class="nn-icon"><i class="fas fa-wifi"></i></div>
+            <div class="nn-body"><h5>AP — Warehouse</h5><p>2 clients · 18 Mbps</p></div>
+            <span class="net-status degraded">Degraded</span>
+          </div>
+          <div class="net-node">
+            <div class="nn-icon" style="background:#fee2e2;color:#dc2626"><i class="fas fa-wifi"></i></div>
+            <div class="nn-body"><h5>AP — Guest Wing</h5><p>Signal lost 4 min ago</p></div>
+            <span class="net-status offline">Offline</span>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Enterprise Controls</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-diagram-project"></i></div>
+              <div class="sr-body"><div class="sr-title">VLAN Segmentation</div><div class="sr-desc">Guest / Staff / IoT</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'VLAN')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-shield-halved"></i></div>
+              <div class="sr-body"><div class="sr-title">VPN Passthrough</div><div class="sr-desc">Allow client VPNs</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'VPN')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-chart-line"></i></div>
+              <div class="sr-body"><div class="sr-title">Bandwidth Shaping</div><div class="sr-desc">Limit per-client speed</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Shaping')"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ BUY DATA ============ -->
+        <section class="page" id="page-buy">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Buy Data</h2>
+          </div>
+
+          <p class="sec-title">Choose SIM</p>
+          <div class="sim-selector" id="buySimSelector"></div>
+
+          <p class="sec-title">Choose Bundle</p>
+          <div class="list-item" onclick="buyBundle('1GB','K25')">
+            <div class="li-avatar" style="background:var(--primary-grad)">1G</div>
+            <div class="li-body"><div class="li-name">1 GB · Daily</div><div class="li-sub">Valid 24 hours</div></div>
+            <div class="li-meta"><span style="font-weight:800;color:var(--primary);font-size:14px">K25</span></div>
+          </div>
+          <div class="list-item" onclick="buyBundle('5GB','K100')">
+            <div class="li-avatar" style="background:var(--blue-grad)">5G</div>
+            <div class="li-body"><div class="li-name">5 GB · Weekly</div><div class="li-sub">Valid 7 days</div></div>
+            <div class="li-meta"><span style="font-weight:800;color:var(--primary);font-size:14px">K100</span></div>
+          </div>
+          <div class="list-item" onclick="buyBundle('20GB','K350')" style="border:2px solid var(--primary);background:#f0fdf4">
+            <div class="li-avatar" style="background:var(--purple-grad)">20</div>
+            <div class="li-body"><div class="li-name">20 GB · Monthly</div><div class="li-sub">Valid 30 days · BEST</div></div>
+            <div class="li-meta"><span style="font-weight:800;color:var(--primary);font-size:14px">K350</span></div>
+          </div>
+          <div class="list-item" onclick="buyBundle('50GB','K750')">
+            <div class="li-avatar" style="background:var(--amber-grad)">50</div>
+            <div class="li-body"><div class="li-name">50 GB · Monthly</div><div class="li-sub">Valid 30 days</div></div>
+            <div class="li-meta"><span style="font-weight:800;color:var(--primary);font-size:14px">K750</span></div>
+          </div>
+          <div class="list-item" onclick="buyBundle('100GB','K1,400')">
+            <div class="li-avatar" style="background:var(--slate-grad)">100</div>
+            <div class="li-body"><div class="li-name">100 GB · Monthly</div><div class="li-sub">Heavy users &amp; teams</div></div>
+            <div class="li-meta"><span style="font-weight:800;color:var(--primary);font-size:14px">K1,400</span></div>
+          </div>
+        </section>
+
+        <!-- ============ HUB SERVICES MAIN ============ -->
+        <section class="page" id="page-hubservices">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Hub Services</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="showToast('Signed in')"><i class="fas fa-user-circle"></i></button>
+            </div>
+          </div>
+
+          <div class="tier-banner cyan">
+            <i class="fas fa-shield-halved"></i>
+            <span>Restricted to SIMs hosted in your SimHub device.</span>
+          </div>
+
+          <div class="welcome-card" style="background:var(--cyan-grad)">
+            <h3>Hub Services 🌐</h3>
+            <p>Voice, video, chat &amp; announcements routed through SimHub SIMs.</p>
+          </div>
+
+          <div class="app-grid">
+            <div class="app-tile" onclick="go('voice')">
+              <div class="tile-icon c-cyan"><i class="fas fa-phone-volume"></i></div>
+              <h4>Voice Call</h4>
+              <p>Conference ready</p>
+            </div>
+            <div class="app-tile" onclick="go('video')">
+              <div class="tile-icon c-green"><i class="fas fa-video"></i></div>
+              <h4>Video Call</h4>
+              <p>Group video · Camera flip</p>
+            </div>
+            <div class="app-tile" onclick="go('onlinemsg')">
+              <div class="tile-icon c-blue"><i class="fas fa-comments"></i></div>
+              <h4>Online Messaging</h4>
+              <p>Chats &amp; announcements</p>
+              <span class="tile-badge blue">2</span>
+            </div>
+            <div class="app-tile" onclick="go('onlinemsg');setTimeout(()=>switchOnlineTab(document.querySelectorAll('.chat-tab')[1],'announcements'),100)">
+              <div class="tile-icon c-purple"><i class="fas fa-bullhorn"></i></div>
+              <h4>Announcements</h4>
+              <p>Broadcast to many</p>
+            </div>
+          </div>
+
+          <p class="sec-title">Hub Stats</p>
+          <div class="quick-stats">
+            <div class="qs-card"><div class="qs-val">12</div><div class="qs-lbl">Contacts</div></div>
+            <div class="qs-card"><div class="qs-val">3</div><div class="qs-lbl">Chats</div></div>
+            <div class="qs-card"><div class="qs-val">5</div><div class="qs-lbl">Announce</div></div>
+          </div>
+        </section>
+
+        <!-- ============ VOICE ============ -->
+        <section class="page" id="page-voice">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('hubservices')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Voice Calls</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSearchCall('voice')"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+
+          <div class="tier-banner cyan">
+            <i class="fas fa-phone-volume"></i>
+            <span>Recent Hub voice calls — tap to redial</span>
+          </div>
+
+          <div class="list-item" onclick="openCallSheetFor('Chanda Nkosi','+260 764 569 476')">
+            <div class="li-avatar" style="background:var(--cyan-grad)">CN</div>
+            <div class="li-body"><div class="li-name">Chanda Nkosi</div><div class="li-sub">Outgoing · 12 min 34 sec</div></div>
+            <div class="li-meta"><span class="li-time">10:38</span><i class="fas fa-phone" style="color:var(--primary)"></i></div>
+          </div>
+          <div class="list-item" onclick="openCallSheetFor('Thandi Banda','+260 977 123 456')">
+            <div class="li-avatar" style="background:var(--purple-grad)">TB</div>
+            <div class="li-body"><div class="li-name">Thandi Banda</div><div class="li-sub">Incoming · 4 min 12 sec</div></div>
+            <div class="li-meta"><span class="li-time">Yesterday</span><i class="fas fa-phone" style="color:var(--primary)"></i></div>
+          </div>
+          <div class="list-item" onclick="openCallSheetFor('Lungu Mwansa','+260 955 987 654')">
+            <div class="li-avatar" style="background:var(--primary-grad)">LM</div>
+            <div class="li-body"><div class="li-name">Lungu Mwansa</div><div class="li-sub">Missed · 2 rings</div></div>
+            <div class="li-meta"><span class="li-time">Monday</span><i class="fas fa-phone-slash" style="color:var(--danger)"></i></div>
+          </div>
+
+          <button class="fab cyan" onclick="openSearchCall('voice')">Start</button>
+        </section>
+
+        <!-- ============ VIDEO ============ -->
+        <section class="page" id="page-video">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('hubservices')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Video Calls</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSearchCall('video')"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+
+          <div class="tier-banner green">
+            <i class="fas fa-video"></i>
+            <span>Recent video calls — tap to video-call again</span>
+          </div>
+
+          <div class="list-item" onclick="openCallSheetFor('Chanda Nkosi','+260 764 569 476','video')">
+            <div class="li-avatar" style="background:var(--cyan-grad)">CN</div>
+            <div class="li-body"><div class="li-name">Chanda Nkosi</div><div class="li-sub">Video · 18 min 02 sec</div></div>
+            <div class="li-meta"><span class="li-time">Today</span><i class="fas fa-video" style="color:var(--primary)"></i></div>
+          </div>
+          <div class="list-item" onclick="openCallSheetFor('Thandi Banda','+260 977 123 456','video')">
+            <div class="li-avatar" style="background:var(--purple-grad)">TB</div>
+            <div class="li-body"><div class="li-name">Thandi Banda</div><div class="li-sub">Video · 6 min 22 sec</div></div>
+            <div class="li-meta"><span class="li-time">Yesterday</span><i class="fas fa-video" style="color:var(--primary)"></i></div>
+          </div>
+
+          <button class="fab green" onclick="openSearchCall('video')">Start</button>
+        </section>
+
+        <!-- ============ ONLINE MESSAGING ============ -->
+        <section class="page" id="page-onlinemsg">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('hubservices')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Online Messaging</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="openSearchContact('chat')"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+
+          <div class="chat-tab-bar">
+            <button class="chat-tab active" onclick="switchOnlineTab(this,'chats')">Chats</button>
+            <button class="chat-tab" onclick="switchOnlineTab(this,'announcements')">Announcements</button>
+          </div>
+
+          <div id="onlineTab-chats">
+            <div class="list-item" onclick="openOnlineChat('Chanda Nkosi')">
+              <div class="li-avatar" style="background:var(--cyan-grad)">CN<span class="chat-online"></span></div>
+              <div class="li-body"><div class="li-name">Chanda Nkosi</div><div class="li-sub">Are you available for a call?</div></div>
+              <div class="li-meta"><span class="li-time">10:38</span><span class="unread-pill">2</span></div>
+            </div>
+            <div class="list-item" onclick="openOnlineChat('Thandi Banda')">
+              <div class="li-avatar" style="background:var(--purple-grad)">TB<span class="chat-online"></span></div>
+              <div class="li-body"><div class="li-name">Thandi Banda</div><div class="li-sub">Thanks for the update 🙏</div></div>
+              <div class="li-meta"><span class="li-time">Yesterday</span></div>
+            </div>
+            <div class="list-item" onclick="openOnlineChat('Lungu Mwansa')">
+              <div class="li-avatar" style="background:var(--primary-grad)">LM</div>
+              <div class="li-body"><div class="li-name">Lungu Mwansa</div><div class="li-sub">📎 Sent a file · project.pdf</div></div>
+              <div class="li-meta"><span class="li-time">Monday</span></div>
+            </div>
+            <button class="fab blue" onclick="openSearchContact('chat')">
+              <i class="fas fa-plus"></i> New
+            </button>
+          </div>
+
+          <div id="onlineTab-announcements" style="display:none">
+            <div class="ann-item">
+              <div class="ann-head"><h5>Network Maintenance Notice</h5><span class="ann-time">Today, 08:00</span></div>
+              <div class="ann-body">Scheduled maintenance on SIM1 tower. Brief interruptions 22:00–23:00.</div>
+              <div class="ann-meta">
+                <span class="ann-recipients"><i class="fas fa-users"></i> 12 recipients</span>
+                <div class="ann-actions">
+                  <button onclick="renameAnnouncement(this)">Rename</button>
+                  <button class="danger" onclick="deleteAnnouncement(this)">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="ann-item">
+              <div class="ann-head"><h5>Special Data Bundle Offer</h5><span class="ann-time">Yesterday</span></div>
+              <div class="ann-body">30% off on 20GB monthly bundle this week.</div>
+              <div class="ann-meta">
+                <span class="ann-recipients"><i class="fas fa-users"></i> 8 recipients</span>
+                <div class="ann-actions">
+                  <button onclick="renameAnnouncement(this)">Rename</button>
+                  <button class="danger" onclick="deleteAnnouncement(this)">Delete</button>
+                </div>
+              </div>
+            </div>
+            <button class="fab green" onclick="openSearchContact('announce')">
+              <i class="fas fa-plus"></i> New
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ ONLINE CHAT ============ -->
+        <section class="page" id="page-onlinechat">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('onlinemsg')"><i class="fas fa-arrow-left"></i></button>
+            <h2 id="onlineChatName">Chanda Nkosi</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="showToast('Chat options')"><i class="fas fa-ellipsis-vertical"></i></button>
+            </div>
+          </div>
+
+          <div class="msg-thread" id="onlineThread">
+            <div class="bubble in">Hey Robert, good morning! 👋<span class="bubble-time">09:12</span></div>
+            <div class="bubble out">Morning Chanda! How can I help?<span class="bubble-time">09:15 · <span class="ticks read">✓✓</span></span></div>
+            <div class="bubble in">Did you get the proposal?<span class="bubble-time">09:18</span></div>
+            <div class="bubble out">Yes — reviewing it now.<span class="bubble-time">09:22 · <span class="ticks read">✓✓</span></span></div>
+          </div>
+
+          <div class="composer">
+            <button class="attach-btn" onclick="attachFile()"><i class="fas fa-paperclip"></i></button>
+            <input type="text" id="onlineMsgInput" placeholder="Type a message...">
+            <button class="send-btn blue" onclick="sendOnlineMessage()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </section>
+
+        <!-- ============ SETTINGS ============ -->
+        <section class="page" id="page-settings">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('home')"><i class="fas fa-arrow-left"></i></button>
+            <h2>Settings</h2>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">SimHub Device</div>
+            <div class="setting-row" onclick="openPairingSheet()" style="cursor:pointer">
+              <div class="sr-icon" style="background:#e0f2fe;color:var(--cyan)">
+                <i class="fas fa-bluetooth-b"></i>
+              </div>
+              <div class="sr-body">
+                <div class="sr-title">Pair / Connect SimHub</div>
+                <div class="sr-desc" id="settingsConnDesc">Tap to pair over Bluetooth or Wi-Fi</div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row" onclick="go('device')" style="cursor:pointer">
+              <div class="sr-icon"><i class="fas fa-microchip"></i></div>
+              <div class="sr-body">
+                <div class="sr-title">SimHub Hardware Info</div>
+                <div class="sr-desc">Sync firmware &amp; hardware specs</div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-bolt"></i></div>
+              <div class="sr-body"><div class="sr-title">Power Saving</div><div class="sr-desc">Auto-sleep after 30 min idle</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Power saving')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-temperature-half"></i></div>
+              <div class="sr-body"><div class="sr-title">Thermal Protection</div><div class="sr-desc">Throttle at 65°C</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Thermal')"></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Data &amp; Network</div>
+            <div class="setting-row" onclick="go('data')" style="cursor:pointer">
+              <div class="sr-icon"><i class="fas fa-signal"></i></div>
+              <div class="sr-body"><div class="sr-title">Data Services</div><div class="sr-desc">SIM switching &amp; usage</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row" onclick="go('hotspot')" style="cursor:pointer">
+              <div class="sr-icon"><i class="fas fa-tower-broadcast"></i></div>
+              <div class="sr-body"><div class="sr-title">Hotspot Control</div><div class="sr-desc">Clients, time limits, access</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row" onclick="go('network')" style="cursor:pointer">
+              <div class="sr-icon"><i class="fas fa-network-wired"></i></div>
+              <div class="sr-body"><div class="sr-title">Network Management</div><div class="sr-desc">Enterprise dashboard</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-arrows-rotate"></i></div>
+              <div class="sr-body"><div class="sr-title">Preferred SIM</div><div class="sr-desc" id="preferredSimDesc">SIM1</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-globe"></i></div>
+              <div class="sr-body"><div class="sr-title">Roaming</div><div class="sr-desc">Off while within Zambia</div></div>
+              <div class="switch" onclick="toggleSwitch(this,'Roaming')"></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Notifications</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-phone"></i></div>
+              <div class="sr-body"><div class="sr-title">Missed Calls</div><div class="sr-desc">Alert for every missed call</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Missed call alerts')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-comment"></i></div>
+              <div class="sr-body"><div class="sr-title">SMS Alerts</div><div class="sr-desc">Notify on new messages</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'SMS alerts')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-battery-half"></i></div>
+              <div class="sr-body"><div class="sr-title">Low Battery</div><div class="sr-desc">Warn below 20%</div></div>
+              <div class="switch on" onclick="toggleSwitch(this,'Battery alerts')"></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Account</div>
+            <div class="setting-row" onclick="go('hubservices')" style="cursor:pointer">
+              <div class="sr-icon" style="background:#e0f2fe;color:var(--cyan)"><i class="fas fa-satellite-dish"></i></div>
+              <div class="sr-body"><div class="sr-title">Hub Services</div><div class="sr-desc">Voice · Video · Chat</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-user"></i></div>
+              <div class="sr-body"><div class="sr-title">Robert Ngambi</div><div class="sr-desc">robertngambi808@gmail.com</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-crown"></i></div>
+              <div class="sr-body"><div class="sr-title">Tier</div><div class="sr-desc">Lite Pro · Personal</div></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">About App</div>
+            <div class="setting-row" onclick="go('about')" style="cursor:pointer">
+              <div class="sr-icon"><i class="fas fa-circle-info"></i></div>
+              <div class="sr-body"><div class="sr-title">About SimHub Connect</div><div class="sr-desc">Version, credits, legal</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+          </div>
+
+          <button class="btn-block btn-ghost" style="margin-top:6px" onclick="showToast('Signed out')">
+            <i class="fas fa-right-from-bracket"></i> Sign Out
+          </button>
+          <button class="btn-block btn-danger" style="margin-top:8px" onclick="unpairDevice()">
+            <i class="fas fa-link-slash"></i> Unpair SimHub Device
+          </button>
+        </section>
+
+        <!-- ============ DEVICE HARDWARE ============ -->
+        <section class="page" id="page-device">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('settings')"><i class="fas fa-arrow-left"></i></button>
+            <h2>SimHub Hardware</h2>
+            <div class="head-actions">
+              <button class="icon-btn" onclick="syncDeviceSpecs()"><i class="fas fa-rotate"></i></button>
+            </div>
+          </div>
+
+          <div class="tier-banner enterprise">
+            <i class="fas fa-microchip"></i>
+            <span>Hardware specifications synced from your SimHub.</span>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Device Identity</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-tag"></i></div>
+              <div class="sr-body"><div class="sr-title">Device Name</div><div class="sr-desc" id="hwDeviceName">SimHub-Lite-Pro</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-fingerprint"></i></div>
+              <div class="sr-body"><div class="sr-title">Serial Number</div><div class="sr-desc" id="hwSerial">SH-LP-2024-00847</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-crown"></i></div>
+              <div class="sr-body"><div class="sr-title">Model Tier</div><div class="sr-desc" id="hwTier">Lite Pro (Personal Pro)</div></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Processor &amp; Memory</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-microchip"></i></div>
+              <div class="sr-body"><div class="sr-title">CPU</div><div class="sr-desc" id="hwCpu">ESP32-D0WDQ6 · dual-core 240 MHz</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-memory"></i></div>
+              <div class="sr-body"><div class="sr-title">Memory</div><div class="sr-desc" id="hwRam">8 MB PSRAM + 16 MB Flash</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-code-branch"></i></div>
+              <div class="sr-body"><div class="sr-title">Firmware</div><div class="sr-desc" id="hwFirmware">v0.9.4-beta</div></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Cellular &amp; Network</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-sim-card"></i></div>
+              <div class="sr-body"><div class="sr-title">Cellular Module</div><div class="sr-desc" id="hwCellular">Quectel MQ95 · Dual-SIM + 4 expansion slots</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-signal"></i></div>
+              <div class="sr-body"><div class="sr-title">Wi-Fi</div><div class="sr-desc" id="hwWifi">2.4 GHz · Up to 150 m range with external antenna</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-bluetooth-b"></i></div>
+              <div class="sr-body"><div class="sr-title">Bluetooth</div><div class="sr-desc" id="hwBt">BLE 4.2 · GATT command &amp; status channels</div></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Power</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-battery-full"></i></div>
+              <div class="sr-body"><div class="sr-title">Battery</div><div class="sr-desc" id="hwBattery">Up to 24 h · 5,000 mAh</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-plug"></i></div>
+              <div class="sr-body"><div class="sr-title">Charging</div><div class="sr-desc" id="hwCharging">TI BQ24070 · USB-C 5V/2A</div></div>
+            </div>
+          </div>
+
+          <p class="sec-title" style="margin-top:16px">SIM Slot Map</p>
+          <div class="sim-slot-grid" id="deviceSimSlots"></div>
+
+          <button class="btn-block btn-primary" style="margin-top:8px" onclick="syncDeviceSpecs()">
+            <i class="fas fa-rotate"></i> Re-sync Hardware
+          </button>
+        </section>
+
+        <!-- ============ ABOUT APP ============ -->
+        <section class="page" id="page-about">
+          <div class="page-head">
+            <button class="back-btn" onclick="go('settings')"><i class="fas fa-arrow-left"></i></button>
+            <h2>About SimHub Connect</h2>
+          </div>
+
+          <div style="text-align:center;padding:16px 0 24px">
+            <div style="width:76px;height:76px;border-radius:22px;background:var(--primary-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px;box-shadow:0 10px 28px rgba(5,150,105,.35)">
+              <i class="fas fa-wifi"></i>
+            </div>
+            <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--text)">SimHub Connect</h3>
+            <p style="font-size:12.5px;color:var(--text-light);margin-top:4px">v2.0.0 · A Division of GetCAD Technologies Ltd</p>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">What this app does</div>
+            <div style="padding:6px 16px 16px;font-size:12.5px;color:var(--text-body);line-height:1.6">
+              SimHub Connect pairs with your SimHub multi-SIM MiFi device over Bluetooth or Wi-Fi and gives you full control of:
+              <br><br>
+              • Contacts, calls and SMS across SimHub SIMs and phone SIMs<br>
+              • Data routing and hotspot access control<br>
+              • Hub Services — voice calls, video calls, chat and announcements restricted to SimHub-hosted SIMs<br>
+              • Enterprise network management with mesh, VLANs and billing dashboard
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Connectivity</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-bluetooth-b"></i></div>
+              <div class="sr-body"><div class="sr-title">Primary Transport</div><div class="sr-desc">BLE GATT (low latency, always paired)</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-wifi"></i></div>
+              <div class="sr-body"><div class="sr-title">Fallback Transport</div><div class="sr-desc">Wi-Fi HTTP at 192.168.4.1</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-arrows-rotate"></i></div>
+              <div class="sr-body"><div class="sr-title">Auto-Reconnect</div><div class="sr-desc">Silent re-pairing on app launch</div></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Legal</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-file-shield"></i></div>
+              <div class="sr-body"><div class="sr-title">Privacy Policy</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-file-contract"></i></div>
+              <div class="sr-body"><div class="sr-title">Terms of Service</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-certificate"></i></div>
+              <div class="sr-body"><div class="sr-title">Patents Pending</div></div>
+              <i class="fas fa-chevron-right" style="color:#d1d5db;font-size:12px"></i>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="sg-title">Support</div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-envelope"></i></div>
+              <div class="sr-body"><div class="sr-title">Email Support</div><div class="sr-desc">simhubqueries@gmail.com</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-phone"></i></div>
+              <div class="sr-body"><div class="sr-title">Call Us</div><div class="sr-desc">+260 973 388 699</div></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-icon"><i class="fas fa-location-dot"></i></div>
+              <div class="sr-body"><div class="sr-title">Head Office</div><div class="sr-desc">Plot 1234, Great East Road, Lusaka</div></div>
+            </div>
+          </div>
+
+          <p style="text-align:center;font-size:11px;color:var(--text-muted);padding:16px 0">
+            © 2024 GetCAD Technologies Ltd. All rights reserved.
+          </p>
+        </section>
+
+      </main>
+
+      <!-- ===== TAB BAR ===== -->
+      <nav class="tab-bar" id="tabBar">
+        <button class="tab-item active" data-page="home" onclick="go('home')">
+          <i class="fas fa-house"></i><span>Home</span>
+        </button>
+        <button class="tab-item" data-page="contacts" onclick="go('contacts')">
+          <i class="fas fa-phone"></i><span>Calls</span>
+          <span class="tab-badge">5</span>
+        </button>
+        <button class="tab-item" data-page="messages" onclick="go('messages')">
+          <i class="fas fa-comment-dots"></i><span>Messages</span>
+          <span class="tab-badge">2</span>
+        </button>
+        <button class="tab-item" data-page="hubservices" onclick="openHubServices()">
+          <i class="fas fa-satellite-dish"></i><span>Hub</span>
+        </button>
+        <button class="tab-item" data-page="settings" onclick="go('settings')">
+          <i class="fas fa-gear"></i><span>Settings</span>
+        </button>
+      </nav>
+
+      <!-- ===== TOAST ===== -->
+      <div class="toast" id="toast"></div>
+
+      <!-- ============================================================
+           SHEETS & MODALS
+           ============================================================ -->
+
+      <!-- Notifications -->
+      <div class="sheet-overlay" id="notifSheet" onclick="if(event.target===this)closeSheet('notifSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Notifications</h3>
+          <p class="sheet-sub">Recent activity</p>
+          <div class="list-item">
+            <div class="li-avatar" style="background:linear-gradient(135deg,#dc2626,#f87171)"><i class="fas fa-phone-slash"></i></div>
+            <div class="li-body"><div class="li-name">Missed call — Mwila Kaunda</div><div class="li-sub">10:42 · SIM1</div></div>
+          </div>
+          <div class="list-item">
+            <div class="li-avatar" style="background:var(--purple-grad)"><i class="fas fa-comment"></i></div>
+            <div class="li-body"><div class="li-name">New SMS — Chanda Nkosi</div><div class="li-sub">10:38 · SIM1</div></div>
+          </div>
+          <div class="list-item">
+            <div class="li-avatar" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)"><i class="fas fa-battery-half"></i></div>
+            <div class="li-body"><div class="li-name">Battery at 78%</div><div class="li-sub">About 4h 30m remaining</div></div>
+          </div>
+          <button class="btn-block btn-primary" style="margin-top:14px" onclick="closeSheet('notifSheet');document.getElementById('notifBadge').style.display='none'">
+            Mark All as Read
+          </button>
+        </div>
+      </div>
+
+      <!-- Pairing Sheet -->
+      <div class="sheet-overlay" id="pairingSheet" onclick="if(event.target===this)closeSheet('pairingSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Connect SimHub Device</h3>
+          <p class="sheet-sub">Pair over Bluetooth, or connect through Wi-Fi</p>
+          <div style="background:var(--primary-grad);color:#fff;padding:16px;border-radius:16px;margin-bottom:16px">
+            <div style="font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Status</div>
+            <div id="pairingStatusLine" style="font-size:15px;font-weight:700">Not connected</div>
+            <div style="font-size:11.5px;opacity:.85;margin-top:6px;display:flex;justify-content:space-between">
+              <span>Transport</span><span id="pairingTransport">—</span>
+            </div>
+          </div>
+          <button class="btn-block btn-primary" style="margin-bottom:10px" onclick="pairFromSheet('ble')">
+            <i class="fab fa-bluetooth-b"></i> Pair via Bluetooth
+          </button>
+          <button class="btn-block btn-ghost" style="margin-bottom:10px" onclick="pairFromSheet('wifi')">
+            <i class="fas fa-wifi"></i> Connect via Wi-Fi (192.168.4.1)
+          </button>
+          <button class="btn-block btn-danger" onclick="disconnectFromSheet()">
+            <i class="fas fa-link-slash"></i> Disconnect
+          </button>
+          <div style="font-size:11px;color:var(--text-light);margin-top:14px;line-height:1.55;text-align:center">
+            Bluetooth requires Chromium-based browser on desktop or Android.<br>
+            iPhone users should connect via Wi-Fi while on the SimHub network.
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Contact -->
+      <div class="sheet-overlay" id="addContactSheet" onclick="if(event.target===this)closeSheet('addContactSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>New Contact</h3>
+          <p class="sheet-sub">Save to device or any SIM (SimHub or phone)</p>
+
+          <div class="form-field">
+            <label>Full Name</label>
+            <input type="text" id="contactName" placeholder="e.g. John Mulenga">
+          </div>
+          <div class="form-field">
+            <label>Phone Number</label>
+            <input type="tel" id="contactNumber" placeholder="+260 XXX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label>Email (optional)</label>
+            <input type="email" id="contactEmail" placeholder="name@example.com">
+          </div>
+          <div class="form-field">
+            <label>Save to</label>
+            <select id="contactSaveTo">
+              <option value="device">📱 This Device</option>
+              <option value="sim1">📶 SIM1 (SimHub)</option>
+              <option value="sim2">📶 SIM2 (SimHub)</option>
+              <option value="sim3">📶 SIM3 (SimHub)</option>
+              <option value="sim4">📶 SIM4 (SimHub)</option>
+              <option value="sim5">📶 SIM5 (SimHub)</option>
+              <option value="sim6">📶 SIM6 (SimHub)</option>
+              <option value="phone1">☎️ Phone SIM1</option>
+              <option value="phone2">☎️ Phone SIM2</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Category</label>
+            <select id="contactCategory">
+              <option>Personal</option>
+              <option>Business</option>
+              <option>Family</option>
+              <option>Work</option>
+            </select>
+          </div>
+
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('addContactSheet')">Cancel</button>
+            <button class="btn-block btn-primary" onclick="saveContact()">Save Contact</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Message (single) -->
+      <div class="sheet-overlay" id="newMsgSheet" onclick="if(event.target===this)closeSheet('newMsgSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>New Message</h3>
+          <p class="sheet-sub">Compose and send via any SIM</p>
+
+          <div class="form-field">
+            <label>To</label>
+            <input type="tel" id="newMsgTo" placeholder="+260 XXX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label>Send via</label>
+            <select id="newMsgSendVia">
+              <option value="sim1">📶 SIM1 (SimHub)</option>
+              <option value="sim2">📶 SIM2 (SimHub)</option>
+              <option value="sim3">📶 SIM3 (SimHub)</option>
+              <option value="sim4">📶 SIM4 (SimHub)</option>
+              <option value="sim5">📶 SIM5 (SimHub)</option>
+              <option value="sim6">📶 SIM6 (SimHub)</option>
+              <option value="phone1">☎️ Phone SIM1</option>
+              <option value="phone2">☎️ Phone SIM2</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Message</label>
+            <textarea id="newMsgBody" rows="3" placeholder="Type your message..."></textarea>
+          </div>
+          <div class="form-field">
+            <label>Quick Templates</label>
+            <div class="chip-row" style="padding-bottom:0">
+              <div class="chip" onclick="document.getElementById('newMsgBody').value='On my way.'">On my way</div>
+              <div class="chip" onclick="document.getElementById('newMsgBody').value='Call me when free.'">Call me</div>
+              <div class="chip" onclick="document.getElementById('newMsgBody').value='Received, thank you.'">Thanks</div>
+            </div>
+          </div>
+
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('newMsgSheet')">Cancel</button>
+            <button class="btn-block btn-primary" onclick="sendNewMessage()">
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mass SMS (send to many) -->
+      <div class="sheet-overlay" id="massSmsSheet" onclick="if(event.target===this)closeSheet('massSmsSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Send to Many</h3>
+          <p class="sheet-sub">Select multiple contacts to receive one message</p>
+
+          <div class="search-box" style="margin-bottom:12px">
+            <i class="fas fa-search"></i>
+            <input type="text" id="massSmsSearch" placeholder="Search contacts..." oninput="filterMassContacts(this.value)">
+          </div>
+
+          <div id="massSmsContactList" style="max-height:240px;overflow-y:auto;margin-bottom:12px">
+            <div class="contact-pick" data-name="Chanda Nkosi" onclick="toggleMassRecipient(this)">
+              <div class="li-avatar" style="background:var(--purple-grad)">CN</div>
+              <div class="li-body"><div class="li-name">Chanda Nkosi</div><div class="li-sub">+260 764 569 476</div></div>
+              <div class="cp-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="contact-pick" data-name="Thandi Banda" onclick="toggleMassRecipient(this)">
+              <div class="li-avatar" style="background:var(--primary-grad)">TB</div>
+              <div class="li-body"><div class="li-name">Thandi Banda</div><div class="li-sub">+260 977 123 456</div></div>
+              <div class="cp-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="contact-pick" data-name="Lungu Mwansa" onclick="toggleMassRecipient(this)">
+              <div class="li-avatar" style="background:var(--cyan-grad)">LM</div>
+              <div class="li-body"><div class="li-name">Lungu Mwansa</div><div class="li-sub">+260 955 987 654</div></div>
+              <div class="cp-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="contact-pick" data-name="Grace Phiri" onclick="toggleMassRecipient(this)">
+              <div class="li-avatar" style="background:#0d9488">GP</div>
+              <div class="li-body"><div class="li-name">Grace Phiri</div><div class="li-sub">+260 966 100 200</div></div>
+              <div class="cp-check"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="contact-pick" data-name="Daniel Tembo" onclick="toggleMassRecipient(this)">
+              <div class="li-avatar" style="background:var(--amber-grad)">DT</div>
+              <div class="li-body"><div class="li-name">Daniel Tembo</div><div class="li-sub">+260 977 300 400</div></div>
+              <div class="cp-check"><i class="fas fa-check"></i></div>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Send via</label>
+            <select id="massSmsVia">
+              <option value="sim1">📶 SIM1 (SimHub)</option>
+              <option value="sim2">📶 SIM2 (SimHub)</option>
+              <option value="sim3">📶 SIM3 (SimHub)</option>
+              <option value="sim4">📶 SIM4 (SimHub)</option>
+              <option value="sim5">📶 SIM5 (SimHub)</option>
+              <option value="sim6">📶 SIM6 (SimHub)</option>
+              <option value="phone1">☎️ Phone SIM1</option>
+              <option value="phone2">☎️ Phone SIM2</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Message</label>
+            <textarea id="massSmsBody" rows="3" placeholder="One message to all recipients..."></textarea>
+          </div>
+
+          <div style="font-size:11.5px;color:var(--text-light);background:#f0fdf4;padding:10px;border-radius:10px;line-height:1.5;margin-bottom:12px">
+            <i class="fas fa-info-circle"></i>
+            Recipients selected: <strong id="massCount">0</strong>
+          </div>
+
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('massSmsSheet')">Cancel</button>
+            <button class="btn-block btn-primary" onclick="sendMassSMS()">
+              <i class="fas fa-paper-plane"></i> Send All
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call Sheet -->
+      <div class="sheet-overlay" id="callSheet" onclick="if(event.target===this)closeSheet('callSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Make a Call</h3>
+          <p class="sheet-sub">Choose number and SIM</p>
+
+          <div class="form-field">
+            <label>Number or Contact</label>
+            <input type="tel" id="callNumber" placeholder="+260 XXX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label>Call via</label>
+            <select id="callVia">
+              <option value="sim1">📶 SIM1 (SimHub)</option>
+              <option value="sim2">📶 SIM2 (SimHub)</option>
+              <option value="sim3">📶 SIM3 (SimHub)</option>
+              <option value="sim4">📶 SIM4 (SimHub)</option>
+              <option value="sim5">📶 SIM5 (SimHub)</option>
+              <option value="sim6">📶 SIM6 (SimHub)</option>
+              <option value="phone1">☎️ Phone SIM1</option>
+              <option value="phone2">☎️ Phone SIM2</option>
+            </select>
+          </div>
+          <div style="font-size:11px;color:var(--text-light);background:#f0fdf4;padding:10px;border-radius:10px;line-height:1.5">
+            <i class="fas fa-circle-info"></i>
+            Calls made via Phone SIMs route through your phone's native dialer. Only SimHub-routed calls appear in this app's call log.
+          </div>
+
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('callSheet')">Cancel</button>
+            <button class="btn-block btn-cyan" onclick="placeCall()">
+              <i class="fas fa-phone"></i> Call Now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Limit -->
+      <div class="sheet-overlay" id="timeLimitSheet" onclick="if(event.target===this)closeSheet('timeLimitSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3>Time-Limited Access</h3>
+          <p class="sheet-sub">Grant a client temporary hotspot access</p>
+          <div class="form-field"><label>Client Name</label><input type="text" placeholder="e.g. Laptop-Thandi"></div>
+          <div class="form-field"><label>MAC Address (optional)</label><input type="text" placeholder="A4:2B:8C:1D:3E:4F"></div>
+          <div class="form-field"><label>Duration</label>
+            <select>
+              <option>1 hour</option>
+              <option selected>2 hours</option>
+              <option>4 hours</option>
+              <option>8 hours</option>
+              <option>24 hours</option>
+            </select>
+          </div>
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('timeLimitSheet')">Cancel</button>
+            <button class="btn-block btn-primary" onclick="closeSheet('timeLimitSheet');showToast('Access granted for 2 hours')">Grant</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Call Sheet -->
+      <div class="sheet-overlay" id="searchCallSheet" onclick="if(event.target===this)closeSheet('searchCallSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3 id="searchCallTitle">Start Voice Call</h3>
+          <p class="sheet-sub">Search a contact or type a number</p>
+          <div class="search-box" style="margin-bottom:12px">
+            <i class="fas fa-search"></i>
+            <input type="tel" id="searchCallInput" placeholder="Name or phone number...">
+          </div>
+          <div class="list-item" onclick="pickCallContact('Chanda Nkosi','+260 764 569 476')">
+            <div class="li-avatar" style="background:var(--cyan-grad)">CN</div>
+            <div class="li-body"><div class="li-name">Chanda Nkosi</div><div class="li-sub">+260 764 569 476</div></div>
+          </div>
+          <div class="list-item" onclick="pickCallContact('Thandi Banda','+260 977 123 456')">
+            <div class="li-avatar" style="background:var(--purple-grad)">TB</div>
+            <div class="li-body"><div class="li-name">Thandi Banda</div><div class="li-sub">+260 977 123 456</div></div>
+          </div>
+          <div class="list-item" onclick="pickCallContact('Lungu Mwansa','+260 955 987 654')">
+            <div class="li-avatar" style="background:var(--primary-grad)">LM</div>
+            <div class="li-body"><div class="li-name">Lungu Mwansa</div><div class="li-sub">+260 955 987 654</div></div>
+          </div>
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('searchCallSheet')">Cancel</button>
+            <button class="btn-block btn-primary" onclick="proceedManualCall()">
+              <i class="fas fa-phone"></i> Call
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact picker (Hub services) -->
+      <div class="sheet-overlay" id="contactPickerSheet" onclick="if(event.target===this)closeSheet('contactPickerSheet')">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3 id="contactPickerTitle">Start Chat</h3>
+          <p class="sheet-sub">Only contacts subscribed to SimHub are shown</p>
+          <div class="search-box" style="margin-bottom:12px">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search subscribed contacts...">
+          </div>
+          <div class="contact-pick" onclick="toggleContactPick(this)">
+            <div class="li-avatar" style="background:var(--cyan-grad)">CN</div>
+            <div class="li-body"><div class="li-name">Chanda Nkosi</div><div class="li-sub">Online · Hub member</div></div>
+            <div class="cp-check"><i class="fas fa-check"></i></div>
+          </div>
+          <div class="contact-pick" onclick="toggleContactPick(this)">
+            <div class="li-avatar" style="background:var(--purple-grad)">TB</div>
+            <div class="li-body"><div class="li-name">Thandi Banda</div><div class="li-sub">Online · Hub member</div></div>
+            <div class="cp-check"><i class="fas fa-check"></i></div>
+          </div>
+          <div class="contact-pick" onclick="toggleContactPick(this)">
+            <div class="li-avatar" style="background:var(--primary-grad)">LM</div>
+            <div class="li-body"><div class="li-name">Lungu Mwansa</div><div class="li-sub">Hub member</div></div>
+            <div class="cp-check"><i class="fas fa-check"></i></div>
+          </div>
+          <div class="contact-pick" onclick="toggleContactPick(this)">
+            <div class="li-avatar" style="background:var(--amber-grad)">SK</div>
+            <div class="li-body"><div class="li-name">Sarah Kabwe</div><div class="li-sub">Online · Hub member</div></div>
+            <div class="cp-check"><i class="fas fa-check"></i></div>
+          </div>
+          <div class="sheet-actions">
+            <button class="btn-block btn-ghost" onclick="closeSheet('contactPickerSheet')">Cancel</button>
+            <button class="btn-block btn-primary" onclick="continueContactPick()">
+              <i class="fas fa-arrow-right"></i> Continue
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auth overlay -->
+      <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+          <div class="auth-logo"><i class="fas fa-satellite-dish"></i></div>
+          <h2>SimHub Services</h2>
+          <p class="auth-sub">Sign in once to unlock voice, video, chat &amp; announcements on your SimHub network.</p>
+          <button class="auth-btn google" onclick="authProvider('Google')">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          <button class="auth-btn apple" onclick="authProvider('Apple')">
+            <i class="fab fa-apple"></i> Continue with Apple
+          </button>
+          <div class="auth-divider">or</div>
+          <button class="auth-btn email" onclick="authProvider('Email')">
+            <i class="fas fa-envelope"></i> Continue with Email
+          </button>
+          <p class="auth-terms">
+            By continuing you agree to our <a href="#" onclick="return false">Terms</a> &amp;
+            <a href="#" onclick="return false">Privacy</a>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Signup success -->
+      <div class="success-modal" id="signupSuccess">
+        <div class="success-card">
+          <div class="success-icon"><i class="fas fa-check"></i></div>
+          <h3>Account Ready!</h3>
+          <p>You're signed up for SimHub Services. Welcome aboard.</p>
+          <button class="btn-block btn-primary" onclick="continueAfterSignup()">
+            Enter Hub Services <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Voice call screen -->
+      <div class="call-screen" id="voiceScreen">
+        <div class="call-top">
+          <div class="call-avatar-lg" id="voiceAvatar">CN</div>
+          <div class="call-name" id="voiceName">Chanda Nkosi</div>
+          <div class="call-status" id="voiceStatus">Calling…</div>
+          <div class="call-timer" id="voiceTimer">00:00</div>
+          <div class="call-sim-badge" id="voiceSimBadge">
+            <i class="fas fa-sim-card"></i> <span>SIM1</span>
+          </div>
+        </div>
+        <div class="call-body">
+          <div class="conf-grid" id="voiceConfGrid" style="display:none"></div>
+          <div class="call-actions">
+            <button class="call-action-btn" id="voiceMuteBtn" onclick="toggleMute('voice')">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button class="call-action-btn add-call" onclick="addConferenceParticipant('voice')">
+              <i class="fas fa-user-plus"></i>
+            </button>
+            <button class="call-action-btn" onclick="toggleSpeaker()">
+              <i class="fas fa-volume-high"></i>
+            </button>
+            <button class="call-action-btn end-call" onclick="endCall('voice')">
+              <i class="fas fa-phone-slash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video call screen -->
+      <div class="video-screen" id="videoScreen">
+        <div class="video-main" id="videoMain">
+          <div class="vm-avatar" id="videoMainAvatar">CN</div>
+          <div class="vm-label" id="videoMainLabel">Chanda Nkosi</div>
+          <div class="self-view" id="selfView">
+            <i class="fas fa-user"></i>
+            <div class="sv-label">You</div>
+            <div class="cam-controls" id="camControls">
+              <button class="cam-btn cam-flip" id="camFlipBtn" onclick="event.stopPropagation();flipCamera()" title="Switch camera">
+                <i class="fas fa-camera-rotate"></i>
+              </button>
+              <button class="cam-btn cam-flash" id="camFlashBtn" onclick="event.stopPropagation();toggleFlashlight()" title="Flashlight">
+                <i class="fas fa-bolt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="thumb-strip" id="thumbStrip" style="display:none"></div>
+        <div class="call-body" style="flex:0">
+          <div class="call-actions" style="margin-bottom:0">
+            <button class="call-action-btn" id="videoMuteBtn" onclick="toggleMute('video')">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button class="call-action-btn add-call" onclick="addConferenceParticipant('video')">
+              <i class="fas fa-user-plus"></i>
+            </button>
+            <button class="call-action-btn" onclick="toggleCamera()">
+              <i class="fas fa-video"></i>
+            </button>
+            <button class="call-action-btn end-call" onclick="endCall('video')">
+              <i class="fas fa-phone-slash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/simhub-bridge.js"></script>
+<script>
+/* ============================================================
+   SimHub Connect v2.0 — Runtime
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  initClock();
+  initNavigation();
+  initUIHelpers();
+  initDeviceRuntime();
+  initAuthState();
+  initSIMSync();
+  console.log('%cSimHub Connect v2.0', 'color:#059669;font-weight:bold;font-size:14px');
+});
+
+/* ---------- CLOCK ---------- */
+function initClock(){
+  const t = () => {
+    const d = new Date();
+    const el = document.getElementById('clock');
+    if (el) el.textContent =
+      d.getHours().toString().padStart(2,'0') + ':' +
+      d.getMinutes().toString().padStart(2,'0');
+  };
+  t(); setInterval(t, 30000);
+}
+
+/* ---------- PAGES ---------- */
+const PAGES = [
+  'home','contacts','contactbook','messages','thread',
+  'data','hotspot','network','buy','settings','about','device',
+  'hubservices','voice','video','onlinemsg','onlinechat'
+];
+
+function go(pageId){
+  PAGES.forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.remove('active');
+  });
+  const target = document.getElementById('page-' + pageId);
+  if (target) target.classList.add('active');
+  const body = document.getElementById('appBody');
+  if (body) body.scrollTop = 0;
+  document.querySelectorAll('.tab-item').forEach(t =>
+    t.classList.toggle('active', t.dataset.page === pageId));
+  // also highlight hub tab when inside hub services
+  if (['voice','video','onlinemsg','onlinechat','hubservices'].includes(pageId)){
+    document.querySelectorAll('.tab-item').forEach(t =>
+      t.classList.toggle('active', t.dataset.page === 'hubservices'));
+  }
+}
+function showSection(id){ go(id); }
+window.go = go;
+window.showSection = showSection;
+
+function initNavigation(){
+  window.addEventListener('popstate', () => {
+    const h = location.hash.substring(1) || 'home';
+    if (PAGES.includes(h)) go(h);
+  });
+  const initial = location.hash.substring(1) || 'home';
+  if (PAGES.includes(initial)) go(initial);
+}
+
+/* ---------- UI HELPERS ---------- */
+function initUIHelpers(){
+  window.showToast = (msg) => {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  };
+  window.openSheet = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  };
+  window.closeSheet = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape')
+      document.querySelectorAll('.sheet-overlay.active').forEach(s => s.classList.remove('active'));
+  });
+}
+
+function toggleSwitch(el, label){
+  el.classList.toggle('on');
+  showToast(label + ' ' + (el.classList.contains('on') ? 'ON' : 'OFF'));
+}
+function selectSim(el, name){
+  const p = el.parentElement;
+  p.querySelectorAll('.sim-option').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  showToast('Active SIM: ' + name);
+}
+function setAccessMode(el, mode){
+  const p = el.parentElement;
+  p.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showToast('Access mode: ' + mode);
+}
+function buyBundle(size, price){
+  showToast('Purchasing ' + size + ' for ' + price + '…');
+  setTimeout(() => showToast('✓ ' + size + ' bundle added'), 1500);
+}
+function copyPasskey(){ showToast('Passkey copied'); }
+function clearCallLog(){ showToast('Call log cleared'); }
+function openNotifications(){ openSheet('notifSheet'); }
+function openAddContact(){ openSystemAddContact(); }
+function openNewMessage(){ openSystemMessageSheet(); }
+function openTimeLimitSheet(){ openSheet('timeLimitSheet'); }
+function trackAffiliateClick(){}
+function filterList(listId, query){
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const q = query.toLowerCase();
+  list.querySelectorAll('.list-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+function filterCalls(el, type){
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showToast('Filter: ' + type);
+}
+function filterContacts(el, type){
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showToast('Showing: ' + type);
+}
+function filterMessages(el, filter){
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showToast('Filter: ' + filter);
+}
+
+/* ---------- DEVICE RUNTIME (BLE + Wi-Fi) ---------- */
+const SIMHUB = {
+  SERVICE_UUID : '0000abf0-0000-1000-8000-00805f9b34fb',
+  STATUS_UUID  : '0000abf1-0000-1000-8000-00805f9b34fb',
+  CMD_UUID     : '0000abf2-0000-1000-8000-00805f9b34fb',
+  NAME_PREFIX  : 'SimHub',
+  WIFI_BASE    : 'http://192.168.4.1'
+};
+
+const DEVICE = {
+  transport: null,
+  btDevice: null,
+  btServer: null,
+  btStatusChar: null,
+  btCmdChar: null,
+  nativeDeviceId: null,
+  wifiBase: SIMHUB.WIFI_BASE,
+  online: false,
+  battery: 78,
+  sims: [
+    { id:1, present:true,  carrier:'MTN Zambia',    signal:3, usedGB:1.12, quotaGB:20 },
+    { id:2, present:true,  carrier:'Airtel Zambia', signal:2, usedGB:0.12, quotaGB:10 },
+    { id:3, present:false, carrier:null,            signal:0, usedGB:0,    quotaGB:0  },
+    { id:4, present:false, carrier:null,            signal:0, usedGB:0,    quotaGB:0  },
+    { id:5, present:false, carrier:null,            signal:0, usedGB:0,    quotaGB:0  },
+    { id:6, present:false, carrier:null,            signal:0, usedGB:0,    quotaGB:0  }
+  ],
+  lastUpdate: 0,
+  pollTimer: null,
+  pairedId: null
+};
+
+const DeviceRuntime = {
+
+  async init(){
+    try {
+      if (window.SimHubBridge && SimHubBridge.isNative()){
+        DEVICE.pairedId = await SimHubBridge.Store.get('simhub.pairedId', null);
+      } else {
+        DEVICE.pairedId = localStorage.getItem('simhub.pairedId');
+      }
+    } catch(_){}
+
+    // Silent Wi-Fi probe on boot
+    setTimeout(() => this._probeWifi(true), 600);
+  },
+
+  async pairBluetooth(){
+    // Native BLE
+    if (window.SimHubBridge && SimHubBridge.isNative()){
+      await SimHubBridge.BLE.init();
+      showToast('Scanning for SimHub…');
+      const scan = await SimHubBridge.BLE.scan({ prefix: SIMHUB.NAME_PREFIX, ms: 6000 });
+      if (!scan.devices || !scan.devices.length){ showToast('No SimHub found'); return false; }
+      const chosen = scan.devices[0];
+      DEVICE.pairedId = chosen.deviceId;
+      await SimHubBridge.Store.set('simhub.pairedId', chosen.deviceId);
+      return this._attachBluetooth({ deviceId: chosen.deviceId, name: chosen.name });
+    }
+    // Web Bluetooth
+    if (!navigator.bluetooth){ showToast('Bluetooth not supported — using Wi-Fi…'); return this.connectWifi(); }
+    try {
+      showToast('Scanning for SimHub…');
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: SIMHUB.NAME_PREFIX }],
+        optionalServices: [SIMHUB.SERVICE_UUID]
+      });
+      DEVICE.pairedId = device.id;
+      localStorage.setItem('simhub.pairedId', device.id);
+      await this._attachBluetooth(device);
+      return true;
+    } catch (err){
+      if (err.name === 'NotFoundError') showToast('Pairing cancelled');
+      else showToast('Pairing failed: ' + (err.message || err));
+      return false;
+    }
+  },
+
+  async _attachBluetooth(device, silent){
+    if (window.SimHubBridge && SimHubBridge.isNative()){
+      const deviceId = device.deviceId || device.id;
+      const res = await SimHubBridge.BLE.connect(deviceId, {
+        serviceUuid: SIMHUB.SERVICE_UUID,
+        statusUuid:  SIMHUB.STATUS_UUID,
+        cmdUuid:     SIMHUB.CMD_UUID
+      });
+      if (!res.ok){ showToast('BLE connect failed'); return false; }
+      await SimHubBridge.BLE.onStatus(applyStatus);
+      DEVICE.transport = 'ble';
+      DEVICE.nativeDeviceId = deviceId;
+      _setConnectionUI(true, 'BT');
+      await this.requestStatus();
+      if (!silent) showToast('✓ Paired with ' + (device.name || 'SimHub'));
+      _stopWifiPoll();
+      return true;
+    }
+    // Web Bluetooth
+    DEVICE.btDevice = device;
+    device.removeEventListener('gattserverdisconnected', onBtDisconnected);
+    device.addEventListener('gattserverdisconnected', onBtDisconnected);
+    if (!silent) showToast('Connecting to ' + (device.name || 'SimHub') + '…');
+    DEVICE.btServer = await device.gatt.connect();
+    const service = await DEVICE.btServer.getPrimaryService(SIMHUB.SERVICE_UUID);
+    DEVICE.btStatusChar = await service.getCharacteristic(SIMHUB.STATUS_UUID);
+    DEVICE.btCmdChar    = await service.getCharacteristic(SIMHUB.CMD_UUID);
+    await DEVICE.btStatusChar.startNotifications();
+    DEVICE.btStatusChar.addEventListener('characteristicvaluechanged', onStatusNotify);
+    DEVICE.transport = 'ble';
+    _setConnectionUI(true, 'BT');
+    await this.requestStatus();
+    if (!silent) showToast('✓ Paired with ' + (device.name || 'SimHub'));
+    _stopWifiPoll();
+    return true;
+  },
+
+  async connectWifi(){ return this._probeWifi(false); },
+
+  async _probeWifi(silent){
+    try {
+      if (!silent) showToast('Looking for SimHub on Wi-Fi…');
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 2500);
+      const r = await fetch(DEVICE.wifiBase + '/ping', { signal: ctrl.signal });
+      clearTimeout(to);
+      if (!r.ok) throw 0;
+      DEVICE.transport = 'wifi';
+      _setConnectionUI(true, 'Wi-Fi');
+      if (!silent) showToast('✓ Connected via Wi-Fi');
+      _startWifiPoll();
+      await this.requestStatus();
+      return true;
+    } catch(_){
+      if (!silent) showToast('SimHub not reachable on Wi-Fi');
+      _setConnectionUI(false);
+      return false;
+    }
+  },
+
+  async send(cmd){
+    const payload = JSON.stringify(cmd);
+    if (DEVICE.transport === 'ble'){
+      if (window.SimHubBridge && SimHubBridge.isNative() && DEVICE.nativeDeviceId){
+        return (await SimHubBridge.BLE.write(
+          DEVICE.nativeDeviceId, SIMHUB.SERVICE_UUID, SIMHUB.CMD_UUID, cmd
+        )).ok;
+      }
+      if (DEVICE.btCmdChar){
+        const bytes = new TextEncoder().encode(payload);
+        const CHUNK = 20;
+        for (let i = 0; i < bytes.length; i += CHUNK){
+          await DEVICE.btCmdChar.writeValue(bytes.slice(i, i + CHUNK));
+        }
+        return true;
+      }
+    }
+    if (DEVICE.transport === 'wifi'){
+      try {
+        const r = await fetch(DEVICE.wifiBase + '/cmd', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: payload
+        });
+        return r.ok;
+      } catch(_){ return false; }
+    }
+    return false;
+  },
+
+  async requestStatus(){
+    if (DEVICE.transport === 'wifi'){
+      try {
+        const r = await fetch(DEVICE.wifiBase + '/status');
+        if (r.ok) applyStatus(await r.json());
+      } catch(_){}
+    } else if (DEVICE.transport === 'ble' && DEVICE.btStatusChar){
+      try {
+        const val = await DEVICE.btStatusChar.readValue();
+        applyStatus(JSON.parse(new TextDecoder().decode(val)));
+      } catch(_){}
+    }
+  },
+
+  async disconnect(){
+    _stopWifiPoll();
+    if (DEVICE.btDevice && DEVICE.btDevice.gatt.connected){
+      try { DEVICE.btDevice.gatt.disconnect(); } catch(_){}
+    }
+    if (window.SimHubBridge && SimHubBridge.isNative() && DEVICE.nativeDeviceId){
+      await SimHubBridge.BLE.disconnect(DEVICE.nativeDeviceId);
+    }
+    DEVICE.transport = null;
+    DEVICE.online = false;
+    _setConnectionUI(false);
+    showToast('SimHub disconnected');
+  },
+
+  isOnline(){ return DEVICE.online && !!DEVICE.transport; },
+  transport(){ return DEVICE.transport; },
+  get status(){ return { ...DEVICE }; }
+};
+
+function onStatusNotify(ev){
+  try { applyStatus(JSON.parse(new TextDecoder().decode(ev.target.value))); } catch(_){}
+}
+function onBtDisconnected(){
+  DEVICE.transport = null;
+  _setConnectionUI(false);
+  showToast('Bluetooth lost — trying Wi-Fi…');
+  _stopWifiPoll();
+  setTimeout(() => DeviceRuntime.connectWifi(), 800);
+}
+function applyStatus(s){
+  if (!s || typeof s !== 'object') return;
+  DEVICE.online   = !!s.online;
+  if (typeof s.batt === 'number') DEVICE.battery = s.batt;
+
+  // Parse up to 6 SIMs
+  if (Array.isArray(s.sims)){
+    s.sims.forEach((sim, i) => {
+      if (i < 6){
+        DEVICE.sims[i].present = !!sim.present;
+        DEVICE.sims[i].carrier = sim.carrier || null;
+        DEVICE.sims[i].signal  = Math.max(0, Math.min(4, sim.signal || 0));
+      }
+    });
+  }
+  DEVICE.lastUpdate = Date.now();
+  _paintDeviceUI();
+}
+function _paintDeviceUI(){
+  // Battery
+  const f = document.getElementById('batteryFill');
+  const p = document.getElementById('batteryPct');
+  if (f && p && DEVICE.battery != null){
+    f.style.width = DEVICE.battery + '%';
+    p.textContent = Math.round(DEVICE.battery) + '%';
+    f.classList.remove('low','critical');
+    if (DEVICE.battery < 15) f.classList.add('critical');
+    else if (DEVICE.battery < 30) f.classList.add('low');
+  }
+  renderHeaderSims();
+  renderHomeSimSlots();
+  renderDataSimSelector();
+  renderBuySimSelector();
+  renderPerSimUsage();
+  renderDeviceSimSlots();
+
+  // Connection indicator
+  const dot = document.getElementById('connDot');
+  const txt = document.getElementById('connText');
+  if (dot && txt){
+    dot.classList.toggle('offline', !DEVICE.online);
+    dot.classList.toggle('wifi', DEVICE.transport === 'wifi');
+    txt.textContent = DEVICE.online
+      ? (DEVICE.transport === 'ble' ? 'BT' : 'Wi-Fi')
+      : 'Offline';
+  }
+  refreshHubTileState();
+  if (typeof updateSettingsConnDesc === 'function') updateSettingsConnDesc();
+}
+
+function _setConnectionUI(online, label){
+  const dot = document.getElementById('connDot');
+  const txt = document.getElementById('connText');
+  if (dot) dot.classList.toggle('offline', !online);
+  if (txt) txt.textContent = online ? (label || 'Connected') : 'Offline';
+}
+
+function _startWifiPoll(){
+  _stopWifiPoll();
+  DEVICE.pollTimer = setInterval(() => DeviceRuntime.requestStatus(), 5000);
+}
+function _stopWifiPoll(){
+  if (DEVICE.pollTimer){ clearInterval(DEVICE.pollTimer); DEVICE.pollTimer = null; }
+}
+
+/* ---------- RENDERERS ---------- */
+function renderHeaderSims(){
+  const container = document.getElementById('simSignalGroup');
+  if (!container) return;
+  const active = DEVICE.sims.filter(s => s.present);
+  if (active.length === 0){
+    container.innerHTML = '<div class="sim-signal offline"><span class="ss-label">No SIMs</span></div>';
+    return;
+  }
+  container.innerHTML = active.map(s => {
+    const cls = s.signal > 0 ? 'active' : 'offline';
+    const sigCls = 'sig-' + Math.max(0, Math.min(3, 4 - s.signal));
+    return `
+      <div class="sim-signal ${cls}">
+        <span class="ss-label">S${s.id}</span>
+        <div class="signal-bars ${sigCls}">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderHomeSimSlots(){
+  const grid = document.getElementById('homeSimSlots');
+  if (!grid) return;
+  grid.innerHTML = DEVICE.sims.map(s => slotMarkup(s)).join('');
+}
+
+function renderDeviceSimSlots(){
+  const grid = document.getElementById('deviceSimSlots');
+  if (!grid) return;
+  grid.innerHTML = DEVICE.sims.map(s => slotMarkup(s)).join('');
+}
+
+function slotMarkup(s){
+  const cls = s.present ? 'filled' : '';
+  const sigCls = 'sig-' + Math.max(0, Math.min(3, 4 - s.signal));
+  return `
+    <div class="sim-slot ${cls}">
+      <div class="ss-icon"><i class="fas fa-sim-card"></i></div>
+      <div class="ss-slot">SLOT ${s.id}</div>
+      <div class="ss-name">${s.present ? (s.carrier || 'SIM ' + s.id) : 'Empty'}</div>
+      <div class="ss-bars ${sigCls}">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>`;
+}
+
+function renderDataSimSelector(){
+  const el = document.getElementById('dataSimSelector');
+  if (!el) return;
+  const active = DEVICE.sims.filter(s => s.present);
+  if (active.length === 0){
+    el.innerHTML = '<div style="padding:12px;color:var(--text-light);font-size:12px">No SIMs present</div>';
+    return;
+  }
+  el.innerHTML = active.map((s, i) => `
+    <div class="sim-option ${i === 0 ? 'selected' : ''}" onclick="selectSim(this,'${s.carrier}')">
+      <div class="so-label">SIM ${s.id}</div>
+      <div class="so-name">${s.carrier}</div>
+      <div class="so-status ${s.signal >= 3 ? '' : s.signal > 0 ? 'weak' : 'off'}">
+        ${s.signal >= 3 ? 'Strong' : s.signal > 0 ? 'Weak' : 'No signal'}
+      </div>
+    </div>`).join('');
+}
+
+function renderBuySimSelector(){
+  const el = document.getElementById('buySimSelector');
+  if (!el) return;
+  const active = DEVICE.sims.filter(s => s.present);
+  if (active.length === 0){
+    el.innerHTML = '<div style="padding:12px;color:var(--text-light);font-size:12px">No SIMs present</div>';
+    return;
+  }
+  el.innerHTML = active.map((s, i) => `
+    <div class="sim-option ${i === 0 ? 'selected' : ''}" onclick="selectSim(this,'${s.carrier}')">
+      <div class="so-label">SIM ${s.id}</div>
+      <div class="so-name">${s.carrier}</div>
+    </div>`).join('');
+}
+
+function renderPerSimUsage(){
+  const el = document.getElementById('perSimUsage');
+  if (!el) return;
+  const active = DEVICE.sims.filter(s => s.present);
+  if (active.length === 0){
+    el.innerHTML = '<div style="padding:12px 16px;color:var(--text-light);font-size:12px">No active SIMs</div>';
+    return;
+  }
+  el.innerHTML = active.map(s => `
+    <div class="setting-row">
+      <div class="sr-icon"><i class="fas fa-sim-card"></i></div>
+      <div class="sr-body">
+        <div class="sr-title">${s.carrier} (SIM ${s.id})</div>
+        <div class="sr-desc">${(s.quotaGB - s.usedGB).toFixed(1)} GB remaining</div>
+      </div>
+      <span style="font-weight:700;color:var(--primary);font-size:13px">${s.usedGB.toFixed(2)} GB</span>
+    </div>`).join('');
+}
+
+/* ---------- BOOT ---------- */
+function initDeviceRuntime(){
+  window.DeviceRuntime = DeviceRuntime;
+  setTimeout(() => DeviceRuntime.init(), 400);
+  setInterval(() => {
+    if (DEVICE.online && Date.now() - DEVICE.lastUpdate > 15000){
+      DEVICE.online = false;
+      _paintDeviceUI();
+    }
+  }, 5000);
+}
+
+/* ---------- AUTH (one-time) ---------- */
+const AUTH_KEY = 'simhub.auth.done';
+let hubSignedUp = false;
+let hubSignedIn = false;
+
+function initAuthState(){
+  try {
+    const v = localStorage.getItem(AUTH_KEY);
+    if (v === 'done'){ hubSignedUp = true; hubSignedIn = true; }
+  } catch(_){}
+}
+
+function openHubServices(){
+  const a = canAccessHubServices();
+  if (!a.ok){ blockHubService(a.reason); return; }
+  if (!hubSignedIn){
+    document.getElementById('authOverlay').classList.add('active');
+    return;
+  }
+  go('hubservices');
+}
+
+function authProvider(name){
+  showToast('Signing in with ' + name + '…');
+  setTimeout(() => {
+    document.getElementById('authOverlay').classList.remove('active');
+    if (!hubSignedUp){
+      hubSignedUp = true;
+      document.getElementById('signupSuccess').classList.add('active');
+    } else {
+      hubSignedIn = true;
+      go('hubservices');
+      showToast('Welcome back!');
+    }
+  }, 1100);
+}
+
+function continueAfterSignup(){
+  document.getElementById('signupSuccess').classList.remove('active');
+  hubSignedIn = true;
+  try { localStorage.setItem(AUTH_KEY, 'done'); } catch(_){}
+  go('hubservices');
+  showToast('✓ Signed in — this stays active');
+}
+
+/* ---------- HUB ACCESS RESTRICTION ---------- */
+function canAccessHubServices(){
+  if (!DeviceRuntime.isOnline())
+    return { ok:false, reason:'SimHub offline. Pair your device.' };
+  const activeSims = DEVICE.sims.filter(s => s.present);
+  if (activeSims.length === 0)
+    return { ok:false, reason:'No SIM in SimHub. Insert a SIM to continue.' };
+  return { ok:true };
+}
+
+function isHubEligibleSim(simKey){
+  const m = simKey && simKey.match(/^sim(\d+)$/);
+  if (!m) return false;
+  const idx = parseInt(m[1], 10) - 1;
+  if (idx < 0 || idx >= 6) return false;
+  return DEVICE.sims[idx].present;
+}
+
+function blockHubService(reason){ showToast(reason); }
+
+function refreshHubTileState(){
+  const lock = document.getElementById('hubLock');
+  const sub  = document.getElementById('hubTileSub');
+  if (!lock || !sub) return;
+  const a = canAccessHubServices();
+  if (!a.ok){
+    lock.style.display = 'flex';
+    sub.textContent = 'Locked — SimHub required';
+  } else {
+    lock.style.display = 'none';
+    sub.textContent = 'Calls · Video · Chat';
+  }
+}
+
+/* ---------- CALL / SMS / CONTACT ROUTING ---------- */
+function resolveSim(key){
+  if (!key) return { label:'—', carrier:'' };
+  const m = key.match(/^sim(\d+)$/);
+  if (m){
+    const idx = parseInt(m[1], 10) - 1;
+    const s = DEVICE.sims[idx];
+    return { label: 'SIM' + s.id, carrier: s.carrier || 'SimHub SIM ' + s.id };
+  }
+  if (key === 'phone1') return { label:'Phone SIM1', carrier:'Phone SIM 1' };
+  if (key === 'phone2') return { label:'Phone SIM2', carrier:'Phone SIM 2' };
+  return { label:'—', carrier:'' };
+}
+
+function openSystemAddContact(){
+  const sel = document.getElementById('contactSaveTo');
+  [...sel.options].forEach(o => o.style.display = '');
+  openSheet('addContactSheet');
+}
+function openHubAddContact(){
+  if (!canAccessHubServices().ok){ blockHubService('Hub offline'); return; }
+  const sel = document.getElementById('contactSaveTo');
+  [...sel.options].forEach(o => {
+    if (o.value.startsWith('phone')) o.style.display = 'none';
+  });
+  openSheet('addContactSheet');
+}
+
+async function saveContact(){
+  const name = document.getElementById('contactName').value.trim();
+  const num  = document.getElementById('contactNumber').value.trim();
+  const email = document.getElementById('contactEmail')?.value?.trim() || '';
+  const dest = document.getElementById('contactSaveTo').value;
+  if (!name || !num){ showToast('Enter name and number'); return; }
+
+  // Device or phone SIM — use native bridge
+  if (dest === 'device' || dest === 'phone1' || dest === 'phone2'){
+    if (window.SimHubBridge){
+      const r = await SimHubBridge.Contacts.create({ name, number: num, email, dest });
+      closeSheet('addContactSheet');
+      showToast(r.ok ? '✓ "' + name + '" saved to ' + dest : 'Save failed');
+      return;
+    }
+    closeSheet('addContactSheet');
+    showToast('✓ "' + name + '" saved');
+    return;
+  }
+
+  // sim1..6 — route via SimHub
+  if (DeviceRuntime.isOnline()){
+    await DeviceRuntime.send({ type:'contact.save', dest, name, number:num, email });
+    closeSheet('addContactSheet');
+    showToast('✓ "' + name + '" saved to ' + resolveSim(dest).carrier);
+    return;
+  }
+
+  closeSheet('addContactSheet');
+  showToast('SimHub offline — contact not saved');
+}
+
+function openSystemMessageSheet(){
+  const sel = document.getElementById('newMsgSendVia');
+  [...sel.options].forEach(o => o.style.display = '');
+  openSheet('newMsgSheet');
+}
+function openHubMessageSheet(){
+  if (!canAccessHubServices().ok){ blockHubService('Hub offline'); return; }
+  const sel = document.getElementById('newMsgSendVia');
+  [...sel.options].forEach(o => {
+    if (o.value.startsWith('phone')) o.style.display = 'none';
+  });
+  openSheet('newMsgSheet');
+}
+
+async function sendNewMessage(){
+  const to   = document.getElementById('newMsgTo').value.trim();
+  const body = document.getElementById('newMsgBody').value.trim();
+  const via  = document.getElementById('newMsgSendVia').value;
+  if (!to || !body){ showToast('Fill recipient and message'); return; }
+
+  if (via.startsWith('phone')){
+    if (window.SimHubBridge){
+      await SimHubBridge.SMS.send({ to, body, simKey: via });
+    }
+    closeSheet('newMsgSheet');
+    showToast('✓ SMS queued via phone');
+    return;
+  }
+
+  if (DeviceRuntime.isOnline()){
+    const ok = await DeviceRuntime.send({ type:'sms', sim:via, to, body });
+    closeSheet('newMsgSheet');
+    showToast(ok ? '✓ Sent via ' + resolveSim(via).carrier : 'SimHub offline');
+    return;
+  }
+
+  closeSheet('newMsgSheet');
+  showToast('SimHub offline');
+}
+
+/* ---------- MASS SMS ---------- */
+function openMassSMSComposer(){
+  document.querySelectorAll('#massSmsContactList .contact-pick').forEach(c => c.classList.remove('selected'));
+  document.getElementById('massCount').textContent = '0';
+  document.getElementById('massSmsBody').value = '';
+  openSheet('massSmsSheet');
+}
+function toggleMassRecipient(el){
+  el.classList.toggle('selected');
+  const n = document.querySelectorAll('#massSmsContactList .contact-pick.selected').length;
+  document.getElementById('massCount').textContent = String(n);
+}
+function filterMassContacts(q){
+  q = q.toLowerCase();
+  document.querySelectorAll('#massSmsContactList .contact-pick').forEach(c => {
+    const name = (c.dataset.name || '').toLowerCase();
+    c.style.display = name.includes(q) ? '' : 'none';
+  });
+}
+async function sendMassSMS(){
+  const picks = [...document.querySelectorAll('#massSmsContactList .contact-pick.selected')];
+  const body = document.getElementById('massSmsBody').value.trim();
+  const via  = document.getElementById('massSmsVia').value;
+  if (picks.length === 0){ showToast('Select recipients'); return; }
+  if (!body){ showToast('Enter a message'); return; }
+
+  const recipients = picks.map(p => ({
+    name: p.dataset.name,
+    number: p.querySelector('.li-sub').textContent.trim()
+  }));
+
+  if (via.startsWith('phone')){
+    if (window.SimHubBridge){
+      for (const r of recipients){
+        await SimHubBridge.SMS.send({ to:r.number, body, simKey:via });
+      }
+    }
+    closeSheet('massSmsSheet');
+    showToast('✓ Sent to ' + recipients.length + ' recipients');
+    return;
+  }
+
+  if (DeviceRuntime.isOnline()){
+    await DeviceRuntime.send({ type:'sms.mass', sim:via, recipients, body });
+    closeSheet('massSmsSheet');
+    showToast('✓ Sent to ' + recipients.length + ' recipients via ' + resolveSim(via).carrier);
+    return;
+  }
+
+  closeSheet('massSmsSheet');
+  showToast('SimHub offline');
+}
+
+/* ---------- CALLS ---------- */
+async function placeCall(){
+  const num = document.getElementById('callNumber').value.trim();
+  const via = document.getElementById('callVia').value;
+  if (!num){ showToast('Enter a number'); return; }
+  closeSheet('callSheet');
+
+  if (via.startsWith('phone')){
+    if (window.SimHubBridge){
+      const r = await SimHubBridge.Phone.call({ number:num, simKey:via });
+      showToast(r.ok ? 'Opening dialer…' : 'Call failed');
+      return;
+    }
+    window.location.href = 'tel:' + num;
+    return;
+  }
+
+  if (DeviceRuntime.isOnline()){
+    await DeviceRuntime.send({ type:'call', sim:via, number:num });
+    showToast('Calling via ' + resolveSim(via).carrier);
+    return;
+  }
+  showToast('SimHub offline');
+}
+
+function redialCall(name, number){ openSheet('callSheet'); document.getElementById('callNumber').value = number; }
+
+async function openCallSheetFor(name, number, type){
+  const a = canAccessHubServices();
+  if (!a.ok){ blockHubService(a.reason); return; }
+  const active = DEVICE.sims.filter(s => s.present);
+  const lines = active.map((s, i) => (i+1) + ' = SIM' + s.id + ' · ' + s.carrier);
+  const pick = prompt('Call ' + name + ' (Hub Services)\n' + lines.join('\n'), '1');
+  if (pick === null) return;
+  const idx = Math.max(0, Math.min(active.length - 1, parseInt(pick, 10) - 1));
+  const simKey = 'sim' + active[idx].id;
+  await DeviceRuntime.send({ type:'call', sim:simKey, number, media:type || 'voice' });
+  showToast('Dialing ' + name);
+}
+
+function openSearchCall(type){
+  document.getElementById('searchCallTitle').textContent =
+    type === 'video' ? 'Start Video Call' : 'Start Voice Call';
+  openSheet('searchCallSheet');
+}
+function pickCallContact(name, number){
+  closeSheet('searchCallSheet');
+  openCallSheetFor(name, number, 'voice');
+}
+function proceedManualCall(){
+  const num = document.getElementById('searchCallInput').value.trim();
+  if (!num){ showToast('Enter a number'); return; }
+  closeSheet('searchCallSheet');
+  openCallSheetFor(num, num, 'voice');
+}
+
+/* ---------- CALL SCREEN ---------- */
+let callTimerInterval = null;
+let conferenceParticipants = [];
+
+function startCall(name, number, type, simLabel){
+  const isVideo = type === 'video';
+  const screen = document.getElementById(isVideo ? 'videoScreen' : 'voiceScreen');
+  const ini = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+  if (isVideo){
+    document.getElementById('videoMainAvatar').textContent = ini;
+    document.getElementById('videoMainLabel').textContent = name;
+  } else {
+    document.getElementById('voiceAvatar').textContent = ini;
+    document.getElementById('voiceName').textContent = name;
+    document.getElementById('voiceStatus').textContent = 'Calling…';
+    document.getElementById('voiceTimer').textContent = '00:00';
+    document.getElementById('voiceSimBadge').querySelector('span').textContent = simLabel || '';
+  }
+  screen.classList.add('active');
+
+  setTimeout(() => {
+    if (!isVideo) document.getElementById('voiceStatus').textContent = 'Connected';
+    startCallTimer(type);
+  }, 2500);
+}
+
+function startCallTimer(type){
+  clearInterval(callTimerInterval);
+  let sec = 0;
+  callTimerInterval = setInterval(() => {
+    sec++;
+    const m = Math.floor(sec / 60).toString().padStart(2,'0');
+    const s = (sec % 60).toString().padStart(2,'0');
+    if (type === 'voice'){
+      document.getElementById('voiceTimer').textContent = m + ':' + s;
+    } else {
+      const lbl = document.getElementById('videoMainLabel');
+      const base = lbl.dataset.base || lbl.textContent.split(' · ')[0];
+      lbl.dataset.base = base;
+      lbl.textContent = base + ' · ' + m + ':' + s;
+    }
+  }, 1000);
+}
+
+function endCall(type){
+  clearInterval(callTimerInterval);
+  const el = document.getElementById(type === 'video' ? 'videoScreen' : 'voiceScreen');
+  if (el) el.classList.remove('active');
+  document.getElementById('voiceConfGrid').style.display = 'none';
+  document.getElementById('thumbStrip').style.display = 'none';
+  conferenceParticipants = [];
+  resetCameraState();
+  showToast('Call ended');
+}
+function toggleMute(type){
+  const btn = document.getElementById(type === 'video' ? 'videoMuteBtn' : 'voiceMuteBtn');
+  btn.classList.toggle('muted');
+  const m = btn.classList.contains('muted');
+  btn.innerHTML = m ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
+  showToast(m ? 'Muted' : 'Unmuted');
+}
+function toggleSpeaker(){ showToast('Speaker toggled'); }
+function toggleCamera(){
+  const btn = document.querySelector('.call-action-btn [class*="fa-video"]');
+  if (btn){
+    const off = btn.classList.toggle('fa-video-slash');
+    btn.classList.toggle('fa-video');
+    showToast(off ? 'Camera off' : 'Camera on');
+  }
+}
+function addConferenceParticipant(type){
+  const pool = ['Thandi Banda','Lungu Mwansa','Sarah Kabwe','Peter Mbewe'];
+  const avail = pool.filter(n => !conferenceParticipants.includes(n));
+  if (!avail.length){ showToast('No more participants'); return; }
+  const p = avail[0];
+  conferenceParticipants.push(p);
+  renderConference(type);
+  showToast(p + ' added');
+}
+function renderConference(type){
+  if (type === 'voice'){
+    const grid = document.getElementById('voiceConfGrid');
+    if (!conferenceParticipants.length){ grid.style.display = 'none'; return; }
+    grid.style.display = 'grid';
+    grid.innerHTML = conferenceParticipants.map((n, i) => {
+      const ini = n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="conf-tile ${i===0?'active':''}" onclick="focusVoice('${n}',this)">
+        ${ini}
+        <span class="conf-name">${n}</span>
+        <button class="conf-remove" onclick="event.stopPropagation();removeConf('${n}','voice')"><i class="fas fa-times"></i></button>
+      </div>`;
+    }).join('');
+  } else {
+    const strip = document.getElementById('thumbStrip');
+    const sv = document.getElementById('selfView');
+    strip.style.display = 'flex';
+    sv.classList.add('left','locked');
+    strip.innerHTML = conferenceParticipants.map((n, i) => {
+      const ini = n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="thumb-item ${i===0?'active':''}" onclick="focusVideo('${n}',this)">
+        ${ini}
+        <button class="thumb-x" onclick="event.stopPropagation();removeConf('${n}','video')"><i class="fas fa-times"></i></button>
+      </div>`;
+    }).join('');
+  }
+}
+function focusVoice(name, el){
+  document.querySelectorAll('#voiceConfGrid .conf-tile').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('voiceName').textContent = name;
+}
+function focusVideo(name, el){
+  document.querySelectorAll('#thumbStrip .thumb-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const ini = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('videoMainAvatar').textContent = ini;
+  const lbl = document.getElementById('videoMainLabel');
+  lbl.textContent = name;
+  lbl.dataset.base = name;
+}
+function removeConf(name, type){
+  conferenceParticipants = conferenceParticipants.filter(n => n !== name);
+  renderConference(type);
+  showToast(name + ' removed');
+}
+
+/* ---------- CAMERA ---------- */
+const CAMERA = { facing:'user', flashOn:false };
+async function flipCamera(){
+  CAMERA.facing = CAMERA.facing === 'user' ? 'environment' : 'user';
+  const btn = document.getElementById('camFlipBtn');
+  try {
+    if (window.SimHubBridge && SimHubBridge.isNative()){
+      await SimHubBridge.Camera.flipFacing(CAMERA.facing);
+    }
+    if (DeviceRuntime.isOnline()){
+      await DeviceRuntime.send({ type:'camera.facing', facing:CAMERA.facing });
+    }
+    if (btn) btn.classList.toggle('active', CAMERA.facing === 'environment');
+    showToast(CAMERA.facing === 'user' ? '📷 Front camera' : '📷 Rear camera');
+  } catch(_){ showToast('Camera flip failed'); }
+}
+async function toggleFlashlight(){
+  if (CAMERA.facing !== 'environment'){ showToast('Switch to rear camera first'); return; }
+  CAMERA.flashOn = !CAMERA.flashOn;
+  const btn = document.getElementById('camFlashBtn');
+  try {
+    if (window.SimHubBridge) await SimHubBridge.Camera.toggleTorch(CAMERA.flashOn);
+    if (DeviceRuntime.isOnline()){
+      await DeviceRuntime.send({ type:'camera.torch', on:CAMERA.flashOn });
+    }
+    if (btn) btn.classList.toggle('active', CAMERA.flashOn);
+    showToast(CAMERA.flashOn ? '🔦 Flashlight ON' : '🔦 Flashlight OFF');
+  } catch(_){ CAMERA.flashOn = !CAMERA.flashOn; showToast('Flashlight unavailable'); }
+}
+function resetCameraState(){
+  CAMERA.facing = 'user';
+  CAMERA.flashOn = false;
+  const f = document.getElementById('camFlipBtn');
+  const g = document.getElementById('camFlashBtn');
+  if (f) f.classList.remove('active');
+  if (g) g.classList.remove('active');
+}
+
+/* ---------- HUB ONLINE MESSAGING ---------- */
+function openOnlineChat(name){
+  document.getElementById('onlineChatName').textContent = name;
+  go('onlinechat');
+  const b = document.getElementById('appBody');
+  if (b) b.scrollTop = b.scrollHeight;
+}
+async function sendOnlineMessage(){
+  const input = document.getElementById('onlineMsgInput');
+  if (!input || !input.value.trim()) return;
+  const text = input.value.trim();
+
+  if (DeviceRuntime.isOnline()){
+    await DeviceRuntime.send({ type:'hub.message', body:text });
+  }
+
+  const thread = document.getElementById('onlineThread');
+  if (!thread) return;
+  const b = document.createElement('div');
+  b.className = 'bubble out';
+  const now = new Date();
+  const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  b.innerHTML = text + '<span class="bubble-time">' + t + ' · <span class="ticks">✓</span></span>';
+  thread.appendChild(b);
+  input.value = '';
+  const body = document.getElementById('appBody');
+  if (body) body.scrollTop = body.scrollHeight;
+
+  setTimeout(() => {
+    const tick = b.querySelector('.ticks');
+    if (tick){ tick.textContent = '✓✓'; tick.classList.add('read'); }
+  }, 1500);
+}
+function attachFile(){ showToast('Attach file (max 1 GB)'); }
+function switchOnlineTab(el, tab){
+  document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('onlineTab-chats').style.display = tab === 'chats' ? 'block' : 'none';
+  document.getElementById('onlineTab-announcements').style.display = tab === 'announcements' ? 'block' : 'none';
+}
+function openSearchContact(mode){ openSheet('contactPickerSheet'); }
+function toggleContactPick(el){ el.classList.toggle('selected'); }
+function continueContactPick(){
+  const picks = [...document.querySelectorAll('#contactPickerSheet .contact-pick.selected')];
+  if (!picks.length){ showToast('Select a contact'); return; }
+  closeSheet('contactPickerSheet');
+  openOnlineChat(picks[0].querySelector('.li-name').textContent);
+}
+function renameAnnouncement(btn){
+  const item = btn.closest('.ann-item');
+  const h5 = item.querySelector('h5');
+  const n = prompt('Rename:', h5.textContent);
+  if (n && n.trim()){ h5.textContent = n.trim(); showToast('Renamed'); }
+}
+function deleteAnnouncement(btn){
+  const item = btn.closest('.ann-item');
+  item.style.transition = 'all .3s';
+  item.style.opacity = '0';
+  item.style.transform = 'translateX(-20px)';
+  setTimeout(() => { item.remove(); showToast('Deleted'); }, 300);
+}
+function sendThreadMessage(){
+  const input = document.getElementById('msgInput');
+  if (!input || !input.value.trim()) return;
+  const text = input.value.trim();
+  const thread = document.querySelector('#page-thread .msg-thread');
+  const b = document.createElement('div');
+  b.className = 'bubble out';
+  const now = new Date();
+  const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  b.innerHTML = text + '<span class="bubble-time">' + t + ' · <span class="ticks">✓</span></span>';
+  thread.appendChild(b);
+  input.value = '';
+  const body = document.getElementById('appBody');
+  if (body) body.scrollTop = body.scrollHeight;
+}
+function openThread(name){ document.getElementById('threadName').textContent = name; go('thread'); }
+
+/* ---------- PAIRING UI ---------- */
+function openPairingSheet(){
+  renderPairingStatus();
+  openSheet('pairingSheet');
+}
+function renderPairingStatus(){
+  const line = document.getElementById('pairingStatusLine');
+  const tr = document.getElementById('pairingTransport');
+  if (!line || !tr) return;
+  if (DEVICE.transport === 'ble'){
+    line.textContent = '✓ Paired over Bluetooth';
+    tr.textContent = DEVICE.btDevice?.name || DEVICE.nativeDeviceId || 'SimHub';
+  } else if (DEVICE.transport === 'wifi'){
+    line.textContent = '✓ Connected over Wi-Fi';
+    tr.textContent = DEVICE.wifiBase;
+  } else {
+    line.textContent = 'Not connected';
+    tr.textContent = '—';
+  }
+}
+async function pairFromSheet(mode){
+  closeSheet('pairingSheet');
+  if (mode === 'ble') await DeviceRuntime.pairBluetooth();
+  else await DeviceRuntime.connectWifi();
+}
+async function disconnectFromSheet(){
+  await DeviceRuntime.disconnect();
+  closeSheet('pairingSheet');
+}
+async function unpairDevice(){
+  try { localStorage.removeItem('simhub.pairedId'); } catch(_){}
+  if (window.SimHubBridge) await SimHubBridge.Store.remove('simhub.pairedId');
+  await DeviceRuntime.disconnect();
+  showToast('SimHub unpaired');
+}
+
+function updateSettingsConnDesc(){
+  const d = document.getElementById('settingsConnDesc');
+  if (!d) return;
+  if (DEVICE.transport === 'ble') d.textContent = '✓ Bluetooth · ' + (DEVICE.btDevice?.name || 'SimHub');
+  else if (DEVICE.transport === 'wifi') d.textContent = '✓ Wi-Fi · ' + DEVICE.wifiBase;
+  else d.textContent = 'Not connected — tap to pair';
+}
+
+/* ---------- HARDWARE SYNC ---------- */
+async function syncDeviceSpecs(){
+  showToast('Syncing hardware…');
+  if (DeviceRuntime.isOnline()){
+    await DeviceRuntime.send({ type:'device.specs' });
+  }
+  setTimeout(() => {
+    document.getElementById('hwDeviceName').textContent = 'SimHub-Lite-Pro';
+    document.getElementById('hwFirmware').textContent = 'v0.9.4-beta';
+    document.getElementById('hwSerial').textContent = 'SH-LP-2024-00847';
+    showToast('✓ Hardware specs synced');
+  }, 800);
+}
+
+function initSIMSync(){
+  // Initial paint
+  _paintDeviceUI();
+  // Refresh hardware settings line
+  setInterval(updateSettingsConnDesc, 3000);
+}
+
+/* ---------- EXPOSE ---------- */
+window.openPairingSheet    = openPairingSheet;
+window.pairFromSheet       = pairFromSheet;
+window.disconnectFromSheet = disconnectFromSheet;
+window.unpairDevice        = unpairDevice;
+window.openHubServices     = openHubServices;
+window.authProvider        = authProvider;
+window.continueAfterSignup = continueAfterSignup;
+window.openSystemAddContact = openSystemAddContact;
+window.openHubAddContact   = openHubAddContact;
+window.openSystemMessageSheet = openSystemMessageSheet;
+window.openHubMessageSheet = openHubMessageSheet;
+window.openMassSMSComposer = openMassSMSComposer;
+window.toggleMassRecipient = toggleMassRecipient;
+window.filterMassContacts  = filterMassContacts;
+window.sendMassSMS         = sendMassSMS;
+window.sendNewMessage      = sendNewMessage;
+window.saveContact         = saveContact;
+window.placeCall           = placeCall;
+window.redialCall          = redialCall;
+window.openCallSheetFor    = openCallSheetFor;
+window.openSearchCall      = openSearchCall;
+window.pickCallContact     = pickCallContact;
+window.proceedManualCall   = proceedManualCall;
+window.startCall           = startCall;
+window.endCall             = endCall;
+window.toggleMute          = toggleMute;
+window.toggleSpeaker       = toggleSpeaker;
+window.toggleCamera        = toggleCamera;
+window.addConferenceParticipant = addConferenceParticipant;
+window.focusVoice          = focusVoice;
+window.focusVideo          = focusVideo;
+window.removeConf          = removeConf;
+window.flipCamera          = flipCamera;
+window.toggleFlashlight    = toggleFlashlight;
+window.resetCameraState    = resetCameraState;
+window.openOnlineChat      = openOnlineChat;
+window.sendOnlineMessage   = sendOnlineMessage;
+window.attachFile          = attachFile;
+window.switchOnlineTab     = switchOnlineTab;
+window.openSearchContact   = openSearchContact;
+window.toggleContactPick   = toggleContactPick;
+window.continueContactPick = continueContactPick;
+window.renameAnnouncement  = renameAnnouncement;
+window.deleteAnnouncement  = deleteAnnouncement;
+window.sendThreadMessage   = sendThreadMessage;
+window.openThread          = openThread;
+window.syncDeviceSpecs     = syncDeviceSpecs;
+window.openNotifications   = openNotifications;
+window.openAddContact      = openAddContact;
+window.openNewMessage      = openNewMessage;
+window.openTimeLimitSheet  = openTimeLimitSheet;
+window.toggleSwitch        = toggleSwitch;
+window.selectSim           = selectSim;
+window.setAccessMode       = setAccessMode;
+window.buyBundle           = buyBundle;
+window.copyPasskey         = copyPasskey;
+window.clearCallLog        = clearCallLog;
+window.trackAffiliateClick = trackAffiliateClick;
+window.filterList          = filterList;
+window.filterCalls         = filterCalls;
+window.filterContacts      = filterContacts;
+window.filterMessages      = filterMessages;
+window.filterMassContacts  = filterMassContacts;
+</script>
+</body>
+</html>

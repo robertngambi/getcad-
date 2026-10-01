@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>GetCAD Water Meter</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ============================================================
+               ROOT VARIABLES & RESET
+               ============================================================ */
+        :root {
+            --primary: #0a2463;
+            --primary-light: #1e3a8a;
+            --secondary: #0d9488;
+            --secondary-light: #14b8a6;
+            --accent: #f59e0b;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --warning: #f97316;
+            --bg-white: #ffffff;
+            --bg-light-blue: #e0f2fe;
+            --bg-light-brown: #f5e6d3;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            transition: background 0.4s ease;
+        }
+
+        /* ============================================================
+               APP CONTAINER (Mobile Frame)
+               ============================================================ */
+        .app-container {
+            max-width: 420px;
+            width: 100%;
+            height: 780px;
+            background: var(--bg-white);
+            border-radius: 36px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: background 0.4s ease;
+        }
+
+        /* ----- Background Themes ----- */
+        .app-container.theme-white {
+            background: #ffffff;
+        }
+        .app-container.theme-light-blue {
+            background: #e0f2fe;
+        }
+        .app-container.theme-light-brown {
+            background: #f5e6d3;
+        }
+
+        /* ============================================================
+               STATUS BAR (iOS-style)
+               ============================================================ */
+        .status-bar {
+            padding: 12px 20px 4px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            background: transparent;
+        }
+
+        /* ============================================================
+               HEADER
+               ============================================================ */
+        .app-header {
+            padding: 8px 20px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+        }
+
+        .app-header .greeting {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .app-header .greeting strong {
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 800;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .header-actions .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            color: var(--primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .header-actions .icon-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        .header-actions .icon-btn .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================================
+               MAIN BALANCE CARD
+               ============================================================ */
+        .balance-card {
+            margin: 8px 20px 16px;
+            padding: 24px 20px 20px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 8px 30px rgba(10, 36, 99, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .balance-card .label {
+            font-size: 13px;
+            opacity: 0.8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .balance-card .amount {
+            font-size: 38px;
+            font-weight: 900;
+            margin: 4px 0 2px;
+            letter-spacing: -0.5px;
+        }
+        .balance-card .amount span {
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.7;
+            margin-left: 4px;
+        }
+        .balance-card .sub {
+            font-size: 14px;
+            opacity: 0.85;
+            font-weight: 400;
+        }
+
+        .balance-card .progress-wrap {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .balance-card .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .balance-card .progress-bar .fill {
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #fcd34d, #f59e0b);
+            width: 65%;
+            transition: width 0.6s ease;
+        }
+        .balance-card .progress-text {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.9;
+            white-space: nowrap;
+        }
+
+        /* ============================================================
+               MODE INDICATOR (LED)
+               ============================================================ */
+        .mode-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 20px 12px;
+            padding: 8px 14px;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            width: fit-content;
+        }
+        .mode-indicator .led {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background 0.3s;
+            animation: blink 1.0s infinite;
+        }
+        .mode-indicator .led.green {
+            background: #22c55e;
+            box-shadow: 0 0 12px #22c55e88;
+        }
+        .mode-indicator .led.yellow {
+            background: #eab308;
+            box-shadow: 0 0 12px #eab30888;
+        }
+        .mode-indicator .led.orange {
+            background: #f97316;
+            box-shadow: 0 0 12px #f9731688;
+        }
+        .mode-indicator .led.off {
+            animation: none;
+            background: #94a3b8;
+            box-shadow: none;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        /* ============================================================
+               STATS ROW
+               ============================================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 20px;
+            margin-bottom: 16px;
+        }
+        .stat-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            padding: 14px 10px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: var(--transition);
+        }
+        .stat-item .icon {
+            font-size: 20px;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .stat-item .value.green {
+            color: var(--success);
+        }
+        .stat-item .value.orange {
+            color: var(--warning);
+        }
+        .stat-item .value.blue {
+            color: var(--primary-light);
+        }
+        .stat-item .label {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+
+        /* ============================================================
+               QUICK ACTIONS
+               ============================================================ */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            padding: 0 20px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .quick-actions::-webkit-scrollbar {
+            display: none;
+        }
+        .quick-actions .action-btn {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            max-width: 80%;
+            border: none;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            color: var(--primary);
+        }
+        .quick-actions .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+        }
+        .quick-actions .action-btn.primary {
+            background: var(--secondary);
+            color: white;
+        }
+        .quick-actions .action-btn.danger {
+            background: var(--danger);
+            color: white;
+        }
+        .quick-actions .action-btn.warning {
+            background: var(--warning);
+            color: white;
+        }
+        .quick-actions .action-btn i {
+            font-size: 14px;
+        }
+
+        /* ============================================================
+               USAGE GRAPH
+               ============================================================ */
+        .graph-section {
+            margin: 0 20px 16px;
+            padding: 16px 16px 12px;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .graph-section .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .graph-section .graph-header h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .graph-section .graph-header span {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .graph-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 80px;
+            gap: 6px;
+        }
+        .graph-bars .bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .graph-bars .bar {
+            width: 100%;
+            max-width: 28px;
+            border-radius: 6px 6px 2px 2px;
+            background: linear-gradient(180deg, var(--secondary-light), var(--secondary));
+            height: 20px;
+            transition: height 0.6s ease;
+            min-height: 4px;
+        }
+        .graph-bars .bar.today {
+            background: linear-gradient(180deg, #f59e0b, #d97706);
+        }
+        .graph-bars .bar-label {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+               ALERT BANNER
+               ============================================================ */
+        .alert-banner {
+            margin: 0 20px 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #92400e;
+        }
+        .alert-banner i {
+            font-size: 18px;
+            color: var(--warning);
+        }
+        .alert-banner.hidden {
+            display: none;
+        }
+
+        /* ============================================================
+               BOTTOM NAVIGATION
+               ============================================================ */
+        .bottom-nav {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 12px 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            border: none;
+            background: none;
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 4px 12px;
+            position: relative;
+        }
+        .bottom-nav .nav-item i {
+            font-size: 20px;
+            transition: var(--transition);
+        }
+        .bottom-nav .nav-item.active {
+            color: var(--secondary);
+        }
+        .bottom-nav .nav-item.active i {
+            transform: translateY(-2px);
+        }
+        .bottom-nav .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            border-radius: 6px;
+            background: var(--secondary);
+        }
+        .bottom-nav .nav-item:hover {
+            color: var(--primary);
+        }
+
+        /* ============================================================
+               PAGE / SECTION CONTAINERS
+               ============================================================ */
+        .page {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 8px;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        /* ============================================================
+               HISTORY PAGE
+               ============================================================ */
+        .history-list {
+            padding: 0 20px;
+            flex: 1;
+        }
+        .history-list .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .history-list .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .history-list .filter-tabs .tab {
+            padding: 6px 16px;
+            border-radius: 40px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .history-list .filter-tabs .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        .history-list .filter-tabs .tab:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .history-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .history-item .left .date {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .history-item .left .desc {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .history-item .right {
+            text-align: right;
+        }
+        .history-item .right .usage {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .history-item .right .status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .history-item .right .status.paid {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        .history-item .right .status.pending {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .history-summary {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-top: 4px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .history-summary .item {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .history-summary .item strong {
+            display: block;
+            font-size: 16px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* ============================================================
+               PAYMENT PAGE
+               ============================================================ */
+        .payment-section {
+            padding: 0 20px;
+            flex: 1;
+        }
+        .payment-section .balance-mini {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            font-size: 14px;
+            color: #64748b;
+        }
+        .payment-section .balance-mini strong {
+            font-size: 20px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .amount-grid .amt-btn {
+            padding: 14px 6px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        .amount-grid .amt-btn:hover {
+            border-color: var(--secondary);
+            transform: scale(1.02);
+        }
+        .amount-grid .amt-btn.active {
+            border-color: var(--secondary);
+            background: var(--secondary);
+            color: white;
+        }
+        .amount-grid .amt-btn .sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+        .amount-grid .amt-btn.active .sub {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .payment-methods .pm {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .payment-methods .pm i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .payment-methods .pm.active {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+        .payment-methods .pm:hover {
+            border-color: var(--secondary);
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            color: white;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35);
+        }
+        .pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(13, 148, 136, 0.45);
+        }
+        .pay-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ============================================================
+               SETTINGS PAGE
+               ============================================================ */
+        .settings-section {
+            padding: 0 20px;
+            flex: 1;
+        }
+        .settings-group {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-sm);
+            padding: 6px 0;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+        .settings-group .group-title {
+            padding: 12px 16px 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        .settings-item:hover {
+            background: #f8fafc;
+        }
+        .settings-item .right {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        .settings-item .right i {
+            margin-left: 6px;
+            font-size: 14px;
+        }
+
+        /* Theme buttons */
+        .theme-selector {
+            display: flex;
+            gap: 12px;
+            padding: 8px 16px 16px;
+            flex-wrap: wrap;
+        }
+        .theme-selector .theme-btn {
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: var(--transition);
+            color: #64748b;
+        }
+        .theme-selector .theme-btn:hover {
+            border-color: var(--secondary);
+        }
+        .theme-selector .theme-btn.active {
+            border-color: var(--secondary);
+            background: var(--secondary);
+            color: white;
+        }
+        .theme-selector .theme-btn .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .theme-selector .theme-btn .dot.white {
+            background: #ffffff;
+            border: 1px solid #ddd;
+        }
+        .theme-selector .theme-btn .dot.light-blue {
+            background: #e0f2fe;
+        }
+        .theme-selector .theme-btn .dot.light-brown {
+            background: #f5e6d3;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: #cbd5e1;
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .toggle.active {
+            background: var(--secondary);
+        }
+        .toggle .thumb {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        .toggle.active .thumb {
+            left: 22px;
+        }
+
+        /* ============================================================
+               METER STATUS PAGE
+               ============================================================ */
+        .meter-status {
+            padding: 0 20px;
+            flex: 1;
+        }
+        .meter-status .status-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 16px;
+        }
+        .meter-status .status-card .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+        }
+        .meter-status .status-card .row:last-child {
+            border-bottom: none;
+        }
+        .meter-status .status-card .row .key {
+            color: #64748b;
+            font-weight: 500;
+        }
+        .meter-status .status-card .row .value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .meter-status .status-card .row .value.online {
+            color: var(--success);
+        }
+        .meter-status .status-card .row .value.offline {
+            color: var(--danger);
+        }
+
+        .meter-status .danger-btn {
+            border: none;
+            background: var(--danger);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+       /* }
+
+        .meter-status {=====*/
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .danger-button {
+            width:80%;
+            padding:12px;
+            margin-top:10px;
+            align-items: center;
+            border-radius:60px;
+            font-weight: 600;
+        }
+
+            
+
+
+        .meter-status .danger-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+        }
+
+        /* ============================================================
+               SCROLLBAR
+               ============================================================ */
+        .page::-webkit-scrollbar {
+            width: 3px;
+        }
+        .page::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .page::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 12px;
+        }
+
+        /* ============================================================
+               RESPONSIVE
+               ============================================================ */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            .app-container {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .bottom-nav {
+                padding-bottom: 20px;
+            }
+        }
+
+        /* ============================================================
+               TOAST NOTIFICATION
+               ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            background: var(--success);
+        }
+        .toast.error {
+            background: var(--danger);
+        }
+        .toast.warning {
+            background: var(--warning);
+        }
+
+        /* ============================================================
+               MODAL OVERLAY
+               ============================================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .modal-box h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .modal-box p {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-box .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal-box .modal-actions .cancel {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .modal-box .modal-actions .confirm {
+            background: var(--danger);
+            color: white;
+        }
+        .modal-box .modal-actions .confirm:hover {
+            transform: scale(1.03);
+        }
+        .modal-box .modal-actions .cancel:hover {
+            background: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    TOAST
+    ============================================================ -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ============================================================
+    MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <h3 id="modalTitle">⚠️ Confirm</h3>
+            <p id="modalMessage">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal()">Cancel</button>
+                <button class="confirm" id="modalConfirmBtn" onclick="confirmModal()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div class="app-container theme-white" id="appContainer">
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span><i class="fas fa-signal"></i> <i class="fas fa-wifi"></i> <i class="fas fa-battery-three-quarters"></i></span>
+        </div>
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="greeting">
+                Hello <strong id="customerName">John</strong>
+                <span style="font-size:12px;font-weight:400;color:#94a3b8;display:block;">Meter: #GET-001-2026</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="syncMeter()" title="Sync Meter">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="icon-btn" onclick="navigateTo('settings')" title="Settings">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+                <button class="icon-btn" onclick="showToast('📬 No new notifications','')">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        PAGE: HOME
+        ============================================================ -->
+        <div class="page active" id="page-home">
+
+            <!-- Mode Indicator (LED) -->
+            <div class="mode-indicator">
+                <span class="led green" id="modeLed"></span>
+                <span id="modeLabel">Normal (Prepaid) Mode</span>
+                <span style="margin-left:auto;font-size:11px;color:#94a3b8;" id="modeBlinkStatus">● Blinking</span>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="label">💧 Remaining Units</div>
+                <div class="amount" id="remainingUnits">1,250 <span>Litres</span></div>
+                <div class="sub">≈ ZMW 312.50</div>
+                <div class="progress-wrap">
+                    <div class="progress-bar">
+                        <div class="fill" id="progressFill" style="width:65%;"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Used: 850 / 2,100</div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="icon"><i class="fas fa-tint"></i></div>
+                    <div class="value green" id="todayUsage">45</div>
+                    <div class="label">Today (L)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="far fa-clock"></i></div>
+                    <div class="value blue" id="estTime">8 Days</div>
+                    <div class="label">Est. Remaining</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fas fa-bolt"></i></div>
+                    <div class="value orange" id="flowRate">2.1</div>
+                    <div class="label">L/min</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn primary" onclick="navigateTo('payment')">
+                    <i class="fas fa-plus-circle"></i> Buy Units
+                </button>
+                <button class="action-btn" onclick="navigateTo('history')">
+                    <i class="fas fa-history"></i> History
+                </button>
+                <button class="action-btn" onclick="navigateTo('meter')">
+                    <i class="fas fa-microchip"></i> Meter
+                </button>
+                <button class="action-btn danger" onclick="triggerEmergencyShutoff()">
+                    <i class="fas fa-power-off"></i> Shut Off
+                </button>
+            </div>
+
+            <!-- Graph -->
+            <div class="graph-section">
+                <div class="graph-header">
+                    <h4><i class="fas fa-chart-line" style="color:var(--secondary);margin-right:6px;"></i> Weekly Usage</h4>
+                    <span>Last 7 days</span>
+                </div>
+                <div class="graph-bars" id="graphBars">
+                    <!-- Bars injected by JS -->
+                </div>
+            </div>
+
+            <!-- Alert Banner -->
+            <div class="alert-banner hidden" id="alertBanner">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="alertMessage">⚠️ Low Units Alert: Less than 10% remaining. Please buy or recharge now to avoid disconnection.</span>
+            </div>
+
+        </div>
+
+        <!-- ============================================================
+        PAGE: HISTORY
+        ============================================================ -->
+        <div class="page" id="page-history">
+            <div style="padding: 4px 20px 12px;">
+                <h2 style="font-size:22px;font-weight:800;color:var(--primary);">Usage History</h2>
+            </div>
+            <div class="history-list">
+                <div class="filter-tabs" id="filterTabs">
+                    <button class="tab active" data-filter="week">This Week</button>
+                    <button class="tab" data-filter="month">This Month</button>
+                    <button class="tab" data-filter="custom">Custom</button>
+                </div>
+                <div id="historyItems">
+                    <!-- Injected by JS -->
+                </div>
+                <div class="history-summary" id="historySummary">
+                    <div class="item">Total Usage <strong id="totalUsageMonth">2,850 L</strong></div>
+                    <div class="item">Total Cost <strong id="totalCostMonth">ZMW 712.50</strong></div>
+                    <div class="item">Avg Daily <strong id="avgDaily">95 L</strong></div>
+                    <div class="item">Bills Paid <strong id="billsPaid">4 / 6</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        PAGE: PAYMENT
+        ============================================================ -->
+        <div class="page" id="page-payment">
+            <div style="padding: 4px 20px 12px;">
+                <h2 style="font-size:22px;font-weight:800;color:var(--primary);">💳 Buy Units</h2>
+            </div>
+            <div class="payment-section">
+                <div class="balance-mini">
+                    Your Balance: <strong id="payBalance">1,250</strong> Litres
+                </div>
+
+                <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:8px;">Select Amount</div>
+                <div class="amount-grid" id="amountGrid">
+                    <button class="amt-btn" data-litres="200" data-price="50">ZMW 50 <span class="sub">200 L</span></button>
+                    <button class="amt-btn" data-litres="400" data-price="100">ZMW 100 <span class="sub">400 L</span></button>
+                    <button class="amt-btn" data-litres="800" data-price="200">ZMW 200 <span class="sub">800 L</span></button>
+                    <button class="amt-btn" data-litres="2000" data-price="500">ZMW 500 <span class="sub">2,000 L</span></button>
+                    <button class="amt-btn" data-litres="4000" data-price="1000">ZMW 1,000 <span class="sub">4,000 L</span></button>
+                    <button class="amt-btn active" data-litres="100" data-price="25">ZMW 25 <span class="sub">100 L</span></button>
+                </div>
+
+                <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:8px;">Payment Method</div>
+                <div class="payment-methods">
+                    <div class="pm active" data-method="momo"><i class="fas fa-mobile-alt"></i> MoMo</div>
+                    <div class="pm" data-method="card"><i class="fas fa-credit-card"></i> Card</div>
+                    <div class="pm" data-method="bank"><i class="fas fa-university"></i> Bank</div>
+                </div>
+
+                <button class="pay-btn" id="payNowBtn" onclick="processPayment()">
+                    <i class="fas fa-check-circle"></i> Buy Now – ZMW 25
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        PAGE: METER
+        ============================================================ -->
+        <div class="page" id="page-meter">
+            <div style="padding: 4px 20px 12px;">
+                <h2 style="font-size:22px;font-weight:800;color:var(--primary);">🔧 Meter Status</h2>
+            </div>
+            <div class="meter-status">
+                <div class="status-card">
+                    <div class="row"><span class="key">Meter ID</span><span class="value">GET-001-2026</span></div>
+                    <div class="row"><span class="key">Status</span><span class="value online" id="meterStatusText">🟢 Online</span></div>
+                    <div class="row"><span class="key">Signal</span><span class="value">📶 4 bars (GSM)</span></div>
+                    <div class="row"><span class="key">Bluetooth</span><span class="value">✅ Connected</span></div>
+                    <div class="row"><span class="key">Firmware</span><span class="value">v2.1.0 <button style="background:none;border:none;color:var(--secondary);cursor:pointer;font-weight:700;" onclick="showToast('📦 Checking for updates...','')">Update</button></span></div>
+                    <div class="row"><span class="key">Tamper Log</span><span class="value" style="color:var(--success);">✅ No tampering detected</span></div>
+                </div>
+
+                <div class="status-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+                        <span style="font-weight:600;color:var(--primary);">🔒 Auto Shut-off</span>
+                        <div class="toggle active" id="toggleAutoShutoff" onclick="toggleSwitch(this)">
+                            <div class="thumb"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #f1f5f9;">
+                        <span style="font-weight:600;color:var(--primary);">🔔 Low Unit Alerts</span>
+                        <div class="toggle active" id="toggleAlerts" onclick="toggleSwitch(this)">
+                            <div class="thumb"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #f1f5f9;">
+                        <span style="font-weight:600;color:var(--primary);">💧 Leak Detection</span>
+                        <div class="toggle" id="toggleLeak" onclick="toggleSwitch(this)">
+                            <div class="thumb"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="danger-btn" onclick="triggerEmergencyShutoff()">
+                    <i class="fas fa-power-off"></i> Shut-off
+                </button>
+                <button style="width:80%;padding:12px;margin-top:10px;border:none;border-radius:60px; align-items: center;background:var(--primary-light);color:white;font-weight:700;cursor:pointer;" onclick="syncMeter()">
+                    <i class="fas fa-sync-alt"></i> Sync Meter Now
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        PAGE: SETTINGS
+        ============================================================ -->
+        <div class="page" id="page-settings">
+            <div style="padding: 4px 20px 12px;">
+                <h2 style="font-size:22px;font-weight:800;color:var(--primary);">⚙️ Settings</h2>
+            </div>
+            <div class="settings-section">
+                <div class="settings-group">
+                    <div class="group-title">Appearance</div>
+                    <div class="theme-selector">
+                        <button class="theme-btn active" data-theme="white" onclick="setTheme('white')">
+                            <span class="dot white"></span> White
+                        </button>
+                        <button class="theme-btn" data-theme="light-blue" onclick="setTheme('light-blue')">
+                            <span class="dot light-blue"></span> Light Blue
+                        </button>
+                        <button class="theme-btn" data-theme="light-brown" onclick="setTheme('light-brown')">
+                            <span class="dot light-brown"></span> Light Brown
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="group-title">Customer Info</div>
+                    <div class="settings-item" onclick="showToast('✏️ Edit name coming soon','')">
+                        Name <span class="right">John <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <div class="settings-item" onclick="showToast('✏️ Edit phone coming soon','')">
+                        Phone <span class="right">+260 97X XXX XXX <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <div class="settings-item" onclick="showToast('📋 Meter serial: GET-001-2026','')">
+                        Meter Serial <span class="right">GET-001-2026 <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="group-title">Meter Configuration</div>
+                    <div class="settings-item" onclick="switchMode()">
+                        Operating Mode <span class="right" id="settingsMode">Prepaid <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <div class="settings-item" onclick="showToast('📡 Searching for Bluetooth devices...','')">
+                        Bluetooth Pairing <span class="right"><i class="fas fa-bluetooth-b"></i> Pair</span>
+                    </div>
+                    <div class="settings-item" onclick="showToast('📦 Checking for firmware updates...','')">
+                        Firmware Update <span class="right">v2.1.0 <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="group-title">Support</div>
+                    <div class="settings-item" onclick="showToast('📧 support@getcad.co.zm','')">
+                        Help Center <span class="right"><i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <div class="settings-item" onclick="showToast('📄 Version 1.0.0','')">
+                        About <span class="right">v1.0.0 <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        BOTTOM NAV
+        ============================================================ -->
+        <div class="bottom-nav">
+            <button class="nav-item active" data-page="home" onclick="navigateTo('home')">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <button class="nav-item" data-page="history" onclick="navigateTo('history')">
+                <i class="fas fa-clock"></i> History
+            </button>
+            <button class="nav-item" data-page="payment" onclick="navigateTo('payment')">
+                <i class="fas fa-wallet"></i> Pay
+            </button>
+            <button class="nav-item" data-page="meter" onclick="navigateTo('meter')">
+                <i class="fas fa-microchip"></i> Meter
+            </button>
+            <button class="nav-item" data-page="settings" onclick="navigateTo('settings')">
+                <i class="fas fa-sliders-h"></i> Settings
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        // ============================================================
+        // DATA STATE
+        // ============================================================
+        const state = {
+            customerName: 'John',
+            phoneNumber: '+260 97X XXX XXX',
+            meterSerial: 'GET-001-2026',
+            remainingUnits: 1250,
+            totalCapacity: 2100,
+            todayUsage: 45,
+            flowRate: 2.1,
+            mode: 'prepaid', // 'prepaid' | 'periodic' | 'service'
+            theme: 'white',
+            selectedAmount: 25,
+            selectedLitres: 100,
+            paymentMethod: 'momo',
+            history: [
+                { date: '09 Jul 2026', usage: 85, cost: 21.25, status: 'paid', time: '06:00-18:00' },
+                { date: '08 Jul 2026', usage: 120, cost: 30.00, status: 'pending', time: '06:00-18:00' },
+                { date: '07 Jul 2026', usage: 72, cost: 18.00, status: 'paid', time: '06:00-18:00' },
+                { date: '06 Jul 2026', usage: 95, cost: 23.75, status: 'paid', time: '06:00-18:00' },
+                { date: '05 Jul 2026', usage: 143, cost: 35.75, status: 'paid', time: '06:00-18:00' },
+                { date: '04 Jul 2026', usage: 58, cost: 14.50, status: 'pending', time: '06:00-18:00' },
+            ],
+            weeklyData: [55, 70, 45, 90, 120, 80, 45],
+            alertShown: false,
+        };
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const $ = id => document.getElementById(id);
+        const toast = $('toast');
+        const modalOverlay = $('modalOverlay');
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message, type = '') {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => toast.classList.add('show'), 10);
+            clearTimeout(toast._hide);
+            toast._hide = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ============================================================
+        // MODAL
+        // ============================================================
+        let modalCallback = null;
+
+        function openModal(title, message, confirmText, callback) {
+            $('modalTitle').textContent = title;
+            $('modalMessage').textContent = message;
+            $('modalConfirmBtn').textContent = confirmText || 'Confirm';
+            modalCallback = callback;
+            modalOverlay.classList.add('open');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+            modalCallback = null;
+        }
+
+        function confirmModal() {
+            if (modalCallback) modalCallback();
+            closeModal();
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = $('page-' + page);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+            const navBtn = document.querySelector(`.bottom-nav .nav-item[data-page="${page}"]`);
+            if (navBtn) navBtn.classList.add('active');
+
+            // Update alert visibility based on page
+            if (page === 'home') updateAlert();
+        }
+
+        // ============================================================
+        // GRAPH
+        // ============================================================
+        function renderGraph() {
+            const container = $('graphBars');
+            const max = Math.max(...state.weeklyData, 1);
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            container.innerHTML = state.weeklyData.map((val, i) => {
+                const pct = (val / max) * 100;
+                const isToday = i === 6;
+                return `
+                    <div class="bar-wrap">
+                        <div class="bar ${isToday ? 'today' : ''}" style="height:${Math.max(pct, 8)}%;"></div>
+                        <span class="bar-label">${days[i]}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // HISTORY
+        // ============================================================
+        function renderHistory() {
+            const container = $('historyItems');
+            container.innerHTML = state.history.map(h => `
+                <div class="history-item">
+                    <div class="left">
+                        <div class="date">${h.date}</div>
+                        <div class="desc">${h.time || ''}</div>
+                    </div>
+                    <div class="right">
+                        <div class="usage">${h.usage} L</div>
+                        <span class="status ${h.status}">${h.status === 'paid' ? '✅ Paid' : '⏳ Pending'}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update summary
+            const total = state.history.reduce((s, h) => s + h.usage, 0);
+            const cost = state.history.reduce((s, h) => s + h.cost, 0);
+            const paid = state.history.filter(h => h.status === 'paid').length;
+            const avg = state.history.length ? Math.round(total / state.history.length) : 0;
+            $('totalUsageMonth').textContent = total + ' L';
+            $('totalCostMonth').textContent = 'ZMW ' + cost.toFixed(2);
+            $('avgDaily').textContent = avg + ' L';
+            $('billsPaid').textContent = paid + ' / ' + state.history.length;
+        }
+
+        // ============================================================
+        // UPDATE UI
+        // ============================================================
+        function updateUI() {
+            const used = state.totalCapacity - state.remainingUnits;
+            const pct = Math.max(0, Math.min(100, (state.remainingUnits / state.totalCapacity) * 100));
+
+            $('remainingUnits').innerHTML = Math.round(state.remainingUnits) + ' <span>Litres</span>';
+            $('progressFill').style.width = pct + '%';
+            $('progressText').textContent = `Used: ${Math.round(used)} / ${state.totalCapacity}`;
+            $('todayUsage').textContent = state.todayUsage;
+            $('flowRate').textContent = state.flowRate.toFixed(1);
+            $('payBalance').textContent = Math.round(state.remainingUnits);
+
+            // Est. time (rough estimate based on 45L/day avg)
+            const daysLeft = Math.max(0, Math.round(state.remainingUnits / 45));
+            $('estTime').textContent = daysLeft + ' Days';
+
+            // Mode LED
+            const led = $('modeLed');
+            const label = $('modeLabel');
+            led.className = 'led';
+            if (state.mode === 'prepaid') {
+                led.classList.add('green');
+                label.textContent = 'Normal (Prepaid) Mode';
+            } else if (state.mode === 'periodic') {
+                led.classList.add('yellow');
+                label.textContent = 'Periodic (Credit) Mode';
+            } else {
+                led.classList.add('orange');
+                label.textContent = 'Service Mode';
+            }
+            $('settingsMode').textContent = state.mode.charAt(0).toUpperCase() + state.mode.slice(1);
+
+            // Update alert
+            updateAlert();
+
+            // Render graph & history
+            renderGraph();
+            renderHistory();
+        }
+
+        // ============================================================
+        // ALERT
+        // ============================================================
+        function updateAlert() {
+            const banner = $('alertBanner');
+            const msg = $('alertMessage');
+            const pct = (state.remainingUnits / state.totalCapacity) * 100;
+
+            let show = false;
+            let text = '';
+
+            if (state.mode === 'prepaid' && state.remainingUnits <= 100) {
+                show = true;
+                text = '⚠️ Low Units Alert: Less than 100 Litres remaining. Buy now to avoid disconnection.';
+            } else if (state.mode === 'periodic' && state.remainingUnits <= 200) {
+                show = true;
+                text = '⚠️ Periodic Mode: You have 2 days or less remaining. Please settle your bill.';
+            } else if (state.mode === 'service' && state.remainingUnits <= 50) {
+                show = true;
+                text = '⚠️ Service Mode: Less than 24 hours remaining. Request extension or pay now.';
+            } else if (state.remainingUnits <= 50) {
+                show = true;
+                text = '⚠️ Critical: Units almost exhausted. Immediate recharge required.';
+            }
+
+            if (show) {
+                banner.classList.remove('hidden');
+                msg.textContent = text;
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        // ============================================================
+        // THEME
+        // ============================================================
+        function setTheme(theme) {
+            state.theme = theme;
+            const container = $('appContainer');
+            container.className = 'app-container';
+            if (theme === 'white') container.classList.add('theme-white');
+            else if (theme === 'light-blue') container.classList.add('theme-light-blue');
+            else if (theme === 'light-brown') container.classList.add('theme-light-brown');
+
+            document.querySelectorAll('.theme-selector .theme-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.theme-selector .theme-btn[data-theme="${theme}"]`)?.classList.add('active');
+
+            showToast('🎨 Theme changed to ' + theme, '');
+        }
+
+        // ============================================================
+        // MODE SWITCH (Cycle through modes)
+        // ============================================================
+        function switchMode() {
+            const modes = ['prepaid', 'periodic', 'service'];
+            const labels = { prepaid: 'Prepaid', periodic: 'Periodic', service: 'Service' };
+            const idx = (modes.indexOf(state.mode) + 1) % modes.length;
+            state.mode = modes[idx];
+            updateUI();
+            showToast('🔄 Mode switched to ' + labels[state.mode], '');
+            // Send SMS warning for mode change
+            sendModeSMS(state.mode);
+        }
+
+        // ============================================================
+        // SMS WARNING MESSAGES (per mode)
+        // ============================================================
+        function sendModeSMS(mode) {
+            const msgs = {
+                prepaid: `[GetCAD] Your meter is now in PREPAID mode. Please recharge units to continue water supply. Balance: ${Math.round(state.remainingUnits)}L. Thank you.`,
+                periodic: `[GetCAD] Your meter is now in PERIODIC mode. You have a 30-day credit period. Remaining: ${Math.round(state.remainingUnits)}L. Payment due in 30 days.`,
+                service: `[GetCAD] Your meter is now in SERVICE mode. You have requested temporary water access. Remaining time: ${Math.round(state.remainingUnits/45)} days.`
+            };
+            // Simulate SMS
+            console.log('📱 SMS to ' + state.phoneNumber + ': ' + msgs[mode]);
+            showToast('📱 SMS sent to ' + state.phoneNumber, '');
+        }
+
+        // ============================================================
+        // SYNC METER
+        // ============================================================
+        function syncMeter() {
+            showToast('🔄 Syncing with meter...', '');
+            setTimeout(() => {
+                // Simulate random fluctuation
+                state.remainingUnits = Math.max(0, state.remainingUnits - Math.random() * 3);
+                updateUI();
+                showToast('✅ Sync complete! Meter updated.', 'success');
+            }, 1500);
+        }
+
+        // ============================================================
+        // TOGGLE SWITCH
+        // ============================================================
+        function toggleSwitch(el) {
+            el.classList.toggle('active');
+            const label = el.closest('.settings-item')?.querySelector('span:first-child')?.textContent || 'Switch';
+            const status = el.classList.contains('active') ? 'ON' : 'OFF';
+            showToast(`🔘 ${label.trim()} ${status}`, '');
+        }
+
+        // ============================================================
+        // PAYMENT
+        // ============================================================
+        // Amount selection
+        document.querySelectorAll('.amount-grid .amt-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.amount-grid .amt-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                state.selectedLitres = parseInt(this.dataset.litres);
+                state.selectedAmount = parseInt(this.dataset.price);
+                $('payNowBtn').innerHTML = `<i class="fas fa-check-circle"></i> Buy Now – ZMW ${state.selectedAmount}`;
+            });
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-methods .pm').forEach(el => {
+            el.addEventListener('click', function() {
+                document.querySelectorAll('.payment-methods .pm').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                state.paymentMethod = this.dataset.method;
+            });
+        });
+
+        function processPayment() {
+            if (state.remainingUnits <= 0) {
+                showToast('⚠️ Meter is depleted. Purchase required.', 'error');
+                return;
+            }
+            const amount = state.selectedAmount;
+            const litres = state.selectedLitres;
+            openModal(
+                '💳 Confirm Purchase',
+                `Buy ${litres} Litres for ZMW ${amount} using ${state.paymentMethod.toUpperCase()}?`,
+                'Pay Now',
+                function() {
+                    state.remainingUnits += litres;
+                    state.history.unshift({
+                        date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                        usage: litres,
+                        cost: amount,
+                        status: 'paid',
+                        time: 'Recharge'
+                    });
+                    updateUI();
+                    showToast(`✅ Purchased ${litres}L for ZMW ${amount}!`, 'success');
+                    // Send confirmation SMS
+                    setTimeout(() => {
+                        showToast(`📱 SMS: ${litres}L added. Balance: ${Math.round(state.remainingUnits)}L`, '');
+                    }, 1000);
+                }
+            );
+        }
+
+        // ============================================================
+        // EMERGENCY SHUT-OFF
+        // ============================================================
+        function triggerEmergencyShutoff() {
+            openModal(
+                '🚨 Emergency Shut-off',
+                'Are you sure you want to immediately shut off the water supply? This will close the valve until manually reopened.',
+                'Shut Off Now',
+                function() {
+                    state.remainingUnits = 0;
+                    updateUI();
+                    showToast('🚨 Water supply SHUT OFF. Valve closed.', 'error');
+                    // Send SMS alert
+                    setTimeout(() => {
+                        showToast(`📱 SMS: Emergency shut-off activated. Please contact support.`, '');
+                    }, 1000);
+                }
+            );
+        }
+
+        // ============================================================
+        // FILTER TABS (History)
+        // ============================================================
+        document.querySelectorAll('#filterTabs .tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('#filterTabs .tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                showToast('📊 Filter: ' + this.textContent, '');
+            });
+        });
+
+        // ============================================================
+        // MOCK SMS SENDING (simulated)
+        // ============================================================
+        // This simulates the meter sending SMS warnings based on thresholds
+        setInterval(() => {
+            const pct = (state.remainingUnits / state.totalCapacity) * 100;
+            if (state.mode === 'prepaid' && state.remainingUnits <= 100 && state.remainingUnits > 0) {
+                console.log(`📱 SMS: Warning - Low units (${Math.round(state.remainingUnits)}L remaining).`);
+            }
+            if (state.mode === 'periodic' && state.remainingUnits <= 200 && state.remainingUnits > 0) {
+                console.log(`📱 SMS: Periodic - 2 days or less remaining. Please pay.`);
+            }
+            if (state.mode === 'service' && state.remainingUnits <= 50 && state.remainingUnits > 0) {
+                console.log(`📱 SMS: Service - Less than 24 hours remaining.`);
+            }
+        }, 30000); // Check every 30 seconds (simulated)
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        updateUI();
+
+        // Simulate real-time consumption (slow drip)
+        setInterval(() => {
+            if (state.remainingUnits > 0) {
+                state.remainingUnits = Math.max(0, state.remainingUnits - 0.1);
+                state.todayUsage = Math.round(state.todayUsage + 0.1);
+                updateUI();
+            }
+        }, 5000);
+
+        // Simulate weekly data update (randomize graph slightly)
+        setInterval(() => {
+            state.weeklyData = state.weeklyData.map(v => Math.max(10, v + (Math.random() - 0.5) * 20));
+            renderGraph();
+        }, 60000);
+
+        console.log('🚀 GetCAD Water Meter App initialized.');
+        console.log('📱 Customer:', state.customerName, state.phoneNumber);
+        console.log('🔧 Mode:', state.mode, '| Units:', Math.round(state.remainingUnits));
+        console.log('💡 SMS warnings will trigger at thresholds based on mode.');
+    </script>
+
+</body>
+</html>

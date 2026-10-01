@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#00bcd4" />
+<meta name="description" content="AquaCtrl — Smart Water Level & Pump Controller with Bluetooth app, dual-tank monitoring, and safe automatic operation." />
+<title>AquaCtrl — Smart Water Level & Pump Controller</title>
+<style>
+/* ============================================================
+   ROOT — same palette as the mobile app
+   ============================================================ */
+:root{
+  --cyan:        #00bcd4;
+  --cyan-dark:   #0097a7;
+  --cyan-light:  #4dd0e1;
+  --bg:          #ffffff;
+  --bg-soft:     #f5f7fa;
+  --line:        #e2e8f0;
+  --text:        #0f1720;
+  --text-dim:    #64748b;
+  --text-soft:   #94a3b8;
+  --green:       #22c55e;
+  --red:         #ef4444;
+  --orange:      #f59e0b;
+  --yellow:      #eab308;
+
+  --radius-lg:   22px;
+  --radius-md:   16px;
+  --radius-sm:   10px;
+
+  --shadow-sm:   0 2px 8px rgba(15,23,32,.06);
+  --shadow-md:   0 6px 20px rgba(15,23,32,.08);
+  --shadow-lg:   0 18px 50px rgba(15,23,32,.14);
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+img{ max-width:100%; display:block; }
+button{ font-family:inherit; cursor:pointer; }
+a{ color:var(--cyan-dark); }
+
+/* ============================================================
+   HEADER / NAV
+   ============================================================ */
+header.site-header{
+  position:sticky; top:0; z-index:80;
+  background:linear-gradient(135deg,var(--cyan) 0%, var(--cyan-dark) 100%);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(0,188,212,.25);
+}
+.header-inner{
+  max-width:1180px; margin:0 auto;
+  padding:12px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-logo{
+  width:38px; height:38px; border-radius:12px;
+  background:rgba(255,255,255,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px;
+  flex-shrink:0;
+}
+.brand-text{ line-height:1.15; }
+.brand-title{ font-size:16px; font-weight:800; letter-spacing:.3px; }
+.brand-sub{ font-size:10.5px; opacity:.9; }
+
+/* Desktop nav */
+nav.main-nav{ display:flex; gap:4px; }
+.nav-link{
+  color:rgba(255,255,255,.85);
+  background:transparent; border:none;
+  padding:9px 16px; border-radius:999px;
+  font-size:13px; font-weight:700; letter-spacing:.3px;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.nav-link:hover{ background:rgba(255,255,255,.15); color:#fff; }
+.nav-link.active{
+  background:rgba(255,255,255,.28);
+  color:#fff;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+
+/* Hamburger button — hidden on desktop */
+.hamburger{
+  display:none;
+  width:42px; height:42px; border-radius:12px;
+  background:rgba(255,255,255,.2);
+  border:none; color:#fff;
+  align-items:center; justify-content:center;
+  cursor:pointer;
+  transition:background .2s;
+  flex-shrink:0;
+}
+.hamburger:active{ background:rgba(255,255,255,.35); }
+.hamburger span{
+  display:block; width:20px; height:2px;
+  background:#fff; border-radius:2px;
+  position:relative;
+  transition:background .2s;
+}
+.hamburger span::before,
+.hamburger span::after{
+  content:""; position:absolute; left:0;
+  width:20px; height:2px; background:#fff; border-radius:2px;
+  transition:transform .25s ease, top .25s ease;
+}
+.hamburger span::before{ top:-6px; }
+.hamburger span::after{ top:6px; }
+
+/* When menu open, morph to X */
+.hamburger.open span{ background:transparent; }
+.hamburger.open span::before{ top:0; transform:rotate(45deg); }
+.hamburger.open span::after{ top:0; transform:rotate(-45deg); }
+
+/* Mobile dropdown menu */
+.mobile-menu{
+  display:none;
+  flex-direction:column;
+  gap:4px;
+  padding:8px 14px 14px;
+  background:linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.12));
+  border-top:1px solid rgba(255,255,255,.2);
+  animation:slideDown .25s ease;
+}
+.mobile-menu.show{ display:flex; }
+@keyframes slideDown{
+  from{ opacity:0; transform:translateY(-8px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+.mobile-menu .nav-link{
+  width:100%;
+  text-align:left;
+  padding:12px 16px;
+  border-radius:10px;
+  font-size:14px;
+  background:rgba(255,255,255,.06);
+}
+.mobile-menu .nav-link.active{ background:rgba(255,255,255,.24); }
+
+/* Responsive toggle */
+@media (max-width:720px){
+  nav.main-nav{ display:none; }
+  .hamburger{ display:flex; }
+  .brand-sub{ display:none; }
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.section{
+  display:none;
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .55s ease, transform .55s ease;
+}
+.section.active{
+  display:block;
+  opacity:1;
+  transform:translateY(0);
+}
+.section-inner{
+  max-width:1180px; margin:0 auto;
+  padding:40px 18px 80px;
+}
+@media (max-width:520px){
+  .section-inner{ padding:28px 16px 60px; }
+}
+
+.section-title{
+  font-size:clamp(25px, 4.8vw, 32px);
+  font-weight:800; letter-spacing:-.4px;
+  margin:0 0 6px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-title .accent{
+  display:inline-block; width:6px; height:22px; border-radius:3px;
+  background:linear-gradient(180deg,var(--cyan),var(--cyan-dark));
+  flex-shrink:0;
+}
+.section-lead{
+  font-size:16px; color:var(--text-dim);
+  margin:0 0 28px; max-width:720px;
+}
+
+/* ============================================================
+   HERO CAROUSEL (center-aligned content)
+   ============================================================ */
+.hero{
+  position:relative;
+  height:min(80vh, 620px);
+  min-height:520px;
+  width:100%;
+  overflow:hidden;
+  background:#0f1720;
+}
+@media (max-width:520px){
+  .hero{ height:70vh; min-height:460px; }
+}
+.hero-slide{
+  position:absolute; inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transition:opacity 1.6s ease;
+}
+.hero-slide.active{ opacity:1; }
+.hero-slide::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(15,23,32,.35) 0%, rgba(15,23,32,.78) 100%);
+}
+
+.hero-content{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center;                 /* center aligned */
+  z-index:2;
+  color:#fff;
+  padding:20px;
+}
+.hero-inner{
+  max-width:820px; margin:0 auto;
+  width:100%;
+  display:flex; flex-direction:column; align-items:center;
+}
+.hero-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(0,188,212,.9);
+  padding:6px 14px; border-radius:999px;
+  font-size:11.5px; font-weight:800; letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+  box-shadow:0 6px 20px rgba(0,188,212,.4);
+}
+.hero-title{
+  font-size:clamp(30px, 5.8vw, 60px);
+  font-weight:950; letter-spacing:-1px;
+  margin:0 0 14px;
+  line-height:1.1;
+  text-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.hero-title span{ color:var(--cyan-light); }
+.hero-sub{
+  font-size:clamp(18px, 2.0vw, 20px);
+  max-width:620px; margin:0 auto 26px;
+  color:rgba(255,255,255,.94);
+  text-shadow:0 2px 12px rgba(0,0,0,.5);
+}
+.hero-actions{
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+}
+
+.hero-arrow{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:46px; height:46px; border-radius:50%;
+  background:rgba(255,255,255,.18);
+  color:#fff; border:1px solid rgba(255,255,255,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; z-index:3;
+  backdrop-filter:blur(8px);
+  transition:background .2s, transform .2s;
+}
+.hero-arrow:hover{ background:rgba(255,255,255,.32); }
+.hero-arrow:active{ transform:translateY(-50%) scale(.94); }
+.hero-arrow.prev{ left:14px; }
+.hero-arrow.next{ right:14px; }
+@media (max-width:520px){
+  .hero-arrow{ width:36px; height:36px; font-size:16px; }
+  .hero-arrow.prev{ left:8px; }
+  .hero-arrow.next{ right:8px; }
+}
+
+.hero-dots{
+  position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+  display:flex; gap:8px; z-index:3;
+}
+.hero-dot{
+  width:9px; height:9px; border-radius:50%;
+  background:rgba(255,255,255,.45);
+  cursor:pointer; transition:all .25s;
+}
+.hero-dot.active{
+  background:#fff;
+  width:26px; border-radius:5px;
+  box-shadow:0 0 14px rgba(255,255,255,.6);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 22px; border-radius:14px; border:none;
+  font-size:13.5px; font-weight:800; letter-spacing:.3px;
+  cursor:pointer; transition:transform .15s, filter .2s, box-shadow .2s;
+  text-decoration:none;
+}
+.btn:active{ transform:scale(.97); }
+.btn-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--cyan-dark));
+  color:#fff; box-shadow:0 8px 24px rgba(0,188,212,.35);
+}
+.btn-primary:hover{ filter:brightness(1.05); }
+.btn-ghost{
+  background:rgba(255,255,255,.14);
+  color:#fff; border:1px solid rgba(255,255,255,.35);
+}
+.btn-ghost:hover{ background:rgba(255,255,255,.25); }
+.btn-outline{
+  background:#fff; color:var(--text);
+  border:1.5px solid var(--line);
+  box-shadow:var(--shadow-sm);
+}
+.btn-outline:hover{ border-color:var(--cyan); color:var(--cyan-dark); }
+.btn-success{
+  background:linear-gradient(135deg,#22c55e,#15803d);
+  color:#fff; box-shadow:0 8px 24px rgba(34,197,94,.35);
+}
+.btn-danger{
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  color:#fff; box-shadow:0 8px 24px rgba(239,68,68,.3);
+}
+.btn-block{ width:100%; }
+.btn-download{
+  min-width:240px; justify-content:flex-start; padding:14px 20px;
+}
+.btn-download .dl-icon{
+  width:34px; height:34px; border-radius:10px;
+  background:rgba(0,188,212,.15); color:var(--cyan-dark);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px;
+  margin-right:6px;
+  flex-shrink:0;
+}
+.btn-download .dl-text{
+  display:flex; flex-direction:column; align-items:flex-start;
+  line-height:1.15; flex:1;
+}
+.btn-download .dl-title{ font-size:13px; font-weight:800; }
+.btn-download .dl-sub{ font-size:10.5px; font-weight:600; color:var(--text-dim); }
+
+/* ============================================================
+   CARDS / GRID
+   ============================================================ */
+.grid{
+  display:grid; gap:18px;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+}
+@media (max-width:520px){
+  .grid{ grid-template-columns:1fr; gap:14px; }
+}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:22px;
+  box-shadow:var(--shadow-sm);
+  transition:transform .25s, box-shadow .25s, border-color .25s;
+}
+.card:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-md);
+  border-color:rgba(0,188,212,.35);
+}
+.card-icon{
+  width:46px; height:46px; border-radius:14px;
+  background:linear-gradient(135deg, rgba(0,188,212,.15), rgba(0,188,212,.06));
+  color:var(--cyan-dark);
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px;
+  margin-bottom:14px;
+}
+.card h3{ margin:0 0 8px; font-size:16px; font-weight:800; }
+.card p{ margin:0; font-size:13.5px; color:var(--text-dim); }
+
+.feature-list{ padding-left:0; list-style:none; margin:0; }
+.feature-list li{
+  padding:8px 0 8px 26px;
+  position:relative;
+  font-size:16px; color:var(--text);
+  border-bottom:1px dashed var(--line);
+}
+.feature-list li:last-child{ border-bottom:none; }
+.feature-list li::before{
+  content:"✓";
+  position:absolute; left:0; top:8px;
+  width:18px; height:18px; border-radius:50%;
+  background:rgba(34,197,94,.15); color:var(--green);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:900;
+}
+
+/* Specs table — responsive stack on mobile */
+.specs-wrap{ overflow-x:auto; border-radius:var(--radius-md); }
+.specs{
+  width:100%;
+  border-collapse:collapse;
+  font-size:18px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+.specs th, .specs td{
+  text-align:left;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line);
+}
+.specs th{
+  background:var(--bg-soft);
+  font-size:15px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.8px;
+  color:var(--text-dim);
+  width:42%;
+}
+.specs tr:last-child td, .specs tr:last-child th{ border-bottom:none; }
+
+@media (max-width:520px){
+  .specs th, .specs td{ padding:10px 12px; font-size:12px; }
+  .specs th{ width:50%; font-size:10.5px; }
+}
+
+/* Download panel */
+.download-panel{
+  margin-top:32px;
+  padding:24px;
+  background:linear-gradient(135deg, rgba(0,188,212,.08), rgba(0,188,212,.02));
+  border:1px solid rgba(0,188,212,.25);
+  border-radius:var(--radius-lg);
+  display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;
+}
+.download-panel .dp-text{ flex:1; min-width:220px; }
+.download-panel h3{ margin:0 0 4px; font-size:17px; font-weight:800; }
+.download-panel p{ margin:0; font-size:13px; color:var(--text-dim); }
+.download-actions{ display:flex; gap:12px; flex-wrap:wrap; }
+@media (max-width:520px){
+  .download-panel{ padding:18px; }
+  .download-actions{ width:100%; }
+  .btn-download{ min-width:0; width:100%; }
+}
+
+/* ============================================================
+   BUY SECTION
+   ============================================================ */
+.buy-hero{
+  text-align:center;
+  padding:30px 10px 10px;
+}
+.buy-price{
+  font-size:clamp(48px, 10vw, 84px);
+  font-weight:900; letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--cyan),var(--cyan-dark));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  line-height:1;
+  margin:8px 0 4px;
+}
+.buy-price small{
+  font-size:20px; font-weight:700;
+  color:var(--text-dim);
+  -webkit-text-fill-color:var(--text-dim);
+  letter-spacing:0;
+  margin-left:4px;
+}
+.buy-note{ font-size:12.5px; color:var(--text-dim); margin-bottom:22px; }
+
+.buy-features{
+  display:grid; gap:14px;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  margin:26px 0;
+}
+@media (max-width:520px){
+  .buy-features{ grid-template-columns:1fr; gap:10px; }
+}
+.buy-feature{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:16px;
+  box-shadow:var(--shadow-sm);
+  display:flex; align-items:flex-start; gap:12px;
+}
+.buy-feature .bf-icon{
+  width:36px; height:36px; border-radius:11px; flex-shrink:0;
+  background:rgba(0,188,212,.14); color:var(--cyan-dark);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.buy-feature .bf-title{ font-size:13.5px; font-weight:800; }
+.buy-feature .bf-sub{ font-size:11.5px; color:var(--text-dim); }
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-overlay{
+  position:fixed; inset:0; z-index:200;
+  background:rgba(15,23,32,.55);
+  backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  opacity:0; pointer-events:none;
+  transition:opacity .28s ease;
+}
+.modal-overlay.show{ opacity:1; pointer-events:auto; }
+
+.modal{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  width:100%; max-width:520px;
+  max-height:92vh;
+  overflow-y:auto;
+  padding:24px;
+  box-shadow:var(--shadow-lg);
+  transform:translateY(16px) scale(.97);
+  transition:transform .32s cubic-bezier(.2,.9,.3,1.1);
+  position:relative;
+}
+.modal-overlay.show .modal{ transform:translateY(0) scale(1); }
+@media (max-width:520px){
+  .modal{ padding:20px; border-radius:18px; }
+}
+
+.modal-header{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  margin-bottom:16px;
+  gap:10px;
+}
+.modal-title{ font-size:19px; font-weight:900; letter-spacing:-.3px; margin:0; }
+.modal-sub{ font-size:12.5px; color:var(--text-dim); margin:3px 0 0; }
+.modal-close{
+  width:34px; height:34px; border-radius:50%;
+  background:var(--bg-soft); border:none;
+  font-size:24px; color:var(--text-dim);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background .2s;
+  flex-shrink:0;
+}
+.modal-close:hover{ background:#e2e8f0; color:var(--text); }
+
+/* Forms */
+.form-row{ margin-bottom:14px; }
+.form-row label{
+  display:block; font-size:15px; font-weight:800;
+  color:var(--text-dim);
+  text-transform:uppercase; letter-spacing:.8px;
+  margin-bottom:6px;
+}
+.form-row input, .form-row textarea, .form-row select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  font-size:22px; font-family:inherit;
+  color:var(--text);
+  transition:border-color .2s, box-shadow .2s;
+}
+.form-row input:focus, .form-row textarea:focus, .form-row select:focus{
+  outline:none;
+  border-color:var(--cyan);
+  box-shadow:0 0 0 4px rgba(0,188,212,.15);
+}
+.form-row textarea{ min-height:76px; resize:vertical; }
+.form-row small{ display:block; font-size:11px; color:var(--text-soft); margin-top:4px; }
+
+/* Mobile money options */
+.momo-grid{ display:grid; gap:12px; margin:8px 0 18px; }
+.momo-option{
+  display:flex; align-items:center; gap:14px;
+  padding:16px;
+  border:1.5px solid var(--line);
+  border-radius:var(--radius-md);
+  background:#fff;
+  cursor:pointer;
+  transition:all .2s;
+}
+.momo-option:hover{
+  border-color:var(--cyan);
+  background:rgba(0,188,212,.04);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-sm);
+}
+.momo-option[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
+.momo-logo{
+  width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; color:#fff;
+  flex-shrink:0;
+  font-weight:900;
+}
+.momo-logo.airtel{ background:linear-gradient(135deg,#ef4444,#b91c1c); }
+.momo-logo.mtn{    background:linear-gradient(135deg,#eab308,#ca8a04); }
+.momo-logo.zamtel{ background:linear-gradient(135deg,#22c55e,#15803d); }
+.momo-info{ flex:1; }
+.momo-name{ font-size:14px; font-weight:800; }
+.momo-sub{ font-size:11.5px; color:var(--text-dim); }
+
+/* Status messages */
+.status-msg{
+  display:none;
+  padding:12px 16px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:700;
+  margin:12px 0;
+  align-items:center; gap:10px;
+}
+.status-msg.show{ display:flex; }
+.status-msg.info{ background:rgba(0,188,212,.1); color:var(--cyan-dark); }
+.status-msg.success{ background:rgba(34,197,94,.12); color:#15803d; }
+.status-msg.error{ background:rgba(239,68,68,.12); color:#b91c1c; }
+.spinner{
+  width:16px; height:16px; border-radius:50%;
+  border:2px solid currentColor; border-right-color:transparent;
+  animation:spin .8s linear infinite;
+  flex-shrink:0;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* Summary card */
+.summary-card{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:14px 16px;
+  margin:14px 0;
+  font-size:15px;
+}
+.summary-card .row{
+  display:flex; justify-content:space-between; gap:12px;
+  padding:6px 0;
+  border-bottom:1px dashed var(--line);
+}
+.summary-card .row:last-child{ border-bottom:none; }
+.summary-card .row span:first-child{ color:var(--text-dim); font-weight:600; }
+.summary-card .row span:last-child{ color:var(--text); font-weight:800; text-align:right; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer.site-footer{
+  background:#0f1720;
+  color:#cbd5e1;
+  padding:44px 18px 26px;
+  margin-top:0;
+}
+.footer-inner{
+  max-width:1180px; margin:0 auto;
+  display:grid; gap:28px;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+}
+@media (max-width:520px){
+  footer.site-footer{ padding:32px 16px 22px; }
+  .footer-inner{ gap:22px; }
+}
+.footer-col h4{
+  font-size:18px; font-weight:800; color:#fff;
+  text-transform:uppercase; letter-spacing:1px;
+  margin:0 0 12px;
+}
+.footer-col p, .footer-col li{
+  font-size:20px; color:#94a3b8; margin:0 0 8px;
+}
+.footer-col ul{ list-style:none; padding:0; margin:0; }
+.footer-col a{ color:#94a3b8; text-decoration:none; transition:color .2s; cursor:pointer; }
+.footer-col a:hover{ color:var(--cyan-light); }
+.footer-brand{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.footer-brand .brand-logo{ background:rgba(0,188,212,.2); }
+.footer-brand .brand-title{ color:#fff; }
+
+.footer-bottom{
+  max-width:1180px; margin:28px auto 0;
+  padding-top:20px;
+  border-top:1px solid rgba(255,255,255,.08);
+  font-size:16px; color:#64748b;
+  display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between;
+}
+.footer-contact-row{
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:8px; font-size:13px; color:#94a3b8;
+}
+.footer-contact-row .ic{
+  width:28px; height:28px; border-radius:9px;
+  background:rgba(0,188,212,.15); color:var(--cyan-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast{
+  position:fixed; bottom:26px; left:50%;
+  transform:translateX(-50%) translateY(30px);
+  background:rgba(15,23,32,.96); color:#fff;
+  padding:12px 20px; border-radius:14px;
+  font-size:20px; font-weight:600;
+  border:1px solid rgba(0,188,212,.35);
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+  opacity:0; pointer-events:none;
+  transition:all .35s ease;
+  z-index:400; max-width:92vw; text-align:center;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.success{ border-color:rgba(34,197,94,.5); }
+.toast.error{ border-color:rgba(239,68,68,.5); }
+
+/* Fade-up animation for revealing content */
+.fade-up{
+  opacity:0; transform:translateY(16px);
+  animation:fadeUp .7s ease forwards;
+}
+@keyframes fadeUp{ to{ opacity:1; transform:translateY(0); } }
+.d-1{ animation-delay:.08s; }
+.d-2{ animation-delay:.16s; }
+.d-3{ animation-delay:.24s; }
+.d-4{ animation-delay:.32s; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">💧</div>
+      <div class="brand-text">
+        <div class="brand-title">AquaCtrl</div>
+        <div class="brand-sub">Smart Water Level & Pump Controller
+          <p>By GetCAD Technologies Ltd.</p></div>
+      </div>
+    </div>
+
+    <!-- Desktop nav -->
+    <nav class="main-nav" id="desktopNav">
+      <button class="nav-link active" data-tab="home">Home</button>
+      <button class="nav-link" data-tab="about">About</button>
+      <button class="nav-link" data-tab="buy">Buy</button>
+    </nav>
+
+    <!-- Hamburger (mobile only) -->
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span>
+    </button>
+  </div>
+
+  <!-- Mobile dropdown menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="nav-link active" data-tab="home">Home</button>
+    <button class="nav-link" data-tab="about">About</button>
+    <button class="nav-link" data-tab="buy">Buy</button>
+  </div>
+</header>
+
+<!-- ============================================================
+     HOME / HERO CAROUSEL
+     ============================================================ -->
+<section class="section active" id="tab-home">
+
+  <div class="hero" id="hero">
+    <div class="hero-slide active" style="background-image:url('items/pic1.jpg')"></div>
+    <div class="hero-slide"        style="background-image:url('items/pic2.jpg')"></div>
+    <div class="hero-slide"        style="background-image:url('items/pic3.jpg')"></div>
+    <div class="hero-slide"        style="background-image:url('items/pic4.jpg')"></div>
+
+    <button class="hero-arrow prev" id="heroPrev" aria-label="Previous">‹</button>
+    <button class="hero-arrow next" id="heroNext" aria-label="Next">›</button>
+
+    <div class="hero-content">
+      <div class="hero-inner">
+        <div class="hero-badge">💧 New · Bluetooth Enabled</div>
+        <h1 class="hero-title">
+          Never run out of water.<br>
+          Never <span>overflow a tank.</span>
+        </h1>
+        <p class="hero-sub">
+          AquaCtrl watches two tanks at once, runs your pumps only when needed,
+          and lets you monitor everything from your phone — anywhere in the house.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-goto="buy">Buy Now →</button>
+          <button class="btn btn-ghost" data-goto="about">Learn More</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-dots" id="heroDots">
+      <div class="hero-dot active" data-i="0"></div>
+      <div class="hero-dot" data-i="1"></div>
+      <div class="hero-dot" data-i="2"></div>
+      <div class="hero-dot" data-i="3"></div>
+    </div>
+  </div>
+
+  <div class="section-inner">
+    <h2 class="section-title fade-up"><span class="accent"></span>Why AquaCtrl?</h2>
+    <p class="section-lead fade-up d-1">
+      A single controller that replaces guesswork with automation. Works with any
+      tank, any pump, and any budget.
+    </p>
+
+    <div class="grid">
+      <div class="card fade-up d-1">
+        <div class="card-icon">💧</div>
+        <h3>Dual Tank Monitoring</h3>
+        <p>Float switch for one tank and ultrasonic sensor for another — both
+           running at the same time, independently.</p>
+      </div>
+      <div class="card fade-up d-2">
+        <div class="card-icon">🔵</div>
+        <h3>Bluetooth App</h3>
+        <p>Watch water levels live from your phone, switch modes, force pumps,
+           and change tank sizes — no wiring changes needed.</p>
+      </div>
+      <div class="card fade-up d-3">
+        <div class="card-icon">⚙️</div>
+        <h3>Auto &amp; Manual Modes</h3>
+        <p>Let the controller decide when to pump — or take over with a single
+           tap when you want full control.</p>
+      </div>
+      <div class="card fade-up d-4">
+        <div class="card-icon">🛡️</div>
+        <h3>Safe &amp; Reliable</h3>
+        <p>Built-in hysteresis, fan cooling, fault detection, and level-based
+           shutdown prevent overflow and dry-run damage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section class="section" id="tab-about">
+  <div class="section-inner">
+    <h2 class="section-title"><span class="accent"></span>About AquaCtrl</h2>
+    <p class="section-lead">
+      AquaCtrl is a compact, microcontroller-based water management device that
+      automatically controls up to two water pumps based on real-time tank levels.
+      It combines a traditional float switch with a non-contact ultrasonic sensor,
+      giving you the flexibility to monitor two different tanks simultaneously.
+    </p>
+
+    <h3 class="section-title" style="font-size:19px; margin-top:36px;">
+      <span class="accent"></span>How It Works
+    </h3>
+    <div class="grid" style="margin-top:16px;">
+      <div class="card">
+        <div class="card-icon">1️⃣</div>
+        <h3>Sensor Input</h3>
+        <p>The float switch detects high/low water via a mechanical contact.
+           The ultrasonic sensor measures distance to the water surface in
+           centimetres.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">2️⃣</div>
+        <h3>Smart Decision</h3>
+        <p>The microcontroller converts readings into a water percentage
+           (based on your chosen tank size) and decides whether to turn the
+           pump ON or OFF.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">3️⃣</div>
+        <h3>Relay Output</h3>
+        <p>The relay switches the pump's mains supply safely, protecting the
+           low-voltage electronics from high-current loads.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">4️⃣</div>
+        <h3>Wireless Monitor</h3>
+        <p>The onboard Bluetooth module streams status to your phone in
+           real time and receives commands from the app.</p>
+      </div>
+    </div>
+
+    <h3 class="section-title" style="font-size:19px; margin-top:44px;">
+      <span class="accent"></span>Hardware Design
+    </h3>
+    <div class="grid" style="margin-top:16px;">
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <h3>Microcontroller</h3>
+        <p>ATmega16U4 running at 8 MHz — plenty of I/O, ADC channels for
+           analog sensors, and a built-in USB interface for firmware updates.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📡</div>
+        <h3>Bluetooth Module</h3>
+        <p>KT6368A BLE 5.0 module on UART at 115200 baud. Bridges the
+           controller to the AquaCtrl mobile app over a secure paired link.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌊</div>
+        <h3>Inputs</h3>
+        <p>Float switch (NO + NC contacts) and HC-SR04 ultrasonic sensor.
+           Analog filtering with pull-downs and capacitors removes noise.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔌</div>
+        <h3>Outputs</h3>
+        <p>Two relays rated for mains pump loads, plus a small cooling fan
+           driven by temperature sensor readings.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌡️</div>
+        <h3>Temperature Safety</h3>
+        <p>A TMP35 sensor monitors the enclosure temperature. If it exceeds
+           45 °C, the fan kicks in automatically.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Power</h3>
+        <p>Input: 7–12 V DC via jack or AC adapter. Regulated 5 V rail for
+           the MCU and sensors using an LM1117DT.</p>
+      </div>
+    </div>
+
+    <h3 class="section-title" style="font-size:19px; margin-top:44px;">
+      <span class="accent"></span>Technical Specifications
+    </h3>
+    <div class="specs-wrap" style="margin-top:16px;">
+      <table class="specs">
+        <tr><th>Microcontroller</th><td>ATmega16U4 @ 8 MHz</td></tr>
+        <tr><th>Bluetooth</th><td>KT6368A · BLE 5.0 · 115200 baud</td></tr>
+        <tr><th>Inputs</th><td>Float switch + HC-SR04 ultrasonic</td></tr>
+        <tr><th>Outputs</th><td>2 × SPST relay (10 A @ 250 VAC) + fan</td></tr>
+        <tr><th>Tank capacities</th><td>500 L · 1,000 L · 2,000 L · 5,000 L · 10,000 L · 20,000 L</td></tr>
+        <tr><th>Ultrasonic range</th><td>2 cm – 400 cm (±3 mm)</td></tr>
+        <tr><th>Temperature sensor</th><td>TMP35 (10 mV/°C)</td></tr>
+        <tr><th>Supply voltage</th><td>7–12 V DC</td></tr>
+        <tr><th>Operating temperature</th><td>0 °C – 60 °C</td></tr>
+        <tr><th>Bluetooth range</th><td>~10 m indoors</td></tr>
+      </table>
+    </div>
+
+    <h3 class="section-title" style="font-size:19px; margin-top:44px;">
+      <span class="accent"></span>Wireless Connection to the App
+    </h3>
+    <p class="section-lead" style="margin-top:12px;">
+      Pair your phone with the controller once and control everything from the
+      <strong><a style="color: rgb(43, 111, 189); text-decoration: none;" href="app-index.html">AquaCtrl mobile app:</strong></a>
+    </p>
+    <ul class="feature-list" style="max-width:720px;">
+      <li>Live water level percentages for both tanks</li>
+      <li>Colour-coded tank fills (red → orange → yellow → green)</li>
+      <li>Switch between <b>AUTO</b> and <b>MANUAL</b> modes remotely</li>
+      <li>Force any pump ON or OFF with one tap</li>
+      <li>Change the target tank size for the ultrasonic sensor</li>
+      <li>Monitor pump status, fan status, and temperature</li>
+      <li>Full communication log for troubleshooting</li>
+    </ul>
+
+    <div class="download-panel">
+      <div class="dp-text">
+        <h3>Get Started</h3>
+        <p>Download the user guide or install the mobile app to begin.</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn btn-outline btn-download" href="items/user-guide.pdf" download>
+          <span class="dl-icon">📄</span>
+          <span class="dl-text">
+            <span class="dl-title">User Guide</span>
+            <span class="dl-sub">PDF · ~2 MB</span>
+          </span>
+        </a>
+        <a class="btn btn-primary btn-download" href="items/AquaCtrl.apk" download>
+          <span class="dl-icon" style="background:rgba(255,255,255,.22); color:#fff;">📱</span>
+          <span class="dl-text">
+            <span class="dl-title" style="color:#fff;">Download APK</span>
+            <span class="dl-sub" style="color:rgba(255,255,255,.85);">Android · Free</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BUY
+     ============================================================ -->
+<section class="section" id="tab-buy">
+  <div class="section-inner">
+    <div class="buy-hero">
+      <div class="hero-badge" style="background:linear-gradient(135deg,var(--cyan),var(--cyan-dark)); margin:0 auto 16px;">
+        💧 AquaCtrl Controller
+      </div>
+      <div class="buy-price">K1,250<small>ZMW</small></div>
+      <div class="buy-note">Includes controller unit, float switch, ultrasonic sensor, and mobile app.</div>
+      <button class="btn btn-primary" id="buyNowBtn" style="padding:16px 40px; font-size:15px;">
+        Buy Now →
+      </button>
+    </div>
+
+    <div class="buy-features">
+      <div class="buy-feature">
+        <div class="bf-icon">✅</div>
+        <div>
+          <div class="bf-title">Dual-Tank Ready</div>
+          <div class="bf-sub">Float switch + ultrasonic in one device</div>
+        </div>
+      </div>
+      <div class="buy-feature">
+        <div class="bf-icon">📱</div>
+        <div>
+          <div class="bf-title">Bluetooth App</div>
+          <div class="bf-sub">Monitor and control from your phone</div>
+        </div>
+      </div>
+      <div class="buy-feature">
+        <div class="bf-icon">🚚</div>
+        <div>
+          <div class="bf-title">Free Delivery</div>
+          <div class="bf-sub">Within Lusaka &amp; Copperbelt</div>
+        </div>
+      </div>
+      <div class="buy-feature">
+        <div class="bf-icon">🛡️</div>
+        <div>
+          <div class="bf-title">12-Month Warranty</div>
+          <div class="bf-sub">Against manufacturing defects</div>
+        </div>
+      </div>
+      <div class="buy-feature">
+        <div class="bf-icon">🔧</div>
+        <div>
+          <div class="bf-title">Installation Support</div>
+          <div class="bf-sub">Guidance by phone or WhatsApp</div>
+        </div>
+      </div>
+      <div class="buy-feature">
+        <div class="bf-icon">💰</div>
+        <div>
+          <div class="bf-title">Mobile Money</div>
+          <div class="bf-sub">Airtel · MTN · Zamtel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="footer-brand">
+        <div class="brand-logo">💧</div>
+        <div class="brand-title">AquaCtrl</div></div>
+        <div class="brand-sub">GetCAD Technologies Ltd</div>
+      <p>Smart water level and pump control for homes, farms, and small businesses across Zambia.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <div class="footer-contact-row"><span class="ic">📞</span> +260 973 388 699</div>
+      <div class="footer-contact-row"><span class="ic">✉️</span> sales@aquactrl.zm</div>
+      <div class="footer-contact-row"><span class="ic">📍</span> Lusaka, Zambia</div>
+      <div class="footer-contact-row"><span class="ic">💬</span> WhatsApp: +260 973 388 699</div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a data-goto="home">Home</a></li>
+        <li><a data-goto="about">About the Device</a></li>
+        <li><a data-goto="buy">Buy Now</a></li>
+        <li><a href="items/user-guide.pdf" download>User Guide (PDF)</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Business Hours</h4>
+      <p>Monday – Friday: 08:00 – 18:00</p>
+      <p>Saturday: 09:00 – 14:00</p>
+      <p>Sunday: Closed</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© <span id="year"></span> AquaCtrl. All rights reserved.</span>
+    <span>Made in Zambia · Powered by innovation 💡</span>
+  </div>
+</footer>
+
+<!-- ============================================================
+     MODAL: BUYER DETAILS
+     ============================================================ -->
+<div class="modal-overlay" id="detailsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Delivery Details</h3>
+        <p class="modal-sub">Tell us where to send your AquaCtrl</p>
+      </div>
+      <button class="modal-close" data-close="detailsModal" aria-label="Close">×</button>
+    </div>
+
+    <form id="detailsForm" novalidate>
+      <div class="form-row">
+        <label for="dName">Full Name *</label>
+        <input type="text" id="dName" required placeholder="e.g. Chanda Mwale" />
+      </div>
+      <div class="form-row">
+        <label for="dAddress">Physical Address / Location *</label>
+        <textarea id="dAddress" required placeholder="e.g. Plot 42, Kabulonga Road, near ABC Filling Station"></textarea>
+      </div>
+      <div class="form-row">
+        <label for="dTown">Town / District *</label>
+        <input type="text" id="dTown" required placeholder="e.g. Lusaka" />
+      </div>
+      <div class="form-row">
+        <label for="dPhone">Phone Number *</label>
+        <input type="tel" id="dPhone" required placeholder="e.g. 0971234567" />
+        <small>This will be used for Mobile Money payment confirmation.</small>
+      </div>
+      <div class="form-row">
+        <label for="dEmail">Email (optional)</label>
+        <input type="email" id="dEmail" placeholder="you@example.com" />
+      </div>
+
+      <div class="status-msg" id="detailsStatus"></div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">
+        Proceed to Payment →
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: PAYMENT METHOD
+     ============================================================ -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Choose Payment Method</h3>
+        <p class="modal-sub">Pay securely with Mobile Money</p>
+      </div>
+      <button class="modal-close" data-close="paymentModal" aria-label="Close">×</button>
+    </div>
+
+    <div class="summary-card">
+      <div class="row"><span>Item</span><span>AquaCtrl Controller</span></div>
+      <div class="row"><span>Quantity</span><span>1</span></div>
+      <div class="row"><span>Delivery</span><span>Free</span></div>
+      <div class="row"><span>Total</span><span style="color:var(--cyan-dark); font-size:15px;">K 1,250.00</span></div>
+    </div>
+
+    <div class="momo-grid">
+      <div class="momo-option" data-momo="airtel">
+        <div class="momo-logo airtel">A</div>
+        <div class="momo-info">
+          <div class="momo-name">Airtel Money</div>
+          <div class="momo-sub">Pay from your Airtel Mobile Money wallet</div>
+        </div>
+        <span style="color:var(--text-soft); font-size:20px;">›</span>
+      </div>
+
+      <div class="momo-option" data-momo="mtn">
+        <div class="momo-logo mtn">M</div>
+        <div class="momo-info">
+          <div class="momo-name">MTN Mobile Money</div>
+          <div class="momo-sub">Pay from your MTN MoMo wallet</div>
+        </div>
+        <span style="color:var(--text-soft); font-size:20px;">›</span>
+      </div>
+
+      <div class="momo-option" data-momo="zamtel">
+        <div class="momo-logo zamtel">Z</div>
+        <div class="momo-info">
+          <div class="momo-name">Zamtel Kwacha</div>
+          <div class="momo-sub">Pay from your Zamtel Money wallet</div>
+        </div>
+        <span style="color:var(--text-soft); font-size:20px;">›</span>
+      </div>
+    </div>
+
+    <div class="status-msg" id="paymentStatus"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIG — replace email with your real one
+   ============================================================ */
+const CONFIG = {
+  businessEmail: "sales@aquactrl.zm",
+  businessPhone: "+260970000000",
+  priceZMW: 1250,
+  /* FormSubmit forwards the order to your inbox. First submission
+     triggers a one-time confirmation email to the address above. */
+  formsubmitUrl: "https://formsubmit.co/ajax/sales@aquactrl.zm",
+  /* Set paymentApiUrl to your aggregator's collect endpoint when ready */
+  paymentApiUrl: null,
+  simulatePayments: true,
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+function showToast(msg, kind = ""){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = "toast " + kind;
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+/* ============================================================
+   TAB / SECTION NAVIGATION
+   ------------------------------------------------------------
+   Each .section has display:none by default and only the
+   active one is shown. Clicking any nav-link (desktop, mobile,
+   or footer) switches to that section cleanly.
+   ============================================================ */
+function switchTab(name){
+  /* Hide all sections, then reveal the target */
+  $$(".section").forEach(s => s.classList.remove("active"));
+  const target = document.getElementById("tab-" + name);
+  if (target) {
+    target.classList.add("active");
+  }
+
+  /* Sync every nav-link that has data-tab */
+  $$('.nav-link[data-tab]').forEach(link => {
+    link.classList.toggle("active", link.dataset.tab === name);
+  });
+
+  /* Close mobile menu if open */
+  closeMobileMenu();
+
+  /* Scroll to top */
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* Wire every nav-link (desktop + mobile) */
+$$('.nav-link[data-tab]').forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+/* Wire every data-goto (hero buttons, footer links) */
+$$('[data-goto]').forEach(el => {
+  el.addEventListener("click", (e) => {
+    e.preventDefault();
+    switchTab(el.dataset.goto);
+  });
+});
+
+/* ============================================================
+   HAMBURGER MENU
+   ============================================================ */
+const hamburger  = $("#hamburger");
+const mobileMenu = $("#mobileMenu");
+
+function openMobileMenu(){
+  mobileMenu.classList.add("show");
+  hamburger.classList.add("open");
+}
+function closeMobileMenu(){
+  mobileMenu.classList.remove("show");
+  hamburger.classList.remove("open");
+}
+
+hamburger.addEventListener("click", () => {
+  if (mobileMenu.classList.contains("show")) closeMobileMenu();
+  else openMobileMenu();
+});
+
+/* Close menu if window resized to desktop */
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 720) closeMobileMenu();
+});
+
+/* ============================================================
+   HERO CAROUSEL (8 s auto-rotate)
+   ============================================================ */
+const heroSlides = $$(".hero-slide");
+const heroDots   = $$(".hero-dot");
+let heroIndex    = 0;
+let heroTimer    = null;
+const HERO_INTERVAL = 8000;
+
+function showHero(i){
+  heroIndex = (i + heroSlides.length) % heroSlides.length;
+  heroSlides.forEach((s, k) => s.classList.toggle("active", k === heroIndex));
+  heroDots.forEach((d, k) => d.classList.toggle("active", k === heroIndex));
+}
+function nextHero(){ showHero(heroIndex + 1); }
+function prevHero(){ showHero(heroIndex - 1); }
+
+function startHeroAuto(){
+  clearInterval(heroTimer);
+  heroTimer = setInterval(nextHero, HERO_INTERVAL);
+}
+function resetHeroAuto(){ startHeroAuto(); }
+
+$("#heroNext").addEventListener("click", () => { nextHero(); resetHeroAuto(); });
+$("#heroPrev").addEventListener("click", () => { prevHero(); resetHeroAuto(); });
+heroDots.forEach(d => {
+  d.addEventListener("click", () => {
+    showHero(Number(d.dataset.i));
+    resetHeroAuto();
+  });
+});
+showHero(0);
+startHeroAuto();
+
+const heroEl = $("#hero");
+heroEl.addEventListener("mouseenter", () => clearInterval(heroTimer));
+heroEl.addEventListener("mouseleave", startHeroAuto);
+
+/* ============================================================
+   MODAL PLUMBING
+   ============================================================ */
+function openModal(id){
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(id){
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+$$("[data-close]").forEach(btn => {
+  btn.addEventListener("click", () => closeModal(btn.dataset.close));
+});
+$$(".modal-overlay").forEach(ov => {
+  ov.addEventListener("click", (e) => {
+    if (e.target === ov) closeModal(ov.id);
+  });
+});
+/* ESC key closes any open modal */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") $$(".modal-overlay.show").forEach(m => closeModal(m.id));
+});
+
+/* ============================================================
+   BUY FLOW — Buy Now → Details → Payment
+   ============================================================ */
+let buyer = { name:"", address:"", town:"", phone:"", email:"" };
+
+/* Buy Now button opens the details modal */
+$("#buyNowBtn").addEventListener("click", () => {
+  openModal("detailsModal");
+});
+
+/* Buyer details form submit */
+$("#detailsForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = $("#detailsStatus");
+
+  const name    = $("#dName").value.trim();
+  const address = $("#dAddress").value.trim();
+  const town    = $("#dTown").value.trim();
+  const phone   = $("#dPhone").value.trim();
+  const email   = $("#dEmail").value.trim();
+
+  if (!name || !address || !town || !phone){
+    status.className = "status-msg error show";
+    status.textContent = "Please fill in all required fields.";
+    return;
+  }
+  if (!/^[0-9+\s-]{9,15}$/.test(phone)){
+    status.className = "status-msg error show";
+    status.textContent = "Please enter a valid phone number.";
+    return;
+  }
+
+  buyer = { name, address, town, phone, email };
+
+  status.className = "status-msg info show";
+  status.innerHTML = '<span class="spinner"></span>Saving your details…';
+
+  setTimeout(() => {
+    status.className = "status-msg success show";
+    status.textContent = "Details saved. Choose a payment method…";
+    setTimeout(() => {
+      closeModal("detailsModal");
+      openModal("paymentModal");
+    }, 600);
+  }, 700);
+});
+
+/* ============================================================
+   PAYMENT FLOW
+   ============================================================ */
+const MOMO_LABELS = {
+  airtel: "Airtel Money",
+  mtn:    "MTN Mobile Money",
+  zamtel: "Zamtel Kwacha",
+};
+
+$$(".momo-option").forEach(opt => {
+  opt.addEventListener("click", () => startPayment(opt.dataset.momo));
+});
+
+function startPayment(provider){
+  const status = $("#paymentStatus");
+  const providerName = MOMO_LABELS[provider] || provider;
+
+  status.className = "status-msg info show";
+  status.innerHTML = `<span class="spinner"></span>Requesting payment via ${providerName}…`;
+  $$(".momo-option").forEach(o => o.setAttribute("disabled","disabled"));
+
+  const reference = "AQ" + Date.now().toString().slice(-8);
+
+  if (CONFIG.paymentApiUrl && !CONFIG.simulatePayments){
+    /* Real API path */
+    fetch(CONFIG.paymentApiUrl, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({
+        provider,
+        phone: buyer.phone,
+        amount: CONFIG.priceZMW,
+        currency: "ZMW",
+        reference,
+        name: buyer.name,
+      })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (!res || !res.paymentId) throw new Error("Payment initiation failed");
+      pollPaymentStatus(res.paymentId, providerName, reference);
+    })
+    .catch(err => {
+      status.className = "status-msg error show";
+      status.textContent = "Payment failed: " + (err.message || err);
+      $$(".momo-option").forEach(o => o.removeAttribute("disabled"));
+    });
+  } else {
+    /* Simulation path — works out of the box */
+    setTimeout(() => {
+      status.className = "status-msg info show";
+      status.innerHTML = `<span class="spinner"></span>Waiting for you to enter your PIN on ${providerName}…`;
+    }, 1200);
+
+    setTimeout(() => {
+      status.className = "status-msg info show";
+      status.innerHTML = `<span class="spinner"></span>Confirming payment…`;
+    }, 4500);
+
+    setTimeout(() => finalizePurchase(providerName, reference), 6200);
+  }
+}
+
+function pollPaymentStatus(paymentId, providerName, reference){
+  const status = $("#paymentStatus");
+  const tick = () => {
+    fetch(CONFIG.paymentApiUrl + "/status/" + paymentId)
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") finalizePurchase(providerName, reference);
+        else if (res.status === "failed"){
+          status.className = "status-msg error show";
+          status.textContent = "Payment was declined or cancelled.";
+          $$(".momo-option").forEach(o => o.removeAttribute("disabled"));
+        } else setTimeout(tick, 2500);
+      })
+      .catch(() => {
+        status.className = "status-msg error show";
+        status.textContent = "Network error while checking payment.";
+        $$(".momo-option").forEach(o => o.removeAttribute("disabled"));
+      });
+  };
+  tick();
+}
+
+function finalizePurchase(providerName, reference){
+  const status = $("#paymentStatus");
+  status.className = "status-msg success show";
+  status.innerHTML = `✅ <b>Payment successful!</b> Reference: ${reference}<br>
+    We received K ${CONFIG.priceZMW.toFixed(2)} via ${providerName}.
+    A confirmation has been sent to ${buyer.email || buyer.phone}.`;
+  showToast("Payment successful! Thank you.", "success");
+
+  /* Send buyer details to your inbox */
+  const payload = {
+    _subject: `New AquaCtrl Order – ${buyer.name}`,
+    _template: "table",
+    _captcha: "false",
+    Name: buyer.name,
+    Address: buyer.address,
+    Town: buyer.town,
+    Phone: buyer.phone,
+    Email: buyer.email || "(not provided)",
+    PaymentMethod: providerName,
+    Reference: reference,
+    Amount: `K ${CONFIG.priceZMW.toFixed(2)} ZMW`,
+    Item: "AquaCtrl Water Level Controller",
+    Timestamp: new Date().toLocaleString(),
+  };
+
+  fetch(CONFIG.formsubmitUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(err => console.warn("Order email failed:", err));
+
+  $$(".momo-option").forEach(o => o.removeAttribute("disabled"));
+  setTimeout(() => closeModal("paymentModal"), 5000);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+$("#year").textContent = new Date().getFullYear();
+
+/* Ensure Home is the visible section on load */
+switchTab("home");
+</script>
+</body>
+</html>
