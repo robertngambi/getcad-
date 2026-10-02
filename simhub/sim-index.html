@@ -38,6 +38,27 @@
         .ncta:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(5,150,105,0.4)}
         .ncta::after{display:none!important}
 
+        /* --- ACTIVE NAV LINK (pop + green) --- */
+        .nlinks a.active-nav {
+            color: var(--p) !important;
+            font-weight: 700;
+            transform: scale(1.07);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s;
+        }
+        .nlinks a.active-nav::after {
+            width: 100% !important;
+            background: var(--pg);
+            height: 3px;
+        }
+        /* mobile active */
+        .mobile-menu a.active-nav {
+            background: var(--bl);
+            color: var(--p) !important;
+            font-weight: 700;
+            padding-left: 22px !important;
+            border-left: 4px solid var(--p);
+        }
+
         /* Hamburger Button */
         .hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;width:48px;height:48px;background:white;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;z-index:1001;padding:0;gap:5px;transition:all 0.3s}
         .hamburger:hover{border-color:var(--p);background:#f0fdf4}
@@ -276,23 +297,20 @@
     <!-- ==================== NAVIGATION ==================== -->
     <nav class="navbar" id="navbar">
         <div class="ncontainer">
-            <a href="#" class="nav-logo" id="logoHome">
+            <a href="#" class="nav-logo" id="logoHome" onclick="navigateTo('home'); return false;">
                 <div class="nlogo-icon"><i class="fas fa-wifi"></i></div>
                 <div class="nlogo-text">Sim<span>Hub</span></div>
             </a>
             
             <!-- Desktop Nav Links -->
             <ul class="nlinks" id="nlinks">
-                <li><a href="#home" onclick="navigateTo('home')">Home</a></li>
-                <li><a href="#problem" onclick="navigateTo('problem')">Problem</a></li>
-                <li><a href="#solution" onclick="navigateTo('solution')">Solution</a></li>
-                <li><a href="#advantages" onclick="navigateTo('advantages')">Advantages</a></li>
-                <li><a href="#specs" onclick="navigateTo('specs')">Models</a></li>
-                <!----<li><a href="#accessories" onclick="navigateTo('accessories')">Shop</a></li>
-                <li><a href="#courses" onclick="navigateTo('courses')">Learn</a></li>
-                <li><a href="#partners" onclick="navigateTo('partners')">Partners</a></li>------hide----->
-                <li><a href="#contact" onclick="navigateTo('contact')">Contact</a></li>
-                <li><a href="#funding" onclick="navigateTo('funding')" class="ncta">Invest</a></li>
+                <li><a href="#home" onclick="navigateTo('home')" data-nav="home">Home</a></li>
+                <li><a href="#problem" onclick="navigateTo('problem')" data-nav="problem">Problem</a></li>
+                <li><a href="#solution" onclick="navigateTo('solution')" data-nav="solution">Solution</a></li>
+                <li><a href="#advantages" onclick="navigateTo('advantages')" data-nav="advantages">Advantages</a></li>
+                <li><a href="#specs" onclick="navigateTo('specs')" data-nav="specs">Models</a></li>
+                <li><a href="#contact" onclick="navigateTo('contact')" data-nav="contact">Contact</a></li>
+                <li><a href="#funding" onclick="navigateTo('funding')" class="ncta" data-nav="funding">Invest</a></li>
             </ul>
             
             <!-- Hamburger Button (Mobile Only) -->
@@ -310,16 +328,13 @@
     <!-- Mobile Menu Panel -->
     <div class="mobile-menu" id="mobileMenu">
         <ul>
-            <li><a href="#home" onclick="navigateTo('home')"><i class="fas fa-home" style="width:22px;margin-right:8px;"></i>Home</a></li>
-            <li><a href="#problem" onclick="navigateTo('problem')"><i class="fas fa-exclamation-triangle" style="width:22px;margin-right:8px;"></i>Problem</a></li>
-            <li><a href="#solution" onclick="navigateTo('solution')"><i class="fas fa-lightbulb" style="width:22px;margin-right:8px;"></i>Solution</a></li>
-            <li><a href="#advantages" onclick="navigateTo('advantages')"><i class="fas fa-trophy" style="width:22px;margin-right:8px;"></i>Advantages</a></li>
-            <li><a href="#specs" onclick="navigateTo('specs')"><i class="fas fa-microchip" style="width:22px;margin-right:8px;"></i>Models</a></li>
-            <!-----<li><a href="#accessories" onclick="navigateTo('accessories')"><i class="fas fa-shopping-bag" style="width:22px;margin-right:8px;"></i>Shop</a></li>
-            <li><a href="#courses" onclick="navigateTo('courses')"><i class="fas fa-graduation-cap" style="width:22px;margin-right:8px;"></i>Learn</a></li>
-            <li><a href="#partners" onclick="navigateTo('partners')"><i class="fas fa-handshake" style="width:22px;margin-right:8px;"></i>Partners</a></li>-------hide ------>
-            <li><a href="#contact" onclick="navigateTo('contact')"><i class="fas fa-envelope" style="width:22px;margin-right:8px;"></i>Contact</a></li>
-            <li><a href="#funding" onclick="navigateTo('funding')" class="mncta"><i class="fas fa-hand-holding-usd" style="margin-right:6px;"></i>Invest Now</a></li>
+            <li><a href="#home" onclick="navigateTo('home')" data-nav="home"><i class="fas fa-home" style="width:22px;margin-right:8px;"></i>Home</a></li>
+            <li><a href="#problem" onclick="navigateTo('problem')" data-nav="problem"><i class="fas fa-exclamation-triangle" style="width:22px;margin-right:8px;"></i>Problem</a></li>
+            <li><a href="#solution" onclick="navigateTo('solution')" data-nav="solution"><i class="fas fa-lightbulb" style="width:22px;margin-right:8px;"></i>Solution</a></li>
+            <li><a href="#advantages" onclick="navigateTo('advantages')" data-nav="advantages"><i class="fas fa-trophy" style="width:22px;margin-right:8px;"></i>Advantages</a></li>
+            <li><a href="#specs" onclick="navigateTo('specs')" data-nav="specs"><i class="fas fa-microchip" style="width:22px;margin-right:8px;"></i>Models</a></li>
+            <li><a href="#contact" onclick="navigateTo('contact')" data-nav="contact"><i class="fas fa-envelope" style="width:22px;margin-right:8px;"></i>Contact</a></li>
+            <li><a href="#funding" onclick="navigateTo('funding')" class="mncta" data-nav="funding"><i class="fas fa-hand-holding-usd" style="margin-right:6px;"></i>Invest Now</a></li>
         </ul>
     </div>
 
@@ -350,15 +365,15 @@
     <section class="page-section" id="problem-section">
         <div class="scontainer">
             <div class="sheader" data-aos="fade-up"><span class="stag">The Challenge</span><h2>Why SimHub Was Born</h2><p>In a world where staying connected is no longer a luxury but a fundamental necessity, millions of professionals, 
-                entrepreneurs, remote workers, and students face a daily battle against unreliable internet. Network outages, limited hotspot range /mobile data bundles, and the constant frustration of managing multiple SIM cards across 
+                entrepreneurs, remote workers, and students face a daily battle against unreliable internet. Network outages, expensive data bundles, limited hotspot range, and the constant frustration of managing multiple SIM cards across 
                 different devices have become an accepted norm — but it doesn't have to be this way.
-                 Introducing SimHub, a revolutionary multi-SIM MiFi device meticulously engineered from the ground up to solve unique connectivity challenges described above. Born from the innovation labs of <strong style="color: #468dad; text-decoration: none;">GetCAD Technologies Ltd</strong> in Zambia, 
-                 SimHub represents a quantum leap forward in how we think about mobile internet access. Unlike conventional single-SIM hotspots that leave you stranded when your carrier goes down, SimHub intelligently manages more SIM cards simultaneously — that enables a user to switch to have a quick shift to another simcard or network. In some other <a href="#specs" onclick="navigateTo('specs')" style="color: #41ad90; text-decoration: none;"><strong>Simhub Models</strong></a>, 
+                 Introducing SimHub, a revolutionary multi-SIM MiFi device meticulously engineered from the ground up to solve unique connectivity challenges. Born from the innovation labs of GetCAD Technologies Ltd in Zambia, 
+                 SimHub represents a quantum leap forward in how we think about mobile internet access. Unlike conventional single-SIM hotspots that leave you stranded when your carrier goes down, SimHub intelligently manages more SIM cards simultaneously — 
                  automatically switching between networks to ensure you never lose connection during critical moments.</p><p>
                  Millions of African professionals face daily connectivity battles. Network outages, physical SIM swapping, limited hotspot range, and fragmented communications are accepted norms — but they shouldn't be.</p></div>
             
             <div class="g3" data-aos="fade-up">
-                <div class="pcard"><div class="picon"><i class="fas fa-signal"></i></div><h4>Unreliable Single Networks</h4><p>One carrier means every tower outage or congestion event stops your work undone.</p>
+                <div class="pcard"><div class="picon"><i class="fas fa-signal"></i></div><h4>Unreliable Single Networks</h4><p>One carrier means every tower outage or congestion event stops your work cold.</p>
                 <p>The fundamental flaw in modern mobile connectivity is its singular point of failure. 
                    When you rely on one mobile network operator for your internet access, you are essentially placing your entire digital life in the hands of a single infrastructure provider. Network towers go down during power outages — a disturbingly frequent occurrence in many African cities. 
                    Unexpected maintenance windows knock out service for hours without warning. And during peak usage periods, network congestion reduces speeds to unusable levels.
@@ -555,7 +570,7 @@
                     <div class="csocial"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-whatsapp"></i></a></div></div>
                 <div class="ncard">
                     <div class="nicon">📬</div><h3>Stay Updated</h3><p>Join our Newsletter and get product updates and exclusive offers.</p>
-                    <form class="nform" id="newsletterForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                    <form class="nform" id="newsletterForm" action="https://formspree.io/f/xeaowvkd" method="POST">
                         <input type="text" name="fullName" placeholder="Full Name" required>
                         <input type="email" name="email" placeholder="Email" required>
                         <input type="text" name="phone" placeholder="Phone" required>
@@ -605,7 +620,7 @@
     <footer>
         <div class="fcontainer">
             <div class="fbrand">
-                <a href="#" class="nav-logo" onclick="navigateTo('home')"><div class="nlogo-icon"><i class="fas fa-wifi"></i></div><div class="nlogo-text">Sim<span>Hub</span></div></a>
+                <a href="#" class="nav-logo" onclick="navigateTo('home'); return false;"><div class="nlogo-icon"><i class="fas fa-wifi"></i></div><div class="nlogo-text">Sim<span>Hub</span></div></a>
                 <p>A division of <strong>GetCAD Technologies Ltd</strong><br>Revolutionising connectivity across Africa. Designed and built in Lusaka, Zambia.</p>
                 <div class="fsocial"><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-whatsapp"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a></div>
             </div>
@@ -621,7 +636,7 @@
         <div class="modal">
             <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
             <h3>Fund SimHub</h3><p class="modal-subtitle">We'll respond within 24 hours with our pitch deck.</p>
-            <form id="fundingForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <form id="fundingForm" action="https://formspree.io/f/xljdkadz" method="POST">
                 <div class="frow"><div class="fgroup"><label>First Name</label><input type="text" name="firstName" required></div><div class="fgroup"><label>Last Name</label><input type="text" name="lastName" required></div></div>
                 <div class="fgroup"><label>Email</label><input type="email" name="email" required></div>
                 <div class="fgroup"><label>Phone</label><input type="tel" name="phone"></div>
@@ -638,6 +653,18 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({ duration: 700, easing: 'ease-out', once: true, offset: 80 });
+
+        // ==================== ACTIVE NAV LINK MANAGEMENT ====================
+        function setActiveNav(sectionName) {
+            // Remove active class from all nav links (both desktop and mobile)
+            document.querySelectorAll('.nlinks a[data-nav], .mobile-menu a[data-nav]').forEach(function(link) {
+                link.classList.remove('active-nav');
+            });
+            // Add active class to matching links
+            document.querySelectorAll('.nlinks a[data-nav="' + sectionName + '"], .mobile-menu a[data-nav="' + sectionName + '"]').forEach(function(link) {
+                link.classList.add('active-nav');
+            });
+        }
 
         // ==================== NAVIGATION ====================
         function navigateTo(sectionName) {
@@ -664,6 +691,9 @@
             if (window.location.hash !== '#' + sectionName) {
                 history.pushState(null, null, '#' + sectionName);
             }
+
+            // Set active nav link
+            setActiveNav(sectionName);
         }
 
         // ==================== MOBILE MENU ====================
@@ -725,7 +755,8 @@
         // ==================== INITIAL LOAD ====================
         window.addEventListener('load', function() {
             var hash = window.location.hash.replace('#', '');
-            if (hash && document.getElementById(hash + '-section')) {
+            var validSections = ['home', 'problem', 'solution', 'advantages', 'specs', 'contact', 'funding'];
+            if (hash && document.getElementById(hash + '-section') && validSections.includes(hash)) {
                 navigateTo(hash);
             } else {
                 navigateTo('home');
@@ -735,7 +766,8 @@
         // Browser back/forward
         window.addEventListener('popstate', function() {
             var hash = window.location.hash.replace('#', '');
-            if (hash && document.getElementById(hash + '-section')) {
+            var validSections = ['home', 'problem', 'solution', 'advantages', 'specs', 'contact', 'funding'];
+            if (hash && document.getElementById(hash + '-section') && validSections.includes(hash)) {
                 navigateTo(hash);
             } else {
                 navigateTo('home');
@@ -768,7 +800,8 @@
             window.open(link, '_blank');
         }
 
-        console.log('✅ SimHub website ready — Hamburger menu active');
+        console.log('✅ SimHub website ready — Active nav link effect enabled');
     </script>
 </body>
 </html>
+
